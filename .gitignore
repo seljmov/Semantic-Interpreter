@@ -1,0 +1,8 @@
+.idea/
+.vs/
+.vscode/
+cloc.exe
+.editorconfig
+
+*/obj/
+*/bin/
