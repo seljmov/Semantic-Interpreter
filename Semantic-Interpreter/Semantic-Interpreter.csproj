@@ -6,4 +6,8 @@
         <RootNamespace>Semantic_Interpreter</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="Demo" />
+    </ItemGroup>
+
 </Project>
