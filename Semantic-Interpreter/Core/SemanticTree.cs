@@ -17,7 +17,7 @@
             }
             else if (AsChild)
             {
-                InsertOperatorAsChild(newOperator, prevOperator);
+                InsertOperatorAsChild(newOperator, FindOperator(prevOperator));
             }
             else
             {
@@ -27,6 +27,42 @@
             _count++;
         }
 
+        public void TraversalTree()
+        {
+            var index = 0;
+            SemanticOperator curr = Root;
+            SemanticOperator parent = Root;
+            while (index != _count)
+            {
+                curr.Execute();
+                
+                if (curr.Child != null)
+                {
+                    parent = curr;
+                    curr = curr.Child;
+                }
+                else
+                {
+                    if (curr.Next != null)
+                    {
+                        curr = curr.Next;
+                    }
+                    else
+                    {
+                        curr = parent.Next;
+
+                        while (curr == null && !(parent is Beginning))
+                        {
+                            parent = parent.Parent;
+                            curr = parent.Next;
+                        }
+                    }
+                }
+
+                index++;
+            }
+        }
+        
         private SemanticOperator FindOperator(SemanticOperator @operator)
         {
             var index = 0;

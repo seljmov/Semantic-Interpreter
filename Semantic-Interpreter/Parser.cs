@@ -8,7 +8,7 @@ namespace Semantic_Interpreter
         private readonly SemanticTree _tree;
         private readonly string _program;
         private int _pos = 0;
-        private SemanticOperator _lastOperator = null;
+        private SemanticOperator _lastOperator;
 
         public Parser(SemanticTree tree, string program)
         {
@@ -71,21 +71,11 @@ namespace Semantic_Interpreter
             }
 
             _lastOperator = currentOperator;
-
-            // currentOperator = word switch
-            // {
-            //     "module" => new Module("mod"),
-            //     "start" => new Beginning(_lastOperator),
-            //     _ => currentOperator
-            // };
-            //
-            // _tree.InsertOperator(_lastOperator, currentOperator);
-            // _lastOperator = currentOperator;
         }
 
         private char PeekSymbol(int i) => _program[_pos + i];
 
         private static bool IsNormalSymbol(char ch)
-            => !(ch == ' ' || ch == '\r' || ch == '\n');
+            => !(ch == ' ' || ch == '\r' || ch == '\n' || ch == '"' || ch == ';' || ch == '.');
     }
 }

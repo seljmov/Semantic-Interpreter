@@ -17,6 +17,7 @@
         {
             Beginning = beginning;
             Beginning.Parent = this;
+            Child = Beginning;
         }
     }
 }

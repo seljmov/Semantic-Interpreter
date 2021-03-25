@@ -16,7 +16,7 @@ namespace Semantic_Interpreter.Core
 
         public override void Execute()
         {
-            Console.WriteLine(Expression.Eval());
+            Console.WriteLine(Text);
         }
     }
 }

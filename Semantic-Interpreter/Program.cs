@@ -18,6 +18,8 @@ namespace Semantic_Interpreter
             var tree = new SemanticTree();
             var parser = new Parser(tree, program);
             parser.BuildTree();
+            
+            tree.TraversalTree();
         }
     }
 }
