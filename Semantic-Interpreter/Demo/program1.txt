@@ -1,0 +1,5 @@
+﻿module main
+
+start
+    output "Hello world!";
+end main.
