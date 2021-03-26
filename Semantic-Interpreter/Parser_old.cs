@@ -3,14 +3,14 @@ using Semantic_Interpreter.Core;
 
 namespace Semantic_Interpreter
 {
-    public class Parser
+    public class Parser_old
     {
         private readonly SemanticTree _tree;
         private readonly string _program;
         private int _pos = 0;
         private SemanticOperator _lastOperator;
 
-        public Parser(SemanticTree tree, string program)
+        public Parser_old(SemanticTree tree, string program)
         {
             _tree = tree;
             _program = program;
@@ -63,7 +63,7 @@ namespace Semantic_Interpreter
                 }
                 case "output":
                 {
-                    currentOperator = new Output("Hi");
+                    // currentOperator = new Output("Hi");
                     _tree.InsertOperator(_lastOperator, currentOperator, true);
                     break;
                 }

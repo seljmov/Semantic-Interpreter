@@ -1,5 +1,5 @@
 ﻿module main
 
-start
+beginning
     output "Hello world!";
 end main.

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Semantic_Interpreter.Core;
+using Semantic_Interpreter.Parser;
 
 namespace Semantic_Interpreter
 {
@@ -15,11 +16,21 @@ namespace Semantic_Interpreter
             using var reader = new StreamReader(Demo + Filename);
             var program = reader.ReadToEnd();
 
+            var lexer = new Lexer(program);
+            var tokens = lexer.Tokenize();
+
+            foreach (var token in tokens)
+            {
+                Console.WriteLine(token.Type + " -> " + token.Text);
+            }
+
+            /*
             var tree = new SemanticTree();
-            var parser = new Parser(tree, program);
+            var parser = new Parser_old(tree, program);
             parser.BuildTree();
             
             tree.TraversalTree();
+            */
         }
     }
 }
