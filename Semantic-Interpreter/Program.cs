@@ -8,7 +8,7 @@ namespace Semantic_Interpreter
     public static class Program
     {
         private const string Demo = @"C:\Github\Semantic-Interpreter\Semantic-Interpreter\Demo\";
-        private const string Filename = "program1.txt";
+        private const string Filename = "program2.txt";
 
         public static void Main(string[] args)
         {
@@ -19,18 +19,18 @@ namespace Semantic_Interpreter
             var lexer = new Lexer(program);
             var tokens = lexer.Tokenize();
 
-            foreach (var token in tokens)
+            var operators = new Parser.Parser(tokens).Parse();
+            foreach (var @operator in operators)
             {
-                Console.WriteLine(token.Type + " -> " + token.Text);
+                Console.WriteLine(@operator);
             }
-
-            /*
-            var tree = new SemanticTree();
-            var parser = new Parser_old(tree, program);
-            parser.BuildTree();
             
-            tree.TraversalTree();
-            */
+            Console.WriteLine("\n-----------------\n");
+            
+            foreach (var @operator in operators)
+            {
+                @operator.Execute();
+            }
         }
     }
 }

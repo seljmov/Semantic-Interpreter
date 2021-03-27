@@ -7,8 +7,4 @@
         <LangVersion>9</LangVersion>
     </PropertyGroup>
 
-    <ItemGroup>
-      <Folder Include="Library" />
-    </ItemGroup>
-
 </Project>

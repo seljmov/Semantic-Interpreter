@@ -2,6 +2,7 @@
 {
     public enum TokenType
     {
+        Eof,
         Word,
         Text,
         

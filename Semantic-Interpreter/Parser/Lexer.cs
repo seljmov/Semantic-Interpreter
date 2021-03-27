@@ -36,7 +36,11 @@ namespace Semantic_Interpreter.Parser
             while (_pos < _lenght)
             {
                 var curr = Peek();
-                if (char.IsLetter(curr))
+                if (char.IsDigit(curr))
+                {
+                    
+                }
+                else if (char.IsLetter(curr))
                 {
                     TokenizeWord();
                 }
@@ -46,6 +50,11 @@ namespace Semantic_Interpreter.Parser
                 }
                 else
                 {
+                    switch (curr)
+                    {
+                        case '.': AddToken(TokenType.Dot); Next(); break;
+                        case ';': AddToken(TokenType.Semicolon); Next(); break;
+                    }
                     Next();
                 }
             }
