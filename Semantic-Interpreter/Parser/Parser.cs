@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.SymbolStore;
+using Semantic_Interpreter.Library;
 using Semantic_Interpreter.Parser.Expressions;
 using Semantic_Interpreter.Parser.Operators;
 
@@ -37,7 +38,31 @@ namespace Semantic_Interpreter.Parser
         {
             if (Match(TokenType.Output))
             {
-                return new Output(ParseExpression());
+                var @operator = new Output(ParseExpression());
+                Consume(TokenType.Semicolon);
+                return @operator;
+            }
+            else if (Match(TokenType.Variable))
+            {
+                Consume(TokenType.Dash);  // Scip -
+                var type = Consume(TokenType.Word).Text switch
+                {
+                    "integer" => SemanticTypes.Integer,
+                    "real" => SemanticTypes.Real,
+                    "boolean" => SemanticTypes.Boolean,
+                    _ => SemanticTypes.String,
+                };
+                var name = Get().Text;
+                IExpression expression = null;
+                if (Match(TokenType.Word) && Get().Type == TokenType.Assing)
+                {
+                    Consume(TokenType.Assing);
+                    expression = ParseExpression();
+                }
+                var variable = new VariableExpression(type, name, expression);
+                VariablesStorage.Add(name, variable);
+                Consume(TokenType.Semicolon);
+                return variable;
             }
 
             return AssignOperator();

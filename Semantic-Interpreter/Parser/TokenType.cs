@@ -20,6 +20,8 @@
         End,
         
         Semicolon,
+        Dash,
         Dot,
+        NotFound,
     }
 }

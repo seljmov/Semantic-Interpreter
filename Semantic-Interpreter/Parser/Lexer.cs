@@ -48,15 +48,21 @@ namespace Semantic_Interpreter.Parser
                 {
                     TokenizeText();
                 }
-                else
+                // Example ,./\\;:=+-_*'\"#@!&|<>[]{}
+                else if (IsNotLetterOrDigit(curr))
                 {
-                    switch (curr)
+                    var token = curr switch
                     {
-                        case '.': AddToken(TokenType.Dot); Next(); break;
-                        case ';': AddToken(TokenType.Semicolon); Next(); break;
-                    }
+                        '.' => TokenType.Dot,
+                        '-' => TokenType.Dash,
+                        ';' => TokenType.Semicolon,
+                        ':' => TokenizeSymbol(curr),
+                        _ => TokenType.NotFound,
+                    };
+                    AddToken(token);
                     Next();
                 }
+                else Next();
             }
             
             return _tokens;
@@ -115,6 +121,33 @@ namespace Semantic_Interpreter.Parser
             
             AddToken(TokenType.Text, buffer.ToString());
         }
+
+        private TokenType TokenizeSymbol(char ch)
+        {
+            var curr = Next();
+            switch (ch)
+            {
+                case ':':
+                {
+                    if (curr == '=')
+                    {
+                        return TokenType.Assing;
+                    }
+                    break;
+                }
+
+                case '<':
+                {
+                    if (curr == '=')
+                    {
+                        // token = 
+                    }
+                    break;
+                }
+            }
+
+            return TokenType.NotFound;
+        }
         
         private char Peek(int i = 0)
         {
@@ -130,5 +163,8 @@ namespace Semantic_Interpreter.Parser
 
         private void AddToken(TokenType type, string text = "")
             => _tokens.Add(new Token(type, text));
+
+        private bool IsNotLetterOrDigit(char ch)
+            => ",./\\;:=+-*'\"#&|<>[]".Contains(ch);
     }
 }

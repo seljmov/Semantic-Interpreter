@@ -1,13 +1,21 @@
 ﻿using Semantic_Interpreter.Library;
+using Semantic_Interpreter.Parser.Operators;
 
 namespace Semantic_Interpreter.Parser.Expressions
 {
-    public class VariableExpression : IExpression
+    public class VariableExpression : IExpression, IOperator
     {
-        public VariableExpression(string name) => Name = name;
+        public VariableExpression(SemanticTypes type, string name, IExpression expression)
+        {
+            Type = type;
+            Name = name;
+            Expression = expression;
+        }
 
-        private string Name { get; set; }
-        
+        public SemanticTypes Type { get; set; }
+        public string Name { get; set; }
+        public IExpression Expression { get; set; }
+
         public IValue Eval()
         {
             // TODO: Create vars storage
@@ -15,5 +23,6 @@ namespace Semantic_Interpreter.Parser.Expressions
         }
 
         public override string ToString() => string.Format(Name);
+        public void Execute() { }
     }
 }
