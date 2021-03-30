@@ -29,10 +29,6 @@ namespace Semantic_Interpreter
             }   
             
             var operators = new Parser.Parser(tokens).Parse();
-            foreach (var @operator in operators)
-            {
-                Console.WriteLine(@operator);
-            }
             
             Console.WriteLine("\n-----------------\n");
             
@@ -40,9 +36,6 @@ namespace Semantic_Interpreter
             {
                 @operator.Execute();
             }
-            
-            var variable = VariablesStorage.At("name");
-            Console.WriteLine($"{(variable.Type)} {variable.Name} := {variable.Expression}");
         }
     }
 }

@@ -1,1 +1,2 @@
-﻿variable-integer name := 1;
+﻿variable-real name := 1.123;
+output name;

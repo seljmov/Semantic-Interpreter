@@ -95,6 +95,12 @@ namespace Semantic_Interpreter.Parser
                 IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
                 return new ValueExpression(Convert.ToDouble(current.Text, formatter));
             }
+
+            if (Match(TokenType.Word))
+            {
+                return VariablesStorage.At(current.Text);
+            }
+            
             if (Match(TokenType.Text))
             {
                 return new ValueExpression(current.Text);
