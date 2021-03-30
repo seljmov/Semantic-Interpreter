@@ -1,1 +1,1 @@
-﻿variable-string name := "Johnny Depp";
+﻿variable-integer name := 1;

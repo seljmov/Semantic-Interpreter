@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using Microsoft.VisualBasic;
 
 namespace Semantic_Interpreter.Parser
 {
@@ -38,7 +39,7 @@ namespace Semantic_Interpreter.Parser
                 var curr = Peek();
                 if (char.IsDigit(curr))
                 {
-                    
+                    TokenizeNumber();
                 }
                 else if (char.IsLetter(curr))
                 {
@@ -68,6 +69,26 @@ namespace Semantic_Interpreter.Parser
             return _tokens;
         }
 
+        private void TokenizeNumber()
+        {
+            var buffer = "";
+            var current = Peek();
+            while (char.IsDigit(current) || current == '.')
+            {
+                if (current == '.')
+                {
+                    if (buffer.IndexOf(".", StringComparison.Ordinal) != -1)
+                    {
+                        throw new Exception("Неправильное вещественное число!");
+                    }
+                }
+
+                buffer += current;
+                current = Next();
+            }
+            AddToken(TokenType.Number, buffer);
+        }
+        
         private void TokenizeWord()
         {
             var buffer = new StringBuilder();

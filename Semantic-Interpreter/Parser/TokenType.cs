@@ -5,6 +5,7 @@
         Eof,
         Word,
         Text,
+        Number,
         
         Module,
         Beginning,

@@ -40,7 +40,7 @@ namespace Semantic_Interpreter
             {
                 @operator.Execute();
             }
-
+            
             var variable = VariablesStorage.At("name");
             Console.WriteLine($"{(variable.Type)} {variable.Name} := {variable.Expression}");
         }

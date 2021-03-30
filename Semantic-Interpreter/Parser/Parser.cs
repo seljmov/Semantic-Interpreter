@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.SymbolStore;
+using System.Globalization;
 using Semantic_Interpreter.Library;
 using Semantic_Interpreter.Parser.Expressions;
 using Semantic_Interpreter.Parser.Operators;
@@ -89,6 +90,11 @@ namespace Semantic_Interpreter.Parser
         private IExpression Primary()
         {
             var current = Get();
+            if (Match(TokenType.Number))
+            {
+                IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
+                return new ValueExpression(Convert.ToDouble(current.Text, formatter));
+            }
             if (Match(TokenType.Text))
             {
                 return new ValueExpression(current.Text);

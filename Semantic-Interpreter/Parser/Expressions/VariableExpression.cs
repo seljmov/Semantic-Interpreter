@@ -1,4 +1,5 @@
-﻿using Semantic_Interpreter.Library;
+﻿using System;
+using Semantic_Interpreter.Library;
 using Semantic_Interpreter.Parser.Operators;
 
 namespace Semantic_Interpreter.Parser.Expressions
@@ -17,12 +18,14 @@ namespace Semantic_Interpreter.Parser.Expressions
         public IExpression Expression { get; set; }
 
         public IValue Eval()
-        {
-            // TODO: Create vars storage
-            throw new System.NotImplementedException();
-        }
+            => VariablesStorage.IsExist(Name)
+                ? Expression.Eval()
+                : throw new Exception("Переменной с таким именем не существует!");
 
         public override string ToString() => string.Format(Name);
-        public void Execute() { }
+
+        public void Execute()
+        {
+        }
     }
 }
