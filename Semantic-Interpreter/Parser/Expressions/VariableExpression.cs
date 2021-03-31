@@ -22,7 +22,7 @@ namespace Semantic_Interpreter.Parser.Expressions
                 ? Expression.Eval()
                 : throw new Exception("Переменной с таким именем не существует!");
 
-        public override string ToString() => string.Format(Name);
+        public override string ToString() => Name;
 
         public void Execute()
         {

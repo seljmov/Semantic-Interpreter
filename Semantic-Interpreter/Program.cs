@@ -8,7 +8,7 @@ namespace Semantic_Interpreter
 {
     public static class Program
     {
-        private const string Demo = @"C:\Github\Semantic-Interpreter\Semantic-Interpreter\Demo\";
+        private const string Demo = @"C:\Github\Own\Semantic-Interpreter\Semantic-Interpreter\Demo\";
         private const string Filename = "program3.txt";
 
         public static void Main(string[] args)

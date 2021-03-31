@@ -9,7 +9,7 @@ namespace Semantic_Interpreter.Parser
     public class Lexer
     {
         private const string OperatorsChars = "+-*/";
-        private Dictionary<string, TokenType> Operators = new()
+        private Dictionary<string, TokenType> _operators = new()
         {
             {"+", TokenType.Plus},
             {"-", TokenType.Minus},
@@ -125,8 +125,8 @@ namespace Semantic_Interpreter.Parser
                     switch (curr)
                     {
                         case '"': curr = Next(); buffer.Append('"'); continue;
-                        case 'n': curr = Next(); buffer.Append('n'); continue;
-                        case 't': curr = Next(); buffer.Append('t'); continue;
+                        case 'n': curr = Next(); buffer.Append('\n'); continue;
+                        case 't': curr = Next(); buffer.Append('\t'); continue;
                     }
 
                     buffer.Append('\\');
