@@ -8,11 +8,12 @@ namespace Semantic_Interpreter
 {
     public static class Program
     {
-        private const string Demo = @"C:\Github\Own\Semantic-Interpreter\Semantic-Interpreter\Demo\";
-        private const string Filename = "program3.txt";
+        private const string Demo = @"E:\Education\Github\Own\Semantic-Interpreter\Semantic-Interpreter\Demo\";
+        private const string Filename = "program1.txt";
 
-        public static void Main(string[] args)
+        public static void Main()
         {
+            
             Console.WriteLine();
             using var reader = new StreamReader(Demo + Filename);
             var program = reader.ReadToEnd();

@@ -35,9 +35,47 @@ namespace Semantic_Interpreter.Parser
             return result;
         }
 
+        private BlockOperator ParseBlock()
+        {
+            var block = new BlockOperator();
+            var token = Get(-1);
+            var endtype = TokenType.End;
+            if (Get(0).Type == TokenType.Module || Get(-1).Type == TokenType.Module)
+            {
+                endtype = TokenType.End;
+            }
+            
+            // Consume(token.Type);
+            while (!Match(endtype))
+            {
+                block.Add(ParseOperator());
+            }
+
+            return block;
+        }
+        
+        private IOperator OperatorOrBlock()
+        {
+            var type = Get().Type;
+            if (type == TokenType.Module || type == TokenType.Beginning)
+            {
+                return ParseBlock();
+            }
+
+            return ParseOperator();
+        }
+        
         private IOperator ParseOperator()
         {
-            if (Match(TokenType.Output))
+            if (Match(TokenType.Module))
+            {
+                return ModuleOperator();
+            }
+            else if (Match(TokenType.Beginning))
+            {
+                
+            }
+            else if (Match(TokenType.Output))
             {
                 var @operator = new Output(ParseExpression());
                 Consume(TokenType.Semicolon);
@@ -80,6 +118,13 @@ namespace Semantic_Interpreter.Parser
             }
 
             throw new Exception("Неизвестный оператор.");
+        }
+
+        private IOperator ModuleOperator()
+        {
+            var name = Get(0).Text;
+            var blockOperator = ParseBlock();
+            return new Module(name, blockOperator);
         }
 
         private IExpression ParseExpression()
