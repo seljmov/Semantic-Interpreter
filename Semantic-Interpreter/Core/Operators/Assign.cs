@@ -1,8 +1,8 @@
-﻿using Semantic_Interpreter.Parser.Expressions;
+﻿using Semantic_Interpreter.Core.Items;
 
-namespace Semantic_Interpreter.Parser.Operators
+namespace Semantic_Interpreter.Core
 {
-    public class Assign : IOperator
+    public class Assign : SingleLineOperator
     {
         public Assign(string variable, IExpression expression)
         {

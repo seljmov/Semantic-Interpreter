@@ -1,7 +1,7 @@
-﻿namespace Semantic_Interpreter.Core
+﻿namespace Semantic_Interpreter.Core.Items
 {
     public interface IHaveType
     {
-        public ConstantTypes Type { get; set; }
+        public SemanticTypes Type { get; set; }
     }
 }

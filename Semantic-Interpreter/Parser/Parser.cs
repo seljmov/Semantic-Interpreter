@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.SymbolStore;
 using System.Globalization;
+using Semantic_Interpreter.Core;
 using Semantic_Interpreter.Library;
-using Semantic_Interpreter.Parser.Expressions;
-using Semantic_Interpreter.Parser.Operators;
 
 namespace Semantic_Interpreter.Parser
 {
@@ -24,9 +22,9 @@ namespace Semantic_Interpreter.Parser
             _pos = 0;
         }
 
-        public List<IOperator> Parse()
+        public List<ISemanticOperator> Parse()
         {
-            var result = new List<IOperator>();
+            var result = new List<ISemanticOperator>();
             while (!Match(TokenType.Eof))
             {
                 result.Add(ParseOperator());
@@ -35,9 +33,9 @@ namespace Semantic_Interpreter.Parser
             return result;
         }
 
-        private BlockOperator ParseBlock()
+        private BlockSemanticOperator ParseBlock()
         {
-            var block = new BlockOperator();
+            var block = new BlockSemanticOperator();
             var token = Get(-1);
             var endtype = TokenType.End;
             if (Get(0).Type == TokenType.Module || Get(-1).Type == TokenType.Module)
@@ -54,7 +52,7 @@ namespace Semantic_Interpreter.Parser
             return block;
         }
         
-        private IOperator OperatorOrBlock()
+        private ISemanticOperator OperatorOrBlock()
         {
             var type = Get().Type;
             if (type == TokenType.Module || type == TokenType.Beginning)
@@ -65,7 +63,7 @@ namespace Semantic_Interpreter.Parser
             return ParseOperator();
         }
         
-        private IOperator ParseOperator()
+        private ISemanticOperator ParseOperator()
         {
             if (Match(TokenType.Module))
             {
@@ -98,7 +96,7 @@ namespace Semantic_Interpreter.Parser
                     Consume(TokenType.Assing);
                     expression = ParseExpression();
                 }
-                var variable = new VariableExpression(type, name, expression);
+                var variable = new Variable(type, name, expression);
                 VariablesStorage.Add(name, variable);
                 Consume(TokenType.Semicolon);
                 return variable;
@@ -107,7 +105,7 @@ namespace Semantic_Interpreter.Parser
             return AssignOperator();
         }
 
-        private IOperator AssignOperator()
+        private ISemanticOperator AssignOperator()
         {
             var current = Get();
             if (Match(TokenType.Word) && Get().Type == TokenType.Assing)
@@ -120,7 +118,7 @@ namespace Semantic_Interpreter.Parser
             throw new Exception("Неизвестный оператор.");
         }
 
-        private IOperator ModuleOperator()
+        private ISemanticOperator ModuleOperator()
         {
             var name = Get(0).Text;
             var blockOperator = ParseBlock();

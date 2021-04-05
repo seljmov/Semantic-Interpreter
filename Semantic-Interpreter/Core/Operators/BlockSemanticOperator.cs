@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Microsoft.VisualBasic.FileIO;
 
-namespace Semantic_Interpreter.Parser.Operators
+namespace Semantic_Interpreter.Core
 {
-    public class BlockOperator : IOperator
+    public class BlockSemanticOperator
     {
-        private readonly List<IOperator> _operators;
+        private readonly List<ISemanticOperator> _operators;
 
-        public BlockOperator()
+        public BlockSemanticOperator()
         {
-            _operators = new List<IOperator>();
+            _operators = new List<ISemanticOperator>();
         }
 
-        public void Add(IOperator @operator) => _operators.Add(@operator);
+        public void Add(ISemanticOperator semanticOperator) => _operators.Add(semanticOperator);
 
         public void Execute()
         {

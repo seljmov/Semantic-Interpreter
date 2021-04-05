@@ -1,6 +1,6 @@
 ﻿using Semantic_Interpreter.Library;
 
-namespace Semantic_Interpreter.Parser.Expressions
+namespace Semantic_Interpreter.Core
 {
     public class ValueExpression : IExpression
     {

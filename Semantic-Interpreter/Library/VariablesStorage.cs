@@ -1,22 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Semantic_Interpreter.Parser.Expressions;
+using Semantic_Interpreter.Core;
 
 namespace Semantic_Interpreter.Library
 {
     public static class VariablesStorage
     {
-        private static readonly Dictionary<string, VariableExpression> Variables = new();
+        private static readonly Dictionary<string, Variable> Variables = new();
 
         public static bool IsExist(string name) => Variables.ContainsKey(name);
 
-        public static VariableExpression At(string name)
+        public static Variable At(string name)
             => IsExist(name) 
                 ? Variables[name] 
                 : throw new Exception("Переменной с таким именем не существует!");
 
-        public static void Add(string name, VariableExpression variable)
+        public static void Add(string name, Variable variable)
         {
             if (IsExist(name))
             {
@@ -26,7 +25,7 @@ namespace Semantic_Interpreter.Library
             Variables.Add(name, variable);
         }
 
-        public static void Replace(string name, VariableExpression variable)
+        public static void Replace(string name, Variable variable)
         {
             if (!IsExist(name))
             {

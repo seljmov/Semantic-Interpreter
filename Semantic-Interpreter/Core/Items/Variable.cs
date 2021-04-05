@@ -1,12 +1,11 @@
 ﻿using System;
 using Semantic_Interpreter.Library;
-using Semantic_Interpreter.Parser.Operators;
 
-namespace Semantic_Interpreter.Parser.Expressions
+namespace Semantic_Interpreter.Core
 {
-    public class VariableExpression : IExpression, IOperator
+    public class Variable : IHaveExpression
     {
-        public VariableExpression(SemanticTypes type, string name, IExpression expression)
+        public Variable(SemanticTypes type, string name, IExpression expression)
         {
             Type = type;
             Name = name;

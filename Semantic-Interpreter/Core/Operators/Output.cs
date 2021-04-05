@@ -1,9 +1,9 @@
 ﻿using System;
-using Semantic_Interpreter.Parser.Expressions;
+using Semantic_Interpreter.Core.Items;
 
-namespace Semantic_Interpreter.Parser.Operators
+namespace Semantic_Interpreter.Core
 {
-    public class Output : IOperator
+    public class Output : SingleLineOperator
     {
         public Output(IExpression expression) => Expression = expression;
         
