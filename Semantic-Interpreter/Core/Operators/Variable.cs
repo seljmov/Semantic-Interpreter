@@ -3,7 +3,7 @@ using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
-    public class Variable : IHaveExpression
+    public class Variable : SemanticOperator, IHaveExpression
     {
         public Variable(SemanticTypes type, string name, IExpression expression)
         {
@@ -23,7 +23,7 @@ namespace Semantic_Interpreter.Core
 
         public override string ToString() => Name;
 
-        public void Execute()
+        public override void Execute()
         {
         }
     }

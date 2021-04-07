@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Semantic_Interpreter.Core;
-using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Parser
 {
@@ -14,7 +12,10 @@ namespace Semantic_Interpreter.Parser
         private readonly int _length;
 
         private int _pos;
+        private SemanticTree _semanticTree = new SemanticTree();
 
+        private SemanticOperator _lastOperator = null;
+        
         public Parser(List<Token> tokens)
         {
             _tokens = tokens;
@@ -22,17 +23,44 @@ namespace Semantic_Interpreter.Parser
             _pos = 0;
         }
 
-        public List<ISemanticOperator> Parse()
+        public SemanticTree Parse()
         {
-            var result = new List<ISemanticOperator>();
             while (!Match(TokenType.Eof))
             {
-                result.Add(ParseOperator());
+                var @operator = ParseOperator();
+                _semanticTree.InsertOperator(@operator, _lastOperator);
+                _lastOperator = @operator;
             }
 
-            return result;
+            return _semanticTree;
         }
 
+        private SemanticOperator ParseOperator()
+        {
+            if (Match(TokenType.Module))
+            {
+                var name = Consume(TokenType.Word).Text;
+                return new Module(name);
+            }
+
+            return null;
+        }
+        
+        /**
+         * Модуль включает в себя: Beginning, ...
+         */
+        private SemanticOperator ModuleOperator()
+        {
+            if (Match(TokenType.Module))
+            {
+                var name = Consume(TokenType.Word).Text;
+                return new Module(name);
+            }
+
+            return null;
+        }
+
+        /*
         private BlockSemanticOperator ParseBlock()
         {
             var block = new BlockSemanticOperator();
@@ -52,7 +80,7 @@ namespace Semantic_Interpreter.Parser
             return block;
         }
         
-        private ISemanticOperator OperatorOrBlock()
+        private SemanticOperator OperatorOrBlock()
         {
             var type = Get().Type;
             if (type == TokenType.Module || type == TokenType.Beginning)
@@ -63,7 +91,7 @@ namespace Semantic_Interpreter.Parser
             return ParseOperator();
         }
         
-        private ISemanticOperator ParseOperator()
+        private SemanticOperator ParseOperator()
         {
             if (Match(TokenType.Module))
             {
@@ -105,7 +133,7 @@ namespace Semantic_Interpreter.Parser
             return AssignOperator();
         }
 
-        private ISemanticOperator AssignOperator()
+        private SemanticOperator AssignOperator()
         {
             var current = Get();
             if (Match(TokenType.Word) && Get().Type == TokenType.Assing)
@@ -118,7 +146,7 @@ namespace Semantic_Interpreter.Parser
             throw new Exception("Неизвестный оператор.");
         }
 
-        private ISemanticOperator ModuleOperator()
+        private SemanticOperator ModuleOperator()
         {
             var name = Get(0).Text;
             var blockOperator = ParseBlock();
@@ -151,6 +179,7 @@ namespace Semantic_Interpreter.Parser
 
             throw new Exception("Неизвестный оператор.");
         }
+        */
         
         private Token Consume(TokenType type)
         {

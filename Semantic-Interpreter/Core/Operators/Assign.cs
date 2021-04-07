@@ -2,7 +2,7 @@
 
 namespace Semantic_Interpreter.Core
 {
-    public class Assign : SingleLineOperator
+    public class Assign : SemanticOperator
     {
         public Assign(string variable, IExpression expression)
         {
@@ -13,7 +13,7 @@ namespace Semantic_Interpreter.Core
         private string Variable { get; set; }
         private IExpression Expression { get; set; }
 
-        public void Execute()
+        public override void Execute()
         {
             // TODO: Create vars storage and add this var
             throw new System.NotImplementedException();

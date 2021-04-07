@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
-using Semantic_Interpreter.Core;
 using Semantic_Interpreter.Parser;
-using VariablesStorage = Semantic_Interpreter.Library.VariablesStorage;
 
 namespace Semantic_Interpreter
 {
@@ -27,16 +25,9 @@ namespace Semantic_Interpreter
                 Console.Write(token.Type);
                 if (token.Text != "") Console.Write($" -> {token.Text}");
                 Console.WriteLine();
-            }   
-            
-            var operators = new Parser.Parser(tokens).Parse();
-            
-            Console.WriteLine("\n-----------------\n");
-            
-            foreach (var @operator in operators)
-            {
-                @operator.Execute();
             }
+
+            var tree = new Parser.Parser(tokens).Parse();
         }
     }
 }

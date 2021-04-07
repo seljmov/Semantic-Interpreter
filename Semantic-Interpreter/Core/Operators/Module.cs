@@ -2,27 +2,25 @@
 
 namespace Semantic_Interpreter.Core
 {
-    public class Module : MultilineOperator
+    public class Module : SemanticOperator
     {
-        public Module(string name, BlockSemanticOperator blockSemanticOperator)
+        public Module(string name)
         {
             Beginning = null;
             Name = name;
-            BlockSemanticOperator = blockSemanticOperator;
         }
         
         private Beginning Beginning { get; set; }
         private string Name { get; set; }
-        private BlockSemanticOperator BlockSemanticOperator { get; set; }
 
         public void SetBeginning(Beginning beginning)
         {
             Beginning = beginning;
             Beginning.Parent = this;
-            BlockSemanticOperator.Add(beginning);
+            Child = Beginning;
         }
         
-        public void Execute()
+        public override void Execute()
         {
         }
 

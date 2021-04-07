@@ -2,14 +2,14 @@
 
 namespace Semantic_Interpreter.Core
 {
-    public class Beginning : MultilineOperator
+    public class Beginning : SemanticOperator
     {
-        public Beginning(ISemanticOperator parent)
+        public Beginning(SemanticOperator parent)
         {
             Parent = parent;
         }
         
-        public void Execute()
+        public override void Execute()
         {
             throw new System.NotImplementedException();
         }

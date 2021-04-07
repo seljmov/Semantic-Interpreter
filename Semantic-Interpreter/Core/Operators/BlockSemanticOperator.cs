@@ -6,14 +6,14 @@ namespace Semantic_Interpreter.Core
 {
     public class BlockSemanticOperator
     {
-        private readonly List<ISemanticOperator> _operators;
+        private readonly List<SemanticOperator> _operators;
 
         public BlockSemanticOperator()
         {
-            _operators = new List<ISemanticOperator>();
+            _operators = new List<SemanticOperator>();
         }
 
-        public void Add(ISemanticOperator semanticOperator) => _operators.Add(semanticOperator);
+        public void Add(SemanticOperator semanticOperator) => _operators.Add(semanticOperator);
 
         public void Execute()
         {
