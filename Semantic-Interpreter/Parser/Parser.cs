@@ -12,7 +12,7 @@ namespace Semantic_Interpreter.Parser
         private readonly int _length;
 
         private int _pos;
-        private SemanticTree _semanticTree = new SemanticTree();
+        private readonly SemanticTree _semanticTree = new SemanticTree();
 
         private SemanticOperator _lastOperator = null;
         
@@ -41,6 +41,10 @@ namespace Semantic_Interpreter.Parser
             {
                 var name = Consume(TokenType.Word).Text;
                 return new Module(name);
+            }
+            else if (Match(TokenType.Beginning))
+            {
+                return new Beginning(_lastOperator);
             }
 
             return null;
