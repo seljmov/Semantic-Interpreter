@@ -65,6 +65,7 @@ namespace Semantic_Interpreter.Parser
                 }
                 else Next();
             }
+            AddToken(TokenType.Eof);
             
             return _tokens;
         }

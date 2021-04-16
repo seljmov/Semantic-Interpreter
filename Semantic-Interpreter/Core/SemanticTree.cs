@@ -36,14 +36,14 @@
             {
                 curr?.Execute();
                 
-                if (curr.Child != null)
+                if (curr?.Child != null)
                 {
                     parent = curr;
                     curr = curr.Child;
                 }
                 else
                 {
-                    if (curr.Next != null)
+                    if (curr?.Next != null)
                     {
                         curr = curr.Next;
                     }

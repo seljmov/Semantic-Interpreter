@@ -1,6 +1,6 @@
 ﻿module main
 
 beginning
-    variable-string name := "Johnny Depp";
-    output "Hello world!";
+    variable-string var1 := "Hello world!";
+    output var1;
 end main.

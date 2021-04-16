@@ -11,7 +11,6 @@ namespace Semantic_Interpreter.Core
         
         public override void Execute()
         {
-            throw new System.NotImplementedException();
         }
     }
 }
