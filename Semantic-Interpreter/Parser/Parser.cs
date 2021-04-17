@@ -49,7 +49,8 @@ namespace Semantic_Interpreter.Parser
                 {
                     var parent = operatorsStack.Peek();
                     var variable = VariableOperator();
-                    _semanticTree.InsertOperator(variable, parent, true);
+                    var asChild = parent.Child == null;
+                    _semanticTree.InsertOperator(variable, _lastOperator, asChild);
                     _lastOperator = variable;
                 }
                 else if (Match(TokenType.Output))
