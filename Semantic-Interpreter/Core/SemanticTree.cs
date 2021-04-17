@@ -21,7 +21,7 @@
             }
             else
             {
-                InsertOperatorAsNext(newOperator, prevOperator);
+                InsertOperatorAsNext(newOperator, FindOperator(prevOperator));
             }
 
             _count++;

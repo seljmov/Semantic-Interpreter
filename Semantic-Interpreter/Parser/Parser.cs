@@ -36,6 +36,7 @@ namespace Semantic_Interpreter.Parser
                     var module = ModuleOperator();
                     _semanticTree.InsertOperator(module);
                     operatorsStack.Push(module);
+                    _lastOperator = module;
                 }
                 else if (Match(TokenType.Beginning))
                 {
@@ -43,19 +44,23 @@ namespace Semantic_Interpreter.Parser
                     var beginning = new Beginning(parent);
                     _semanticTree.InsertOperator(beginning, parent);
                     operatorsStack.Push(beginning);
+                    _lastOperator = beginning;
                 }
                 else if (Match(TokenType.Variable))
                 {
                     var parent = operatorsStack.Peek();
                     var variable = VariableOperator();
                     _semanticTree.InsertOperator(variable, parent, true);
+                    _lastOperator = variable;
                 }
                 else if (Match(TokenType.Output))
                 {
                     var parent = operatorsStack.Peek();
                     var output = new Output(ParseExpression());
                     Consume(TokenType.Semicolon);
-                    _semanticTree.InsertOperator(output, parent, true);
+                    var asChild = parent.Child == null;
+                    _semanticTree.InsertOperator(output, _lastOperator, asChild);
+                    _lastOperator = output;
                 }
                 else if (Match(TokenType.End))
                 {
