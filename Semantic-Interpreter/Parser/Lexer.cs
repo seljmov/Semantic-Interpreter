@@ -55,7 +55,10 @@ namespace Semantic_Interpreter.Parser
                     var token = curr switch
                     {
                         '.' => TokenType.Dot,
-                        '-' => TokenType.Dash,
+                        '-' => TokenType.Minus,
+                        '+' => TokenType.Plus,
+                        '*' => TokenType.Multiply,
+                        '/' => TokenType.Divide,
                         ';' => TokenType.Semicolon,
                         ':' => TokenizeSymbol(curr),
                         _ => TokenType.NotFound,

@@ -80,7 +80,7 @@ namespace Semantic_Interpreter.Parser
 
         private SemanticOperator VariableOperator()
         {
-            Consume(TokenType.Dash);  // Scip -
+            Consume(TokenType.Minus);  // Scip -
             var type = Consume(TokenType.Word).Text switch
             {
                 "integer" => SemanticTypes.Integer,
@@ -104,9 +104,72 @@ namespace Semantic_Interpreter.Parser
         
         private IExpression ParseExpression()
         {
-            return Primary();
+            return Additive();
         }
 
+        private IExpression Additive()
+        {
+            IExpression result = Multiplicative();
+            
+            while (true)
+            {
+                if (Match(TokenType.Plus))
+                {
+                    result = new BinaryExpression(Operations.Plus, result, Multiplicative());
+                    continue;
+                }
+
+                if (Match(TokenType.Minus))
+                {
+                    result = new BinaryExpression(Operations.Minus, result, Multiplicative());
+                    continue;
+                }
+                
+                break;
+            }
+
+            return result;
+        }
+
+        private IExpression Multiplicative()
+        {
+            IExpression result = Unary();
+
+            while (true)
+            {
+                if (Match(TokenType.Multiply))
+                {
+                    result = new BinaryExpression(Operations.Multiply, result, Unary());
+                    continue;
+                }
+
+                if (Match(TokenType.Divide))
+                {
+                    result = new BinaryExpression(Operations.Divide, result, Unary());
+                    continue;
+                }
+                
+                break;
+            }
+
+            return result;
+        }
+
+        private IExpression Unary()
+        {
+            if (Match(TokenType.Minus))
+            {
+                return new UnaryExpression(Operations.Minus, Primary());
+            }
+
+            if (Match(TokenType.Plus))
+            {
+                return Primary();
+            }
+
+            return Primary();
+        }
+        
         private IExpression Primary()
         {
             var current = Get();
