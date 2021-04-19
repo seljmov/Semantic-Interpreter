@@ -20,8 +20,6 @@ namespace Semantic_Interpreter
             var lexer = new Lexer(program);
             var tokens = lexer.Tokenize();
             
-            PrintTokens(tokens);
-            
             var tree = new Parser.Parser(tokens).Parse();
             tree.TraversalTree();
         }

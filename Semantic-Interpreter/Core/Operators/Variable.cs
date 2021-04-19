@@ -9,7 +9,20 @@ namespace Semantic_Interpreter.Core
         {
             Type = type;
             Name = name;
-            Expression = expression;
+            // Expression = expression;
+            var value = expression.Eval();
+            switch (type)
+            {
+                case SemanticTypes.String when value is StringValue:
+                case SemanticTypes.Integer when value is IntegerValue:
+                case SemanticTypes.Real when value is RealValue || value is IntegerValue:
+                    Expression = expression;
+                    break;
+                case SemanticTypes.Boolean:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
         }
 
         public SemanticTypes Type { get; set; }

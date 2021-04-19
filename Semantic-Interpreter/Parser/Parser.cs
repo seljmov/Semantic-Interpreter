@@ -86,7 +86,7 @@ namespace Semantic_Interpreter.Parser
                 "integer" => SemanticTypes.Integer,
                 "real" => SemanticTypes.Real,
                 "boolean" => SemanticTypes.Boolean,
-                _ => SemanticTypes.String,
+                _ => SemanticTypes.String
             };
             var name = Get().Text;
             IExpression expression = null;
@@ -109,7 +109,7 @@ namespace Semantic_Interpreter.Parser
 
         private IExpression Additive()
         {
-            IExpression result = Multiplicative();
+            var result = Multiplicative();
             
             while (true)
             {
@@ -133,7 +133,7 @@ namespace Semantic_Interpreter.Parser
 
         private IExpression Multiplicative()
         {
-            IExpression result = Unary();
+            var result = Unary();
 
             while (true)
             {
@@ -157,17 +157,9 @@ namespace Semantic_Interpreter.Parser
 
         private IExpression Unary()
         {
-            if (Match(TokenType.Minus))
-            {
-                return new UnaryExpression(Operations.Minus, Primary());
-            }
-
-            if (Match(TokenType.Plus))
-            {
-                return Primary();
-            }
-
-            return Primary();
+            return Match(TokenType.Minus) 
+                ? new UnaryExpression(Operations.Minus, Primary()) 
+                : Primary();
         }
         
         private IExpression Primary()
@@ -175,18 +167,25 @@ namespace Semantic_Interpreter.Parser
             var current = Get();
             if (Match(TokenType.Number))
             {
+                // Если точки нет, то число целое, иначе - вещественное
+                if (!current.Text.Contains('.'))
+                    return new ValueExpression(Convert.ToInt32(current.Text));
+                
                 IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
                 return new ValueExpression(Convert.ToDouble(current.Text, formatter));
             }
 
             if (Match(TokenType.Word))
-            {
                 return VariablesStorage.At(current.Text);
-            }
             
             if (Match(TokenType.Text))
-            {
                 return new ValueExpression(current.Text);
+
+            if (Match(TokenType.LParen))
+            {
+                var result = ParseExpression();
+                Match(TokenType.RParen);
+                return result;
             }
 
             throw new Exception("Неизвестный оператор.");
@@ -195,7 +194,9 @@ namespace Semantic_Interpreter.Parser
         private Token Consume(TokenType type)
         {
             var current = Get();
-            if (type != current.Type) throw new Exception($"Токен '{current}' не найден ({type}).");
+            if (type != current.Type) 
+                throw new Exception($"Токен '{current}' не найден ({type}).");
+            
             _pos++;
             return current;
         }
@@ -203,7 +204,9 @@ namespace Semantic_Interpreter.Parser
         private bool Match(TokenType type)
         {
             var current = Get();
-            if (type != current.Type) return false;
+            if (type != current.Type) 
+                return false;
+            
             _pos++;
             return true;
         }
@@ -211,8 +214,9 @@ namespace Semantic_Interpreter.Parser
         private Token Get(int i = 0)
         {
             var position = _pos + i;
-            if (position >= _length) return Eof;
-            return _tokens[position];
+            return position >= _length 
+                ? Eof 
+                : _tokens[position];
         }
     }
 }

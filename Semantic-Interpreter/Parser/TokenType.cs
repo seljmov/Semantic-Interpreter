@@ -18,10 +18,11 @@
         Multiply,
         Divide,
         
+        LParen,
+        RParen,
         End,
         
         Semicolon,
-        Dash,
         Dot,
         NotFound,
     }

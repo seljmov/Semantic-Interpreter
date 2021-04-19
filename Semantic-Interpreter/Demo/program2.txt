@@ -1,15 +1,6 @@
 ﻿module main
 
 beginning
-    output 1.5 + 2.8;
-    output "\n";
-    output 1.5 - 2.8;
-    output "\n";
-    output 1.5 * 2.8;
-    output "\n";
-    output 1.5 / 2.8;
-    output "\n";
-    output 1.5;
-    output "\n";
-    output -1.5;
+    variable-real var1 := 1.123;
+    output var1;
 end main.

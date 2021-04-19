@@ -54,6 +54,8 @@ namespace Semantic_Interpreter.Parser
                 {
                     var token = curr switch
                     {
+                        '(' => TokenType.LParen,
+                        ')' => TokenType.RParen,
                         '.' => TokenType.Dot,
                         '-' => TokenType.Minus,
                         '+' => TokenType.Plus,
@@ -190,6 +192,6 @@ namespace Semantic_Interpreter.Parser
             => _tokens.Add(new Token(type, text));
 
         private bool IsNotLetterOrDigit(char ch)
-            => ",./\\;:=+-*'\"#&|<>[]".Contains(ch);
+            => ",./\\;:=+-*'\"#&|<>()[]".Contains(ch);
     }
 }
