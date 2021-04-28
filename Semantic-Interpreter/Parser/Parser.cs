@@ -16,6 +16,7 @@ namespace Semantic_Interpreter.Parser
         private int _pos;
         private readonly SemanticTree _semanticTree = new();
 
+        Stack<SemanticOperator> operatorsStack = new();
         private SemanticOperator _lastOperator;
 
         public Parser(List<Token> tokens)
@@ -27,51 +28,109 @@ namespace Semantic_Interpreter.Parser
 
         public SemanticTree Parse()
         {
-            Stack<SemanticOperator> operatorsStack = new();
             while (!Match(TokenType.Eof))
             {
-                if (Match(TokenType.Module))
-                {
-                    var module = ModuleOperator();
-                    _semanticTree.InsertOperator(module);
-                    operatorsStack.Push(module);
-                    _lastOperator = module;
-                }
-                else if (Match(TokenType.Beginning))
-                {
-                    var parent = operatorsStack.Pop();
-                    var beginning = new Beginning(parent);
-                    _semanticTree.InsertOperator(beginning, parent);
-                    operatorsStack.Push(beginning);
-                    _lastOperator = beginning;
-                }
-                else if (Match(TokenType.Variable))
-                {
-                    var parent = operatorsStack.Peek();
-                    var variable = VariableOperator();
-                    var asChild = parent.Child == null;
-                    _semanticTree.InsertOperator(variable, _lastOperator, asChild);
-                    _lastOperator = variable;
-                }
-                else if (Match(TokenType.Output))
-                {
-                    var parent = operatorsStack.Peek();
-                    var output = new Output(ParseExpression());
-                    Consume(TokenType.Semicolon);
-                    var asChild = parent.Child == null;
-                    _semanticTree.InsertOperator(output, _lastOperator, asChild);
-                    _lastOperator = output;
-                }
-                else if (Match(TokenType.End))
+                if (Match(TokenType.End))
                 {
                     Consume(TokenType.Word);
                     Consume(TokenType.Dot);
+                }
+                else
+                {
+                    ParseOperator();
                 }
             }
 
             return _semanticTree;
         }
 
+        private SemanticOperator ParseOperator()
+        {
+            if (Match(TokenType.Module))
+            {
+                var module = ModuleOperator();
+                _semanticTree.InsertOperator(module);
+                operatorsStack.Push(module);
+                _lastOperator = module;
+                
+                return module;
+            }
+            
+            if (Match(TokenType.Beginning))
+            {
+                var parent = operatorsStack.Pop();
+                var beginning = new Beginning(parent);
+                _semanticTree.InsertOperator(beginning, parent);
+                operatorsStack.Push(beginning);
+                _lastOperator = beginning;
+                
+                return beginning;
+            }
+            
+            if (Match(TokenType.While))
+            {
+                var expression = ParseExpression();
+                Consume(TokenType.Word); // Scip then
+                var block = new BlockSemanticOperator();
+                while (!Match(TokenType.While))
+                {
+                    if (Match(TokenType.End)) continue;
+                    block.Add(ParseOperator());
+                }
+
+                Consume(TokenType.Dot);
+
+                var parent = operatorsStack.Peek();
+                var @while = new While(expression, block);
+                var asChild = parent.Child == null;
+                _semanticTree.InsertOperator(@while, _lastOperator, asChild);
+                _lastOperator = @while;
+
+                return @while;
+            }
+            
+            if (Match(TokenType.Variable))
+            {
+                var parent = operatorsStack.Peek();
+                var variable = VariableOperator();
+                var asChild = parent.Child == null;
+                _semanticTree.InsertOperator(variable, _lastOperator, asChild);
+                _lastOperator = variable;
+                
+                return variable;
+            }
+
+            if (Match(TokenType.Let))
+            {
+                var parent = operatorsStack.Peek();
+                var nameVar = Consume(TokenType.Word).Text;
+                Consume(TokenType.Assing);
+                var expression = ParseExpression();
+                Consume(TokenType.Semicolon);
+
+                var let = new Let(nameVar, expression);
+                var asChild = parent.Child == null;
+                _semanticTree.InsertOperator(let, _lastOperator, asChild);
+                _lastOperator = let;
+
+                return let;
+            }
+            
+            if (Match(TokenType.Output))
+            {
+                var parent = operatorsStack.Peek();
+                var output = new Output(ParseExpression());
+                Consume(TokenType.Semicolon);
+                var asChild = parent.Child == null;
+                _semanticTree.InsertOperator(output, _lastOperator, asChild);
+                _lastOperator = output;
+
+                return output;
+            }
+
+            return null;
+        }
+        
         private SemanticOperator ModuleOperator()
         {
             var name = Consume(TokenType.Word).Text;
@@ -104,7 +163,95 @@ namespace Semantic_Interpreter.Parser
         
         private IExpression ParseExpression()
         {
-            return Additive();
+            return LogicalOr();
+        }
+
+        private IExpression LogicalOr()
+        {
+            var result = LogicalAnd();
+
+            while (true)
+            {
+                if (Match(TokenType.OrOr))
+                {
+                    result = new ConditionalExpression(TokenType.OrOr, result, LogicalAnd());
+                    continue;
+                }
+                break;
+            }
+
+            return result;
+        }
+
+        private IExpression LogicalAnd()
+        {
+            var result = Equality();
+
+            while (true)
+            {
+                if (Match(TokenType.AndAnd))
+                {
+                    result = new ConditionalExpression(TokenType.AndAnd, result, Equality());
+                    continue;
+                }
+                
+                break;
+            }
+
+            return result;
+        }
+
+        private IExpression Equality()
+        {
+            var result = Conditional();
+
+            if (Match(TokenType.Equal))
+            {
+                return new ConditionalExpression(TokenType.Equal, result, Conditional());
+            }
+
+            if (Match(TokenType.NotEqual))
+            {
+                return new ConditionalExpression(TokenType.NotEqual, result, Conditional());
+            }
+
+            return result;
+        }
+
+        private IExpression Conditional()
+        {
+            var result = Additive();
+
+            while (true)
+            {
+                if (Match(TokenType.Less))
+                {
+                    result = new ConditionalExpression(TokenType.Less, result, Additive());
+                    continue;
+                }
+
+                if (Match(TokenType.LessOrEqual))
+                {
+                    result = new ConditionalExpression(TokenType.LessOrEqual, result, Additive());
+                    continue;
+                }
+
+                if (Match(TokenType.Greater))
+                {
+                    result = new ConditionalExpression(TokenType.Greater, result, Additive());
+                    continue;
+                }
+
+                if (Match(TokenType.GreaterOrEqual))
+                {
+                    result = new ConditionalExpression(TokenType.GreaterOrEqual, result, Additive());
+                    continue;
+                }
+                
+                break;
+            }
+
+            return result;
         }
 
         private IExpression Additive()

@@ -8,13 +8,27 @@ namespace Semantic_Interpreter.Parser
 {
     public class Lexer
     {
-        private const string OperatorsChars = "+-*/";
         private Dictionary<string, TokenType> _operators = new()
         {
             {"+", TokenType.Plus},
             {"-", TokenType.Minus},
             {"*", TokenType.Multiply},
             {"/", TokenType.Divide},
+            {"(", TokenType.LParen},
+            {")", TokenType.RParen},
+            {".", TokenType.Dot},
+            {":=", TokenType.Assing},
+            {"<", TokenType.Less},
+            {">", TokenType.Greater},
+            {";", TokenType.Semicolon},
+            
+            {"!=", TokenType.NotEqual},
+            {"==", TokenType.Equal},
+            {"<=", TokenType.LessOrEqual},
+            {">=", TokenType.GreaterOrEqual},
+            
+            {"&&", TokenType.AndAnd},
+            {"||", TokenType.OrOr},
         };
 
         private readonly string _program;
@@ -52,19 +66,19 @@ namespace Semantic_Interpreter.Parser
                 // Example ,./\\;:=+-_*'\"#@!&|<>[]{}
                 else if (IsNotLetterOrDigit(curr))
                 {
-                    var token = curr switch
+                    var next = Peek(1);
+                    var symbol = curr.ToString();
+                    if (next == '=')
                     {
-                        '(' => TokenType.LParen,
-                        ')' => TokenType.RParen,
-                        '.' => TokenType.Dot,
-                        '-' => TokenType.Minus,
-                        '+' => TokenType.Plus,
-                        '*' => TokenType.Multiply,
-                        '/' => TokenType.Divide,
-                        ';' => TokenType.Semicolon,
-                        ':' => TokenizeSymbol(curr),
-                        _ => TokenType.NotFound,
-                    };
+                        symbol += next;
+                        Next(); // Scip =
+                    }
+
+
+                    var token = _operators.ContainsKey(symbol) 
+                        ? _operators[symbol] 
+                        : TokenType.NotFound;
+                    
                     AddToken(token);
                     Next();
                 }
@@ -110,8 +124,9 @@ namespace Semantic_Interpreter.Parser
             {
                 case "module": AddToken(TokenType.Module); break;
                 case "beginning": AddToken(TokenType.Beginning); break;
+                case "while": AddToken(TokenType.While); break;
                 case "variable": AddToken(TokenType.Variable); break;
-                case "assign": AddToken(TokenType.Assing); break;
+                case "let": AddToken(TokenType.Let); break;
                 case "output": AddToken(TokenType.Output); break;
                 case "end": AddToken(TokenType.End); break;
                 default: AddToken(TokenType.Word, word); break;
@@ -151,29 +166,12 @@ namespace Semantic_Interpreter.Parser
 
         private TokenType TokenizeSymbol(char ch)
         {
-            var curr = Next();
-            switch (ch)
-            {
-                case ':':
-                {
-                    if (curr == '=')
-                    {
-                        return TokenType.Assing;
-                    }
-                    break;
-                }
+            var next = Next();
+            var symbol = next == '=' ? ch.ToString() + next : ch.ToString();
 
-                case '<':
-                {
-                    if (curr == '=')
-                    {
-                        // token = 
-                    }
-                    break;
-                }
-            }
-
-            return TokenType.NotFound;
+            return _operators.ContainsKey(symbol) 
+                ? _operators[symbol] 
+                : TokenType.NotFound;
         }
         
         private char Peek(int i = 0)
@@ -192,6 +190,6 @@ namespace Semantic_Interpreter.Parser
             => _tokens.Add(new Token(type, text));
 
         private bool IsNotLetterOrDigit(char ch)
-            => ",./\\;:=+-*'\"#&|<>()[]".Contains(ch);
+            => ",./\\;:=+-_*'\"#@!&|<>[]{}".Contains(ch);
     }
 }

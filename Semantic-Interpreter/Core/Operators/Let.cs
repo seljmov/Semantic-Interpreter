@@ -1,10 +1,11 @@
 ﻿using Semantic_Interpreter.Core.Items;
+using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
-    public class Assign : SemanticOperator
+    public class Let : SemanticOperator
     {
-        public Assign(string variable, IExpression expression)
+        public Let(string variable, IExpression expression)
         {
             Variable = variable;
             Expression = expression;
@@ -15,8 +16,9 @@ namespace Semantic_Interpreter.Core
 
         public override void Execute()
         {
-            // TODO: Create vars storage and add this var
-            throw new System.NotImplementedException();
+            var currVar = VariablesStorage.At(Variable);
+            currVar.Expression = Expression;
+            VariablesStorage.Replace(Variable, currVar);
         }
 
         public override string ToString()

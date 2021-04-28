@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Semantic_Interpreter.Parser;
 
@@ -8,8 +9,8 @@ namespace Semantic_Interpreter
     public static class Program
     {
         private const string Demo = @"E:\Education\Github\Own\Semantic-Interpreter\Semantic-Interpreter\Demo\";
-        private const string Filename = "program2.txt";
-
+        private const string Filename = "program3.txt";
+        
         public static void Main()
         {
             
@@ -19,6 +20,8 @@ namespace Semantic_Interpreter
             
             var lexer = new Lexer(program);
             var tokens = lexer.Tokenize();
+            
+            // PrintTokens(tokens);
             
             var tree = new Parser.Parser(tokens).Parse();
             tree.TraversalTree();

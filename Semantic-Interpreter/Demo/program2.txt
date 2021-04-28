@@ -1,6 +1,9 @@
 ﻿module main
 
 beginning
-    variable-real var1 := 1.123;
-    output var1;
+    variable-integer i := 0;
+    while (i < 2) then
+        let i := 2;
+        output i;
+    end while.
 end main.

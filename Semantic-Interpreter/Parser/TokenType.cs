@@ -9,9 +9,11 @@
         
         Module,
         Beginning,
+        While,
         Output,
         Variable,
         Assing,
+        Let,
         
         Plus,
         Minus,
@@ -20,6 +22,14 @@
         
         LParen,
         RParen,
+        Equal,
+        NotEqual,
+        Greater,
+        Less,
+        GreaterOrEqual,
+        LessOrEqual,
+        AndAnd,
+        OrOr,
         End,
         
         Semicolon,

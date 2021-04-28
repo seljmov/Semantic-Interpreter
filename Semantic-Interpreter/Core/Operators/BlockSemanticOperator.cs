@@ -4,20 +4,20 @@ using System.Text;
 
 namespace Semantic_Interpreter.Core
 {
-    public class BlockSemanticOperator
+    public class BlockSemanticOperator : SemanticOperator
     {
-        private readonly List<SemanticOperator> _operators;
+        public List<SemanticOperator> Operators { get; set; }
 
         public BlockSemanticOperator()
         {
-            _operators = new List<SemanticOperator>();
+            Operators = new List<SemanticOperator>();
         }
 
-        public void Add(SemanticOperator semanticOperator) => _operators.Add(semanticOperator);
+        public void Add(SemanticOperator semanticOperator) => Operators.Add(semanticOperator);
 
-        public void Execute()
+        public override void Execute()
         {
-            foreach (var @operator in _operators)
+            foreach (var @operator in Operators)
             {
                 @operator.Execute();
             }
@@ -26,7 +26,7 @@ namespace Semantic_Interpreter.Core
         public override string ToString()
         {
             var result = new StringBuilder();
-            foreach (var @operator in _operators)
+            foreach (var @operator in Operators)
             {
                 result.Append(@operator.ToString()).Append("\n");
             }
