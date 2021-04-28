@@ -15,10 +15,7 @@ namespace Semantic_Interpreter.Parser
 
         private int _pos;
         private readonly SemanticTree _semanticTree = new();
-
-        Stack<SemanticOperator> operatorsStack = new();
-        private SemanticOperator _lastOperator;
-
+        
         public Parser(List<Token> tokens)
         {
             _tokens = tokens;
@@ -28,17 +25,58 @@ namespace Semantic_Interpreter.Parser
 
         public SemanticTree Parse()
         {
+            Stack<SemanticOperator> operatorsStack = new();
+            SemanticOperator lastOperator = null;
+            
             while (!Match(TokenType.Eof))
             {
-                if (Match(TokenType.End))
+                if (Match(TokenType.End)) return _semanticTree;
+
+                var prevOperator = lastOperator;
+                var newOperator = ParseOperator();
+                var asChild = false;
+                switch (newOperator)
                 {
-                    Consume(TokenType.Word);
-                    Consume(TokenType.Dot);
+                    case Module:
+                    {
+                        operatorsStack.Push(newOperator);
+                        break;
+                    }
+                    
+                    case Beginning:
+                    {
+                        asChild = operatorsStack.Pop().Child == null;
+                        operatorsStack.Push(newOperator);
+                        break;
+                    }
+                    
+                    case While:
+                    {
+                        asChild = operatorsStack.Peek().Child == null;
+                        break;
+                    }
+                    
+                    case Variable:
+                    {
+                        asChild = operatorsStack.Peek().Child == null;
+                        break;
+                    }
+                    
+                    case Let:
+                    {
+                        asChild = operatorsStack.Peek().Child == null; 
+                        break;
+                    }
+                    
+                    case Output:
+                    {
+                        asChild = operatorsStack.Peek().Child == null;
+                        break;
+                    }
                 }
-                else
-                {
-                    ParseOperator();
-                }
+                
+                _semanticTree.InsertOperator(prevOperator, newOperator, asChild);
+                lastOperator = newOperator;
             }
 
             return _semanticTree;
@@ -48,84 +86,50 @@ namespace Semantic_Interpreter.Parser
         {
             if (Match(TokenType.Module))
             {
-                var module = ModuleOperator();
-                _semanticTree.InsertOperator(module);
-                operatorsStack.Push(module);
-                _lastOperator = module;
-                
-                return module;
+                return ModuleOperator();
             }
             
             if (Match(TokenType.Beginning))
             {
-                var parent = operatorsStack.Pop();
-                var beginning = new Beginning(parent);
-                _semanticTree.InsertOperator(beginning, parent);
-                operatorsStack.Push(beginning);
-                _lastOperator = beginning;
-                
-                return beginning;
+                return new Beginning();
             }
             
             if (Match(TokenType.While))
             {
                 var expression = ParseExpression();
-                Consume(TokenType.Word); // Scip then
+                Consume(TokenType.Word); // Skip then
                 var block = new BlockSemanticOperator();
-                while (!Match(TokenType.While))
+                while (!Match(TokenType.End))
                 {
-                    if (Match(TokenType.End)) continue;
                     block.Add(ParseOperator());
                 }
 
+                Consume(TokenType.While);
                 Consume(TokenType.Dot);
-
-                var parent = operatorsStack.Peek();
-                var @while = new While(expression, block);
-                var asChild = parent.Child == null;
-                _semanticTree.InsertOperator(@while, _lastOperator, asChild);
-                _lastOperator = @while;
-
-                return @while;
+                return new While(expression, block);
             }
             
             if (Match(TokenType.Variable))
             {
-                var parent = operatorsStack.Peek();
-                var variable = VariableOperator();
-                var asChild = parent.Child == null;
-                _semanticTree.InsertOperator(variable, _lastOperator, asChild);
-                _lastOperator = variable;
-                
-                return variable;
+                return VariableOperator();
             }
 
             if (Match(TokenType.Let))
             {
-                var parent = operatorsStack.Peek();
-                var nameVar = Consume(TokenType.Word).Text;
+                var variable = Consume(TokenType.Word).Text;
                 Consume(TokenType.Assing);
                 var expression = ParseExpression();
                 Consume(TokenType.Semicolon);
-
-                var let = new Let(nameVar, expression);
-                var asChild = parent.Child == null;
-                _semanticTree.InsertOperator(let, _lastOperator, asChild);
-                _lastOperator = let;
-
-                return let;
+                
+                return new Let(variable, expression);
             }
             
             if (Match(TokenType.Output))
             {
-                var parent = operatorsStack.Peek();
-                var output = new Output(ParseExpression());
+                var expression = ParseExpression();
                 Consume(TokenType.Semicolon);
-                var asChild = parent.Child == null;
-                _semanticTree.InsertOperator(output, _lastOperator, asChild);
-                _lastOperator = output;
 
-                return output;
+                return new Output(expression);
             }
 
             return null;
@@ -139,7 +143,7 @@ namespace Semantic_Interpreter.Parser
 
         private SemanticOperator VariableOperator()
         {
-            Consume(TokenType.Minus);  // Scip -
+            Consume(TokenType.Minus);  // Skip -
             var type = Consume(TokenType.Word).Text switch
             {
                 "integer" => SemanticTypes.Integer,

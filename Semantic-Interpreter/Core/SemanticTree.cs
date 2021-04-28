@@ -5,7 +5,7 @@
         private int _count;
         private SemanticOperator Root { get; set; }
 
-        public void InsertOperator(SemanticOperator newOperator, SemanticOperator prevOperator = null, bool asChild = false)
+        public void InsertOperator(SemanticOperator prevOperator, SemanticOperator newOperator, bool asChild = false)
         {
             if (prevOperator == null && newOperator is Module)
             {

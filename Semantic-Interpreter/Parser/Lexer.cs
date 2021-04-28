@@ -66,21 +66,7 @@ namespace Semantic_Interpreter.Parser
                 // Example ,./\\;:=+-_*'\"#@!&|<>[]{}
                 else if (IsNotLetterOrDigit(curr))
                 {
-                    var next = Peek(1);
-                    var symbol = curr.ToString();
-                    if (next == '=')
-                    {
-                        symbol += next;
-                        Next(); // Scip =
-                    }
-
-
-                    var token = _operators.ContainsKey(symbol) 
-                        ? _operators[symbol] 
-                        : TokenType.NotFound;
-                    
-                    AddToken(token);
-                    Next();
+                    TokenizeSymbol(curr);
                 }
                 else Next();
             }
@@ -164,14 +150,23 @@ namespace Semantic_Interpreter.Parser
             AddToken(TokenType.Text, buffer.ToString());
         }
 
-        private TokenType TokenizeSymbol(char ch)
+        private void TokenizeSymbol(char ch)
         {
-            var next = Next();
-            var symbol = next == '=' ? ch.ToString() + next : ch.ToString();
+            var next = Peek(1);
+            var symbol = ch.ToString();
+            if (next == '=')
+            {
+                symbol += next;
+                Next(); // Scip =
+            }
 
-            return _operators.ContainsKey(symbol) 
+
+            var token = _operators.ContainsKey(symbol) 
                 ? _operators[symbol] 
                 : TokenType.NotFound;
+                    
+            AddToken(token);
+            Next();
         }
         
         private char Peek(int i = 0)
@@ -190,6 +185,6 @@ namespace Semantic_Interpreter.Parser
             => _tokens.Add(new Token(type, text));
 
         private bool IsNotLetterOrDigit(char ch)
-            => ",./\\;:=+-_*'\"#@!&|<>[]{}".Contains(ch);
+            => ",./\\;:=+-_*'\"#@!&|<>()[]".Contains(ch);
     }
 }
