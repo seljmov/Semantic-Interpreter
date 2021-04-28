@@ -8,8 +8,8 @@ namespace Semantic_Interpreter.Core
         public BinaryExpression(Operations operation, IExpression expression1, IExpression expression2)
         {
             Operation = operation;
-            Expression1 = expression1;
-            Expression2 = expression2;
+            Expression1 = FormatExpression(expression1);
+            Expression2 = FormatExpression(expression2);
         }
         
         private IExpression Expression1 { get; set; }
@@ -41,6 +41,23 @@ namespace Semantic_Interpreter.Core
                 },
                 _ => throw new Exception("Неопределенный тип!")
             };
+        }
+
+        private IExpression FormatExpression(IExpression expression)
+        {
+            if (expression is Variable variable)
+            {
+                return variable.Type switch
+                {
+                    SemanticTypes.Integer => new ValueExpression(expression.Eval().AsInteger()),
+                    SemanticTypes.Real => new ValueExpression(expression.Eval().AsReal()),
+                    SemanticTypes.Boolean => new ValueExpression(expression.Eval().AsInteger()),
+                    SemanticTypes.String => new ValueExpression(expression.Eval().AsString()),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+            }
+
+            return expression;
         }
     }
 }

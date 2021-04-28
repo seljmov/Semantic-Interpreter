@@ -9,7 +9,7 @@ namespace Semantic_Interpreter
     public static class Program
     {
         private const string Demo = @"E:\Education\Github\Own\Semantic-Interpreter\Semantic-Interpreter\Demo\";
-        private const string Filename = "program3.txt";
+        private const string Filename = "program2.txt";
         
         public static void Main()
         {
