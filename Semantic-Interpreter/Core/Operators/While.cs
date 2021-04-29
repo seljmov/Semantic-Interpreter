@@ -1,4 +1,6 @@
-﻿namespace Semantic_Interpreter.Core
+﻿using System;
+
+namespace Semantic_Interpreter.Core
 {
     public class While : SemanticOperator
     {
@@ -20,9 +22,11 @@
         
         public override void Execute()
         {
-            while (Expression.Eval().AsInteger() != 0)
+            var cond = Expression.Eval().AsInteger();
+            while (cond != 0)
             {
                 Operator.Execute();
+                cond = Expression.Eval().AsInteger();
             }
         }
     }

@@ -19,8 +19,8 @@ namespace Semantic_Interpreter.Core
         
         public IValue Eval()
         {
-            var value1 = Expression1.Eval();
-            var value2 = Expression2.Eval();
+            var value1 = FormatExpression(Expression1).Eval();
+            var value2 = FormatExpression(Expression2).Eval();
 
             int result;
             switch (value1)
@@ -63,6 +63,23 @@ namespace Semantic_Interpreter.Core
             };
             
             return Convert.ToInt32(result);
+        }
+        
+        private IExpression FormatExpression(IExpression expression)
+        {
+            if (expression is Variable variable)
+            {
+                return variable.Type switch
+                {
+                    SemanticTypes.Integer => new ValueExpression(variable.Eval().AsInteger()),
+                    SemanticTypes.Real => new ValueExpression(variable.Eval().AsReal()),
+                    SemanticTypes.Boolean => new ValueExpression(variable.Eval().AsInteger()),
+                    SemanticTypes.String => new ValueExpression(variable.Eval().AsString()),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+            }
+
+            return expression;
         }
     }
 }

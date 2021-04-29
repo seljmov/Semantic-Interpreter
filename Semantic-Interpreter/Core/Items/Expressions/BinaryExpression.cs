@@ -8,8 +8,8 @@ namespace Semantic_Interpreter.Core
         public BinaryExpression(Operations operation, IExpression expression1, IExpression expression2)
         {
             Operation = operation;
-            Expression1 = FormatExpression(expression1);
-            Expression2 = FormatExpression(expression2);
+            Expression1 = expression1;
+            Expression2 = expression2;
         }
         
         private IExpression Expression1 { get; set; }
@@ -18,8 +18,8 @@ namespace Semantic_Interpreter.Core
         
         public IValue Eval()
         {
-            var value1 = Expression1.Eval();
-            var value2 = Expression2.Eval();
+            var value1 = FormatExpression(Expression1).Eval();
+            var value2 = FormatExpression(Expression2).Eval();
 
             return value1 switch
             {
@@ -49,10 +49,10 @@ namespace Semantic_Interpreter.Core
             {
                 return variable.Type switch
                 {
-                    SemanticTypes.Integer => new ValueExpression(expression.Eval().AsInteger()),
-                    SemanticTypes.Real => new ValueExpression(expression.Eval().AsReal()),
-                    SemanticTypes.Boolean => new ValueExpression(expression.Eval().AsInteger()),
-                    SemanticTypes.String => new ValueExpression(expression.Eval().AsString()),
+                    SemanticTypes.Integer => new ValueExpression(variable.Eval().AsInteger()),
+                    SemanticTypes.Real => new ValueExpression(variable.Eval().AsReal()),
+                    SemanticTypes.Boolean => new ValueExpression(variable.Eval().AsInteger()),
+                    SemanticTypes.String => new ValueExpression(variable.Eval().AsString()),
                     _ => throw new ArgumentOutOfRangeException()
                 };
             }
