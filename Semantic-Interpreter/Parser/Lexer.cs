@@ -113,6 +113,7 @@ namespace Semantic_Interpreter.Parser
                 case "while": AddToken(TokenType.While); break;
                 case "variable": AddToken(TokenType.Variable); break;
                 case "let": AddToken(TokenType.Let); break;
+                case "input": AddToken(TokenType.Input); break;
                 case "output": AddToken(TokenType.Output); break;
                 case "end": AddToken(TokenType.End); break;
                 default: AddToken(TokenType.Word, word); break;

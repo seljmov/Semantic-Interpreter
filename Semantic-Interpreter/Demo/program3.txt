@@ -1,6 +1,10 @@
 ﻿module main
 
 beginning
-    variable-integer i := (1 + 4) * 2;
-    output i;
+    variable-integer i := 0;
+    while (i < 10) then
+        output i;
+        output "\n";
+        let i := i + 1;
+    end while.
 end main.

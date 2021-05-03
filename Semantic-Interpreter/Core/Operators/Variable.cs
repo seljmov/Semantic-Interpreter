@@ -10,18 +10,21 @@ namespace Semantic_Interpreter.Core
             Type = type;
             Name = name;
             // Expression = expression;
-            var value = expression.Eval();
-            switch (type)
+            if (expression != null)
             {
-                case SemanticTypes.String when value is StringValue:
-                case SemanticTypes.Integer when value is IntegerValue:
-                case SemanticTypes.Real when value is RealValue || value is IntegerValue:
-                    Expression = expression;
-                    break;
-                case SemanticTypes.Boolean:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                var value = expression.Eval();
+                switch (type)
+                {
+                    case SemanticTypes.String when value is StringValue:
+                    case SemanticTypes.Integer when value is IntegerValue:
+                    case SemanticTypes.Real when value is RealValue || value is IntegerValue:
+                        Expression = expression;
+                        break;
+                    case SemanticTypes.Boolean:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(type), type, null);
+                }
             }
         }
 
@@ -30,9 +33,11 @@ namespace Semantic_Interpreter.Core
         public IExpression Expression { get; set; }
 
         public IValue Eval()
-            => VariablesStorage.IsExist(Name)
-                ? Expression.Eval()
-                : throw new Exception("Переменной с таким именем не существует!");
+            => !VariablesStorage.IsExist(Name)
+                ? throw new Exception("Переменной с таким именем не существует!")
+                : Expression != null
+                    ? Expression.Eval()
+                    : throw new Exception($"Переменная с именем {Name} не инициализированна!");
 
         public override string ToString() => Name;
 

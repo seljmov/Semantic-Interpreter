@@ -11,6 +11,7 @@
         Beginning,
         While,
         Output,
+        Input,
         Variable,
         Assing,
         Let,

@@ -68,6 +68,12 @@ namespace Semantic_Interpreter.Parser
                         break;
                     }
                     
+                    case Input:
+                    {
+                        asChild = operatorsStack.Peek().Child == null;
+                        break;
+                    }
+                    
                     case Output:
                     {
                         asChild = operatorsStack.Peek().Child == null;
@@ -122,6 +128,14 @@ namespace Semantic_Interpreter.Parser
                 Consume(TokenType.Semicolon);
                 
                 return new Let(variable, expression);
+            }
+            
+            if (Match(TokenType.Input))
+            {
+                var name = Consume(TokenType.Word).Text;
+                Consume(TokenType.Semicolon);
+
+                return new Input(name);
             }
             
             if (Match(TokenType.Output))
