@@ -2,7 +2,7 @@
 
 beginning
     variable-integer i := 0;
-    while (i < 10) then
+    while (i <= 5) then
         output i;
         output "\n";
         let i := i + 1;

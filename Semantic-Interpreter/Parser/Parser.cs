@@ -35,50 +35,20 @@ namespace Semantic_Interpreter.Parser
                 var prevOperator = lastOperator;
                 var newOperator = ParseOperator();
                 var asChild = false;
+                // Операторы Module и Beginning имеют индивидуальные правила, по которым они вставляются
+                // в дерево, а остальные операторы вставляются по общим правилам (кейс default)
                 switch (newOperator)
                 {
                     case Module:
-                    {
                         operatorsStack.Push(newOperator);
                         break;
-                    }
-                    
                     case Beginning:
-                    {
                         asChild = operatorsStack.Pop().Child == null;
                         operatorsStack.Push(newOperator);
                         break;
-                    }
-                    
-                    case While:
-                    {
+                    default:
                         asChild = operatorsStack.Peek().Child == null;
                         break;
-                    }
-                    
-                    case Variable:
-                    {
-                        asChild = operatorsStack.Peek().Child == null;
-                        break;
-                    }
-                    
-                    case Let:
-                    {
-                        asChild = operatorsStack.Peek().Child == null; 
-                        break;
-                    }
-                    
-                    case Input:
-                    {
-                        asChild = operatorsStack.Peek().Child == null;
-                        break;
-                    }
-                    
-                    case Output:
-                    {
-                        asChild = operatorsStack.Peek().Child == null;
-                        break;
-                    }
                 }
                 
                 _semanticTree.InsertOperator(prevOperator, newOperator, asChild);
@@ -90,72 +60,45 @@ namespace Semantic_Interpreter.Parser
 
         private SemanticOperator ParseOperator()
         {
-            if (Match(TokenType.Module))
+            var token = Get();
+            _pos++;
+            return token.Type switch
             {
-                return ModuleOperator();
-            }
-            
-            if (Match(TokenType.Beginning))
-            {
-                return new Beginning();
-            }
-            
-            if (Match(TokenType.While))
-            {
-                var expression = ParseExpression();
-                Consume(TokenType.Word); // Skip then
-                var block = new BlockSemanticOperator();
-                while (!Match(TokenType.End))
-                {
-                    block.Add(ParseOperator());
-                }
-
-                Consume(TokenType.While);
-                Consume(TokenType.Dot);
-                return new While(expression, block);
-            }
-            
-            if (Match(TokenType.Variable))
-            {
-                return VariableOperator();
-            }
-
-            if (Match(TokenType.Let))
-            {
-                var variable = Consume(TokenType.Word).Text;
-                Consume(TokenType.Assing);
-                var expression = ParseExpression();
-                Consume(TokenType.Semicolon);
-                
-                return new Let(variable, expression);
-            }
-            
-            if (Match(TokenType.Input))
-            {
-                var name = Consume(TokenType.Word).Text;
-                Consume(TokenType.Semicolon);
-
-                return new Input(name);
-            }
-            
-            if (Match(TokenType.Output))
-            {
-                var expression = ParseExpression();
-                Consume(TokenType.Semicolon);
-
-                return new Output(expression);
-            }
-
-            return null;
+                TokenType.Module => ParseModuleOperator(),
+                TokenType.Beginning => ParseBeginningOperator(),
+                TokenType.While => ParseWhileOperator(),
+                TokenType.Variable => ParseVariableOperator(),
+                TokenType.Let => ParseLetOperator(),
+                TokenType.Input => ParseInputOperator(),
+                TokenType.Output => ParseOutputOperator(),
+                _ => null
+            };
         }
         
-        private SemanticOperator ModuleOperator()
+        private SemanticOperator ParseModuleOperator()
         {
             var name = Consume(TokenType.Word).Text;
             return new Module(name);
         }
 
-        private SemanticOperator VariableOperator()
+        private SemanticOperator ParseBeginningOperator() => new Beginning();
+        
+        private SemanticOperator ParseWhileOperator()
+        {
+            var expression = ParseExpression();
+            Consume(TokenType.Word); // Skip then
+            var block = new BlockSemanticOperator();
+            while (!Match(TokenType.End))
+            {
+                block.Add(ParseOperator());
+            }
+
+            Consume(TokenType.While);
+            Consume(TokenType.Dot);
+            return new While(expression, block);
+        }
+        
+        private SemanticOperator ParseVariableOperator()
         {
             Consume(TokenType.Minus);  // Skip -
             var type = Consume(TokenType.Word).Text switch
@@ -177,7 +120,32 @@ namespace Semantic_Interpreter.Parser
             Consume(TokenType.Semicolon);
             return variable;
         }
-        
+
+        private SemanticOperator ParseLetOperator()
+        {
+            var variable = Consume(TokenType.Word).Text;
+            Consume(TokenType.Assing);
+            var expression = ParseExpression();
+            Consume(TokenType.Semicolon);
+                
+            return new Let(variable, expression);
+        }
+
+        private SemanticOperator ParseInputOperator()
+        {
+            var name = Consume(TokenType.Word).Text;
+            Consume(TokenType.Semicolon);
+
+            return new Input(name);
+        }
+
+        private SemanticOperator ParseOutputOperator()
+        {
+            var expression = ParseExpression();
+            Consume(TokenType.Semicolon);
+
+            return new Output(expression);
+        }
         
         private IExpression ParseExpression()
         {
@@ -330,29 +298,25 @@ namespace Semantic_Interpreter.Parser
         private IExpression Primary()
         {
             var current = Get();
-            if (Match(TokenType.Number))
+            var token = Get();
+            _pos++;
+            switch (token.Type)
             {
-                // Если точки нет, то число целое, иначе - вещественное
-                if (!current.Text.Contains('.'))
-                    return new ValueExpression(Convert.ToInt32(current.Text));
+                case TokenType.Word: return VariablesStorage.At(current.Text);
+                case TokenType.Text: return new ValueExpression(current.Text);
+                case TokenType.Number:
+                    // Если точки нет, то число целое, иначе - вещественное
+                    if (!current.Text.Contains('.'))
+                        return new ValueExpression(Convert.ToInt32(current.Text));
                 
-                IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
-                return new ValueExpression(Convert.ToDouble(current.Text, formatter));
+                    IFormatProvider formatter = new NumberFormatInfo { NumberDecimalSeparator = "." };
+                    return new ValueExpression(Convert.ToDouble(current.Text, formatter));
+                case TokenType.LParen:
+                    var result = ParseExpression();
+                    Match(TokenType.RParen);
+                    return result;
             }
-
-            if (Match(TokenType.Word))
-                return VariablesStorage.At(current.Text);
             
-            if (Match(TokenType.Text))
-                return new ValueExpression(current.Text);
-
-            if (Match(TokenType.LParen))
-            {
-                var result = ParseExpression();
-                Match(TokenType.RParen);
-                return result;
-            }
-
             throw new Exception("Неизвестный оператор.");
         }
         

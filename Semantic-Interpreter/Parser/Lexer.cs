@@ -10,16 +10,25 @@ namespace Semantic_Interpreter.Parser
     {
         private Dictionary<string, TokenType> _operators = new()
         {
+            {"module", TokenType.Module},
+            {"beginning", TokenType.Beginning},
+            {"while", TokenType.While},
+            {"variable", TokenType.Variable},
+            {"let", TokenType.Let},
+            {"input", TokenType.Input},
+            {"output", TokenType.Output},
+            {"end", TokenType.End},
+            
             {"+", TokenType.Plus},
             {"-", TokenType.Minus},
             {"*", TokenType.Multiply},
             {"/", TokenType.Divide},
-            {"(", TokenType.LParen},
-            {")", TokenType.RParen},
-            {".", TokenType.Dot},
             {":=", TokenType.Assing},
             {"<", TokenType.Less},
             {">", TokenType.Greater},
+            {"(", TokenType.LParen},
+            {")", TokenType.RParen},
+            {".", TokenType.Dot},
             {";", TokenType.Semicolon},
             
             {"!=", TokenType.NotEqual},
@@ -30,7 +39,7 @@ namespace Semantic_Interpreter.Parser
             {"&&", TokenType.AndAnd},
             {"||", TokenType.OrOr},
         };
-
+        
         private readonly string _program;
         private readonly int _lenght;
         
@@ -106,23 +115,17 @@ namespace Semantic_Interpreter.Parser
             }
 
             var word = buffer.ToString();
-            switch (word)
-            {
-                case "module": AddToken(TokenType.Module); break;
-                case "beginning": AddToken(TokenType.Beginning); break;
-                case "while": AddToken(TokenType.While); break;
-                case "variable": AddToken(TokenType.Variable); break;
-                case "let": AddToken(TokenType.Let); break;
-                case "input": AddToken(TokenType.Input); break;
-                case "output": AddToken(TokenType.Output); break;
-                case "end": AddToken(TokenType.End); break;
-                default: AddToken(TokenType.Word, word); break;
-            }
+            var cond = _operators.ContainsKey(word);
+            
+            AddToken(
+                cond ? _operators[word] : TokenType.Word, 
+                cond ? "" : word
+            );
         }
 
         private void TokenizeText()
         {
-            Next(); // Scip "
+            Next(); // Skip "
             var buffer = new StringBuilder();
             var curr = Peek();
             while (true)
@@ -158,7 +161,7 @@ namespace Semantic_Interpreter.Parser
             if (next == '=')
             {
                 symbol += next;
-                Next(); // Scip =
+                Next(); // Skip =
             }
 
 
@@ -185,7 +188,7 @@ namespace Semantic_Interpreter.Parser
         private void AddToken(TokenType type, string text = "")
             => _tokens.Add(new Token(type, text));
 
-        private bool IsNotLetterOrDigit(char ch)
+        private static bool IsNotLetterOrDigit(char ch)
             => ",./\\;:=+-_*'\"#@!&|<>()[]".Contains(ch);
     }
 }
