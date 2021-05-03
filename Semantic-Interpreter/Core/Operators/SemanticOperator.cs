@@ -7,6 +7,6 @@
         public SemanticOperator Next { get; set; }
         public SemanticOperator Previous { get; set; }
         
-        public virtual void Execute() {}
+        public abstract void Execute();
     }
 }

@@ -1,5 +1,9 @@
 ﻿module main
 
 beginning
-    output "Hello world!";
+    variable-string var1 := "var1";
+    variable-string var2 := "var2";
+    output var1;
+    output "\n";
+    output var2;
 end main.

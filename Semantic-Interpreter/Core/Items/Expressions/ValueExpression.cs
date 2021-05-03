@@ -1,6 +1,6 @@
 ﻿using Semantic_Interpreter.Library;
 
-namespace Semantic_Interpreter.Parser.Expressions
+namespace Semantic_Interpreter.Core
 {
     public class ValueExpression : IExpression
     {
@@ -9,6 +9,8 @@ namespace Semantic_Interpreter.Parser.Expressions
         public ValueExpression(double value) => Value = new RealValue(value);
         
         public ValueExpression(string value) => Value = new StringValue(value);
+
+        public ValueExpression(IValue value) => Value = value;
 
         private IValue Value { get; set; }
 

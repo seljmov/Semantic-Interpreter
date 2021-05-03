@@ -2,10 +2,10 @@
 {
     public class SemanticTree
     {
-        private int _count = 0;
-        public SemanticOperator Root { get; private set; }
+        private int _count;
+        private SemanticOperator Root { get; set; }
 
-        public void InsertOperator(SemanticOperator prevOperator, SemanticOperator newOperator, bool AsChild)
+        public void InsertOperator(SemanticOperator prevOperator, SemanticOperator newOperator, bool asChild = false)
         {
             if (prevOperator == null && newOperator is Module)
             {
@@ -15,13 +15,13 @@
             {
                 ((Module) FindOperator(prevOperator)).SetBeginning(beginning);
             }
-            else if (AsChild)
+            else if (asChild)
             {
                 InsertOperatorAsChild(newOperator, FindOperator(prevOperator));
             }
             else
             {
-                InsertOperatorAsNext(newOperator, prevOperator);
+                InsertOperatorAsNext(newOperator, FindOperator(prevOperator));
             }
 
             _count++;
@@ -30,20 +30,20 @@
         public void TraversalTree()
         {
             var index = 0;
-            SemanticOperator curr = Root;
-            SemanticOperator parent = Root;
+            var curr = Root;
+            var parent = Root;
             while (index != _count)
             {
-                curr.Execute();
+                curr?.Execute();
                 
-                if (curr.Child != null)
+                if (curr?.Child != null)
                 {
                     parent = curr;
                     curr = curr.Child;
                 }
                 else
                 {
-                    if (curr.Next != null)
+                    if (curr?.Next != null)
                     {
                         curr = curr.Next;
                     }
@@ -66,8 +66,8 @@
         private SemanticOperator FindOperator(SemanticOperator @operator)
         {
             var index = 0;
-            SemanticOperator curr = Root;
-            SemanticOperator parent = Root;
+            var curr = Root;
+            var parent = Root;
             while (index != _count)
             {
                 if (curr == @operator)
@@ -129,7 +129,7 @@
             newOperator.Parent = previous.Parent;
         }
 
-        private void InsertOperatorAsNext(SemanticOperator newOperator, SemanticOperator next)
+        private static void InsertOperatorAsNext(SemanticOperator newOperator, SemanticOperator next)
         {
             if (next.Next != null)
             {
@@ -142,7 +142,7 @@
             newOperator.Parent = next.Parent;
         }
 
-        private void InsertOperatorAsChild(SemanticOperator newOperator, SemanticOperator child)
+        private static void InsertOperatorAsChild(SemanticOperator newOperator, SemanticOperator child)
         {
             if (child.Child != null)
             {
