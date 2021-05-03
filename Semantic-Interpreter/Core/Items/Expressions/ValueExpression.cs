@@ -10,6 +10,8 @@ namespace Semantic_Interpreter.Core
         
         public ValueExpression(string value) => Value = new StringValue(value);
 
+        public ValueExpression(IValue value) => Value = value;
+
         private IValue Value { get; set; }
 
         public IValue Eval() => Value;

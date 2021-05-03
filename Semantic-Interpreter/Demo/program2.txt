@@ -1,7 +1,7 @@
 ﻿module main
 
 beginning
-    variable-integer i := 0;
+    variable-integer i := 2;
     let i := i + 1;
     output i;
 end main.

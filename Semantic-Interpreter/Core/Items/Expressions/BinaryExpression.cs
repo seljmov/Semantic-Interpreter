@@ -3,7 +3,7 @@ using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
-    public class BinaryExpression : IExpression
+    public class BinaryExpression : Expression
     {
         public BinaryExpression(Operations operation, IExpression expression1, IExpression expression2)
         {
@@ -16,10 +16,10 @@ namespace Semantic_Interpreter.Core
         private IExpression Expression2 { get; set; }
         private Operations Operation { get; set; }
         
-        public IValue Eval()
+        public override IValue Eval()
         {
-            var value1 = FormatExpression(Expression1).Eval();
-            var value2 = FormatExpression(Expression2).Eval();
+            var value1 = Expression1.Eval();
+            var value2 = Expression2.Eval();
 
             return value1 switch
             {
@@ -41,23 +41,6 @@ namespace Semantic_Interpreter.Core
                 },
                 _ => throw new Exception("Неопределенный тип!")
             };
-        }
-
-        private IExpression FormatExpression(IExpression expression)
-        {
-            if (expression is Variable variable)
-            {
-                return variable.Type switch
-                {
-                    SemanticTypes.Integer => new ValueExpression(variable.Eval().AsInteger()),
-                    SemanticTypes.Real => new ValueExpression(variable.Eval().AsReal()),
-                    SemanticTypes.Boolean => new ValueExpression(variable.Eval().AsInteger()),
-                    SemanticTypes.String => new ValueExpression(variable.Eval().AsString()),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-            }
-
-            return expression;
         }
     }
 }
