@@ -3,7 +3,7 @@
     public class SemanticTree
     {
         private int _count;
-        private SemanticOperator Root { get; set; }
+        public SemanticOperator Root { get; set; }
 
         public void InsertOperator(SemanticOperator prevOperator, SemanticOperator newOperator, bool asChild = false)
         {
