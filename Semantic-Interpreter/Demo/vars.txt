@@ -1,6 +1,7 @@
 ﻿module main
 
 beginning
+    output "Программа: переменные \n";
     variable-string var1 := "var1";
     variable-string var2 := "var2";
     output var1;

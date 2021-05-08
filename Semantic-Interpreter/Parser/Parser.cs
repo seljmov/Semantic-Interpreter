@@ -103,27 +103,53 @@ namespace Semantic_Interpreter.Parser
         {
             var expression = ParseExpression();
             Consume(TokenType.Word);    // Skip then
-            var ifBlock = new BlockSemanticOperator();
+            
+            BlockSemanticOperator @if = new();
+            List<ElseIf> elseIfs = null;
+            Else @else = null;
+            
             var currentToken = Get();
-            while (!Match(TokenType.Else) && !Match(TokenType.End))
+            while (!Match(TokenType.End))
             {
-                ifBlock.Add(ParseOperator());
-                currentToken = Get();
-            }
-
-            BlockSemanticOperator elseBlock = null;
-            if (currentToken.Type == TokenType.Else)
-            {
-                elseBlock = new BlockSemanticOperator();
-                while (!Match(TokenType.End))
+                if (currentToken.Type != TokenType.Else)
                 {
-                    elseBlock.Add(ParseOperator());
+                    @if.Add(ParseOperator());
                 }
+                else
+                {
+                    Consume(TokenType.Else);
+                    if (Match(TokenType.If))
+                    {
+                        elseIfs ??= new List<ElseIf>();
+                        var elseIfExpr = ParseExpression();
+                        Consume(TokenType.Word);    // Skip then
+                        BlockSemanticOperator elseIfBlock = new();
+                        while (Get().Type != TokenType.Else && Get().Type != TokenType.End)
+                        {
+                            elseIfBlock.Add(ParseOperator());
+                        }
+
+                        var elseIf = new ElseIf(elseIfExpr, elseIfBlock);
+                        elseIfs.Add(elseIf);
+                    }
+                    else
+                    {
+                        BlockSemanticOperator elseBlock = new();
+                        while (Get().Type != TokenType.End)
+                        {
+                            elseBlock.Add(ParseOperator());
+                        }
+
+                        @else = new Else(elseBlock);
+                    }
+                }
+
+                currentToken = Get();
             }
             
             Consume(TokenType.If);      // Skip if word
             Consume(TokenType.Semicolon);   // Skip ;
-            return new If(expression, ifBlock, elseBlock);
+            return new If(expression, @if, elseIfs, @else);
         }
         
         private SemanticOperator ParseVariableOperator()
@@ -136,6 +162,7 @@ namespace Semantic_Interpreter.Parser
                 "boolean" => SemanticTypes.Boolean,
                 _ => SemanticTypes.String
             };
+            
             var name = Get().Text;
             IExpression expression = null;
             if (Match(TokenType.Word) && Get().Type == TokenType.Assing)
@@ -143,6 +170,7 @@ namespace Semantic_Interpreter.Parser
                 Consume(TokenType.Assing);
                 expression = ParseExpression();
             }
+            
             var variable = new Variable(type, name, expression);
             VariablesStorage.Add(name, variable);
             Consume(TokenType.Semicolon);

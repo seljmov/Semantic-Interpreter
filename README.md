@@ -2,10 +2,6 @@
 
 Интерпретатор новой версии интегрированной среды [«Semantic IDE».](https://github.com/seljmov/Semantic-IDE)
 
-__Текущая цель__
-
-Добавить операторы If, Else, Else If
-
 __Реализованные операторы:__
 - Module
 - Beginning
@@ -16,3 +12,4 @@ __Реализованные операторы:__
 - While
 - If
 - Else
+- Else if
