@@ -33,5 +33,8 @@ namespace Semantic_Interpreter.Core
                  _ => throw new Exception("Неопределенный тип!")
             };
         }
+
+        public override string ToString()
+            => Operation + Expression.ToString();
     }
 }

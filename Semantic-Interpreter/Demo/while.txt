@@ -1,10 +1,11 @@
 ﻿module main
 
 beginning
+    output "Программа: цикл while \n";
     variable-integer i := 0;
-    while (i <= 5) then
+    while (i <= 5) repeat
         output i;
         output "\n";
         let i := i + 1;
-    end while.
+    end while;
 end main.

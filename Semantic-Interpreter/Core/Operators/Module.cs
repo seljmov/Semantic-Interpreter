@@ -11,7 +11,7 @@ namespace Semantic_Interpreter.Core
         }
         
         private Beginning Beginning { get; set; }
-        private string Name { get; set; }
+        public string Name { get; set; }
 
         public void SetBeginning(Beginning beginning)
         {

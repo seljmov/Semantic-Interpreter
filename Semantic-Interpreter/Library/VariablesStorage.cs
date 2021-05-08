@@ -34,5 +34,7 @@ namespace Semantic_Interpreter.Library
 
             Variables[name] = variable;
         }
+
+        public static void Clear() => Variables.Clear();
     }
 }

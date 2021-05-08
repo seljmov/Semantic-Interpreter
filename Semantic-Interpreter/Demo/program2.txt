@@ -1,6 +1,0 @@
-﻿module main
-
-beginning
-    variable-integer i := (1 + 4) * 2;
-    output i;
-end main.

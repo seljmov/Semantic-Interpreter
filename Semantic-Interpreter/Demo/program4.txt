@@ -1,7 +1,0 @@
-﻿module main
-
-beginning
-    variable-integer i;
-    input i;
-    output i;
-end main.

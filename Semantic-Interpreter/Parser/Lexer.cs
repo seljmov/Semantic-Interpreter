@@ -8,11 +8,13 @@ namespace Semantic_Interpreter.Parser
 {
     public class Lexer
     {
-        private Dictionary<string, TokenType> _operators = new()
+        private readonly Dictionary<string, TokenType> _operators = new()
         {
             {"module", TokenType.Module},
             {"beginning", TokenType.Beginning},
             {"while", TokenType.While},
+            {"if", TokenType.If},
+            {"else", TokenType.Else},
             {"variable", TokenType.Variable},
             {"let", TokenType.Let},
             {"input", TokenType.Input},
