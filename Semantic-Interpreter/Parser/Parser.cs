@@ -67,6 +67,7 @@ namespace Semantic_Interpreter.Parser
                 TokenType.Module => ParseModuleOperator(),
                 TokenType.Beginning => ParseBeginningOperator(),
                 TokenType.While => ParseWhileOperator(),
+                TokenType.If => ParseIfOperator(),
                 TokenType.Variable => ParseVariableOperator(),
                 TokenType.Let => ParseLetOperator(),
                 TokenType.Input => ParseInputOperator(),
@@ -86,16 +87,43 @@ namespace Semantic_Interpreter.Parser
         private SemanticOperator ParseWhileOperator()
         {
             var expression = ParseExpression();
-            Consume(TokenType.Word); // Skip then
+            Consume(TokenType.Word); // Skip repeat
             var block = new BlockSemanticOperator();
             while (!Match(TokenType.End))
             {
                 block.Add(ParseOperator());
             }
 
-            Consume(TokenType.While);
-            Consume(TokenType.Dot);
+            Consume(TokenType.While);   // Skip while word
+            Consume(TokenType.Semicolon);   // Skip ;
             return new While(expression, block);
+        }
+
+        private SemanticOperator ParseIfOperator()
+        {
+            var expression = ParseExpression();
+            Consume(TokenType.Word);    // Skip then
+            var ifBlock = new BlockSemanticOperator();
+            var currentToken = Get();
+            while (!Match(TokenType.Else) && !Match(TokenType.End))
+            {
+                ifBlock.Add(ParseOperator());
+                currentToken = Get();
+            }
+
+            BlockSemanticOperator elseBlock = null;
+            if (currentToken.Type == TokenType.Else)
+            {
+                elseBlock = new BlockSemanticOperator();
+                while (!Match(TokenType.End))
+                {
+                    elseBlock.Add(ParseOperator());
+                }
+            }
+            
+            Consume(TokenType.If);      // Skip if word
+            Consume(TokenType.Semicolon);   // Skip ;
+            return new If(expression, ifBlock, elseBlock);
         }
         
         private SemanticOperator ParseVariableOperator()
@@ -298,9 +326,8 @@ namespace Semantic_Interpreter.Parser
         private IExpression Primary()
         {
             var current = Get();
-            var token = Get();
             _pos++;
-            switch (token.Type)
+            switch (current.Type)
             {
                 case TokenType.Word: return VariablesStorage.At(current.Text);
                 case TokenType.Text: return new ValueExpression(current.Text);

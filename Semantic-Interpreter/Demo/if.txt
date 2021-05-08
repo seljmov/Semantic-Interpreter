@@ -1,0 +1,12 @@
+﻿module main
+
+beginning
+    variable-integer i;
+    output "Введите число: ";
+    input i;
+    if (i <= 5) then
+        output "True!";
+    else
+        output "False!";
+    end if;
+end main.

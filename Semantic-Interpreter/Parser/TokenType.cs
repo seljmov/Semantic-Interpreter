@@ -10,6 +10,8 @@
         Module,
         Beginning,
         While,
+        If,
+        Else,
         Output,
         Input,
         Variable,

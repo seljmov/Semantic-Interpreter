@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Semantic_Interpreter.Library;
 using Semantic_Interpreter.Parser;
 
 namespace Semantic_Interpreter
@@ -9,11 +8,10 @@ namespace Semantic_Interpreter
     public static class Program
     {
         private const string Demo = @"E:\Education\Github\Own\Semantic-Interpreter\Semantic-Interpreter\Demo\";
-        private const string Filename = "program2.txt";
+        private const string Filename = "factorial.txt";
         
         public static void Main()
         {
-            
             Console.WriteLine();
             using var reader = new StreamReader(Demo + Filename);
             var program = reader.ReadToEnd();
@@ -24,9 +22,9 @@ namespace Semantic_Interpreter
             // PrintTokens(tokens);
             
             var tree = new Parser.Parser(tokens).Parse();
-            // tree.TraversalTree();
+            tree.TraversalTree();
 
-            DocumentRW.Save(tree);
+            // DocumentRW.Save(tree);
         }
 
         private static void PrintTokens(List<Token> tokens)
