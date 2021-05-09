@@ -3,7 +3,7 @@ using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
-    public class BinaryExpression : Expression
+    public class BinaryExpression : IExpression
     {
         public BinaryExpression(Operations operation, IExpression expression1, IExpression expression2)
         {
@@ -12,11 +12,11 @@ namespace Semantic_Interpreter.Core
             Expression2 = expression2;
         }
         
-        private IExpression Expression1 { get; set; }
-        private IExpression Expression2 { get; set; }
-        private Operations Operation { get; set; }
+        private IExpression Expression1 { get; }
+        private IExpression Expression2 { get; }
+        private Operations Operation { get; }
         
-        public override IValue Eval()
+        public IValue Eval()
         {
             var value1 = Expression1.Eval();
             var value2 = Expression2.Eval();
@@ -44,6 +44,6 @@ namespace Semantic_Interpreter.Core
         }
 
         public override string ToString()
-            => Expression1 + Operation.ToString() + Expression2;
+            => $"{Expression1} {Operation} {Expression2}";
     }
 }

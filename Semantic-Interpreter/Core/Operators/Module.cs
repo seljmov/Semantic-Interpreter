@@ -10,8 +10,9 @@ namespace Semantic_Interpreter.Core
             Name = name;
         }
         
+        // TODO: Нужно ли?
         private Beginning Beginning { get; set; }
-        public string Name { get; set; }
+        public string Name { get; }
 
         public void SetBeginning(Beginning beginning)
         {
@@ -20,10 +21,6 @@ namespace Semantic_Interpreter.Core
             Child = Beginning;
         }
         
-        public override void Execute()
-        {
-        }
-
-        public override string ToString() => "module: " + Name;
+        public override void Execute() { }
     }
 }

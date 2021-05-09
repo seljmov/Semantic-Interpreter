@@ -6,7 +6,7 @@ namespace Semantic_Interpreter.Library
     {
         public IntegerValue(int value) => Value = value;
 
-        private int Value { get; set; }
+        private int Value { get; }
 
         public int AsInteger() => Value;
 

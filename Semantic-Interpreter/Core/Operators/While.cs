@@ -4,28 +4,27 @@ namespace Semantic_Interpreter.Core
 {
     public class While : SemanticOperator
     {
-        public While(IExpression expression, BlockSemanticOperator @operator)
+        public While(IExpression expression, BlockSemanticOperator operators)
         {
             Expression = expression;
 
-            foreach (var op in @operator.Operators)
+            foreach (var op in operators.Operators)
             {
                 op.Parent = this;
             }
             
-            Operator = @operator;
-            
+            Operators = operators;
         }
         
-        private IExpression Expression { get; set; }
-        private SemanticOperator Operator { get; set; }
+        public IExpression Expression { get; }
+        public BlockSemanticOperator Operators { get; }
         
         public override void Execute()
         {
             var cond = Expression.Eval().AsInteger();
             while (cond != 0)
             {
-                Operator.Execute();
+                Operators.Execute();
                 cond = Expression.Eval().AsInteger();
             }
         }

@@ -8,7 +8,7 @@
             Text = text;
         }
         
-        public TokenType Type { get; set; }
-        public string Text { get; set; }
+        public TokenType Type { get; }
+        public string Text { get; }
     }
 }

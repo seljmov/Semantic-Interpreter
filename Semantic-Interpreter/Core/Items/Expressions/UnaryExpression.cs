@@ -11,8 +11,8 @@ namespace Semantic_Interpreter.Core
             Expression = expression;
         }
         
-        private IExpression Expression { get; set; }
-        private Operations Operation { get; set; }
+        private IExpression Expression { get; }
+        private Operations Operation { get; }
         
         public IValue Eval()
         {
@@ -33,8 +33,5 @@ namespace Semantic_Interpreter.Core
                  _ => throw new Exception("Неопределенный тип!")
             };
         }
-
-        public override string ToString()
-            => Operation + Expression.ToString();
     }
 }

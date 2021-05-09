@@ -6,7 +6,7 @@ namespace Semantic_Interpreter.Library
     {
         public StringValue(string value) => Value = value;
         
-        private string Value { get; set; }
+        private string Value { get; }
 
         public int AsInteger() => Convert.ToInt32(Value);
 

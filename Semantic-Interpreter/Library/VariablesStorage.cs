@@ -4,6 +4,7 @@ using Semantic_Interpreter.Core;
 
 namespace Semantic_Interpreter.Library
 {
+    // TODO: Перенести хранилище переменных в модуль
     public static class VariablesStorage
     {
         private static readonly Dictionary<string, Variable> Variables = new();

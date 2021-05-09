@@ -12,7 +12,7 @@ namespace Semantic_Interpreter.Core
 
         public ValueExpression(IValue value) => Value = value;
 
-        private IValue Value { get; set; }
+        private IValue Value { get; }
 
         public IValue Eval() => Value;
 

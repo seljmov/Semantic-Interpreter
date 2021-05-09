@@ -9,7 +9,7 @@ namespace Semantic_Interpreter.Core
         {
             Type = type;
             Name = name;
-            // Expression = expression;
+            
             if (expression != null)
             {
                 var value = expression.Eval();
@@ -28,8 +28,8 @@ namespace Semantic_Interpreter.Core
             }
         }
 
-        public SemanticTypes Type { get; set; }
-        public string Name { get; set; }
+        public SemanticTypes Type { get; }
+        public string Name { get; }
         public IExpression Expression { get; set; }
 
         public IValue Eval()
@@ -38,11 +38,7 @@ namespace Semantic_Interpreter.Core
                 : Expression != null
                     ? Expression.Eval()
                     : throw new Exception($"Переменная с именем {Name} не инициализированна!");
-
-        public override string ToString() => Name;
-
-        public override void Execute()
-        {
-        }
+        
+        public override void Execute() { }
     }
 }

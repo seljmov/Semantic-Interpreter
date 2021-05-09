@@ -3,14 +3,9 @@
     public class Else : SemanticOperator
     {
         public Else(BlockSemanticOperator operators)
-        {
-            Operators = operators;
-        }
-        
-        private BlockSemanticOperator Operators { get; set; }
-        public override void Execute()
-        {
-            Operators.Execute();
-        }
+            => Operators = operators;
+
+        public BlockSemanticOperator Operators { get; }
+        public override void Execute() => Operators.Execute();
     }
 }

@@ -7,7 +7,7 @@ namespace Semantic_Interpreter.Library
     {
         public RealValue(double value) => Value = value;
 
-        private double Value { get; set; }
+        private double Value { get; }
 
         public int AsInteger() => Convert.ToInt32(Value);
 

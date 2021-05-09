@@ -6,11 +6,9 @@ namespace Semantic_Interpreter.Core
     public class Input : SemanticOperator
     {
         public Input(string name)
-        {
-            Name = name;
-        }
-        
-        public string Name { get; set; }
+            => Name = name;
+
+        public string Name { get; }
 
         public override void Execute()
         {
@@ -27,7 +25,5 @@ namespace Semantic_Interpreter.Core
             variable.Expression = expression;
             VariablesStorage.Replace(Name, variable);
         }
-        
-        public override string ToString() => $"input: {Name}";
     }
 }

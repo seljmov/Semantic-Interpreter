@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Security.Principal;
 
 namespace Semantic_Interpreter.Core
 {
@@ -13,10 +12,10 @@ namespace Semantic_Interpreter.Core
             Else = @else;
         }
 
-        public IExpression Expression { get; set; }
-        public BlockSemanticOperator IfBlock { get; set; }
-        public List<ElseIf> ElseIfs { get; set; }
-        public Else Else { get; set; }
+        public IExpression Expression { get; }
+        public BlockSemanticOperator IfBlock { get; }
+        public List<ElseIf> ElseIfs { get; }
+        public Else Else { get; }
 
         public override void Execute()
         {

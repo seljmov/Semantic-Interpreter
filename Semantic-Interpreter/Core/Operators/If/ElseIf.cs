@@ -8,11 +8,8 @@
             Operators = operators;
         }
         
-        public IExpression Expression { get; set; }
-        private BlockSemanticOperator Operators { get; set; }
-        public override void Execute()
-        {
-            Operators.Execute();
-        }
+        public IExpression Expression { get; }
+        public BlockSemanticOperator Operators { get; }
+        public override void Execute() => Operators.Execute();
     }
 }

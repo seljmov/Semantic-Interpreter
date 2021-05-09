@@ -1,5 +1,4 @@
-﻿using Semantic_Interpreter.Core.Items;
-using Semantic_Interpreter.Library;
+﻿using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
@@ -11,8 +10,8 @@ namespace Semantic_Interpreter.Core
             Expression = expression;
         }
         
-        private string Variable { get; set; }
-        private IExpression Expression { get; set; }
+        public string Variable { get; }
+        public IExpression Expression { get; }
 
         public override void Execute()
         {
@@ -21,8 +20,5 @@ namespace Semantic_Interpreter.Core
             currVar.Expression = new ValueExpression(value);
             VariablesStorage.Replace(Variable, currVar);
         }
-
-        public override string ToString()
-            => string.Format($"{Variable} := {Expression}");
     }
 }

@@ -4,7 +4,7 @@ using Semantic_Interpreter.Parser;
 
 namespace Semantic_Interpreter.Core
 {
-    public class ConditionalExpression : Expression
+    public class ConditionalExpression : IExpression
     {
         public ConditionalExpression(TokenType @operator, IExpression expression1, IExpression expression2)
         {
@@ -17,7 +17,7 @@ namespace Semantic_Interpreter.Core
         private IExpression Expression2 { get; set; }
         private TokenType Operator { get; set; }
         
-        public override IValue Eval()
+        public IValue Eval()
         {
             var value1 = Expression1.Eval();
             var value2 = Expression2.Eval();
@@ -48,6 +48,9 @@ namespace Semantic_Interpreter.Core
             return new IntegerValue(result);
         }
 
+        public override string ToString()
+            => $"{Expression1} {Operator} {Expression2}";
+        
         private int Conditional(dynamic number1, dynamic number2)
         {
             bool result = Operator switch
