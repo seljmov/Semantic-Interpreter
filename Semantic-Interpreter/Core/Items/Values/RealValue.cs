@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Semantic_Interpreter.Library
+namespace Semantic_Interpreter.Core
 {
     public class RealValue : IValue
     {
@@ -14,6 +14,8 @@ namespace Semantic_Interpreter.Library
         public double AsReal() => Value;
 
         public bool AsBoolean() => Convert.ToBoolean(Value);
+        
+        public char AsChar() => Convert.ToChar(Value);
 
         public string AsString() => Convert.ToString(Value, CultureInfo.InvariantCulture);
         

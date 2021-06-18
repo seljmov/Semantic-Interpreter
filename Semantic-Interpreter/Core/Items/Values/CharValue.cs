@@ -2,22 +2,22 @@
 
 namespace Semantic_Interpreter.Core
 {
-    public class IntegerValue : IValue
+    public class CharValue : IValue
     {
-        public IntegerValue(int value) => Value = value;
+        public CharValue(char value) => Value = value;
 
-        private int Value { get; }
+        private char Value { get; }
 
-        public int AsInteger() => Value;
+        public int AsInteger() => Convert.ToInt32(Value);
 
         public double AsReal() => Convert.ToDouble(Value);
 
         public bool AsBoolean() => Convert.ToBoolean(Value);
-        
-        public char AsChar() => Convert.ToChar(Value);
+
+        public char AsChar() => Value;
 
         public string AsString() => Convert.ToString(Value);
-        
+
         public override string ToString() => AsString();
     }
 }

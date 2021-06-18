@@ -1,6 +1,5 @@
 ﻿module main
-
-beginning
+start
     output "Программа: цикл while \n";
     variable-integer i := 0;
     while (i <= 5) repeat

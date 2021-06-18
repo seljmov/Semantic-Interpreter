@@ -1,6 +1,5 @@
 ﻿module main
-
-beginning
+start
     output "Программа: нахождение факториала \n";
     variable-integer n;
     output "Введите число: ";

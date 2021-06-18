@@ -6,19 +6,18 @@ namespace Semantic_Interpreter.Core
     {
         public Module(string name)
         {
-            Beginning = null;
+            Start = null;
             Name = name;
         }
         
-        // TODO: Нужно ли?
-        private Beginning Beginning { get; set; }
+        private Start Start { get; set; }
         public string Name { get; }
 
-        public void SetBeginning(Beginning beginning)
+        public void SetStart(Start start)
         {
-            Beginning = beginning;
-            Beginning.Parent = this;
-            Child = Beginning;
+            Start = start;
+            Start.Parent = this;
+            Child = Start;
         }
         
         public override void Execute() { }

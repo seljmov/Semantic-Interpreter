@@ -11,9 +11,9 @@
             {
                 InsertRoot(newOperator);
             }
-            else if (newOperator is Beginning beginning)
+            else if (newOperator is Start start)
             {
-                ((Module) FindOperator(prevOperator)).SetBeginning(beginning);
+                ((Module) FindOperator(prevOperator)).SetStart(start);
             }
             else if (asChild)
             {
@@ -51,7 +51,7 @@
                     {
                         curr = parent.Next;
 
-                        while (curr == null && !(parent is Beginning))
+                        while (curr == null && !(parent is Start))
                         {
                             parent = parent.Parent;
                             curr = parent.Next;

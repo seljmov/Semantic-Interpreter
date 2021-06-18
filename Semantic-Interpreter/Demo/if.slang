@@ -1,6 +1,5 @@
 ﻿module main
-
-beginning
+start
     output "Программа: ветвление (if-else if-else) \n";
     variable-integer i;
     output "Введите число: ";

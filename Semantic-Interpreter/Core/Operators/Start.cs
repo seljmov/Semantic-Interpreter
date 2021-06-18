@@ -2,7 +2,7 @@
 
 namespace Semantic_Interpreter.Core
 {
-    public class Beginning : SemanticOperator
+    public class Start : SemanticOperator
     {
         public override void Execute() { }
     }

@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using Semantic_Interpreter.Library;
 using Semantic_Interpreter.Parser;
 
 namespace Semantic_Interpreter
@@ -11,7 +11,7 @@ namespace Semantic_Interpreter
         public static void Main()
         {
             Console.WriteLine();
-            using var reader = new StreamReader(Demo + "if.txt");
+            using var reader = new StreamReader(Demo + "vars.slang");
             var program = reader.ReadToEnd();
             
             var lexer = new Lexer(program);
@@ -20,9 +20,19 @@ namespace Semantic_Interpreter
             // PrintTokens(tokens);
             
             var tree = new Parser.Parser(tokens).Parse();
-            // tree.TraversalTree();
+            tree.TraversalTree();
 
-            DocumentRW.Save(tree);
+            // DocumentRW.Save(tree);
+        }
+        
+        private static void PrintTokens(List<Token> tokens)
+        {
+            foreach (var token in tokens)
+            {
+                Console.Write(token.Type);
+                if (token.Text != "") Console.Write($" -> {token.Text}");
+                Console.WriteLine();
+            }
         }
     }
 }

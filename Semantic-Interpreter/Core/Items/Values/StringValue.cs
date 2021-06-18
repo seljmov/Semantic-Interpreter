@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Semantic_Interpreter.Library
+namespace Semantic_Interpreter.Core
 {
     public class StringValue : IValue
     {
@@ -13,6 +13,8 @@ namespace Semantic_Interpreter.Library
         public double AsReal() => Convert.ToDouble(Value);
 
         public bool AsBoolean() => Convert.ToBoolean(Value);
+        
+        public char AsChar() => Convert.ToChar(Value);
 
         public string AsString() => Value;
 

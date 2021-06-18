@@ -1,10 +1,10 @@
 ﻿module main
-
-beginning
+start
     output "Программа: переменные \n";
-    variable-string var1 := "var1";
-    variable-string var2 := "var2";
+    variable-boolean var1 := false;
     output var1;
     output "\n";
+    variable-char var2;
+    input var2;
     output var2;
 end main.

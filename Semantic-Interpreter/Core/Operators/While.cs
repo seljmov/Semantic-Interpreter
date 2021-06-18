@@ -21,11 +21,11 @@ namespace Semantic_Interpreter.Core
         
         public override void Execute()
         {
-            var cond = Expression.Eval().AsInteger();
-            while (cond != 0)
+            var result = Expression.Eval().AsBoolean();
+            while (result)
             {
                 Operators.Execute();
-                cond = Expression.Eval().AsInteger();
+                result = Expression.Eval().AsBoolean();
             }
         }
     }

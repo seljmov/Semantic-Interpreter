@@ -19,8 +19,8 @@ namespace Semantic_Interpreter.Core
 
         public override void Execute()
         {
-            var result = Expression.Eval().AsInteger();
-            if (result != 0)
+            var result = Expression.Eval().AsBoolean();
+            if (result)
             {
                 IfBlock.Execute();
             }
@@ -31,8 +31,8 @@ namespace Semantic_Interpreter.Core
                     var beExecuted = false;
                     foreach (var elseIf in ElseIfs)
                     {
-                        var elseIfResult = elseIf.Expression.Eval().AsInteger();
-                        if (elseIfResult != 0)
+                        var elseIfResult = elseIf.Expression.Eval().AsBoolean();
+                        if (elseIfResult)
                         {
                             elseIf.Execute();
                             beExecuted = true;

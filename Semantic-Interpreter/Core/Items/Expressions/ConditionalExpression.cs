@@ -1,5 +1,4 @@
 ﻿using System;
-using Semantic_Interpreter.Library;
 using Semantic_Interpreter.Parser;
 
 namespace Semantic_Interpreter.Core
@@ -21,8 +20,7 @@ namespace Semantic_Interpreter.Core
         {
             var value1 = Expression1.Eval();
             var value2 = Expression2.Eval();
-
-            int result;
+            
             switch (value1)
             {
                 case IntegerValue:
@@ -30,30 +28,28 @@ namespace Semantic_Interpreter.Core
                     var number1 = value1.AsInteger();
                     var number2 = value2.AsInteger();
 
-                    // TODO: Добавить тип Boolean и переписать
-                    result = Conditional(number1, number2);
-                    break;
+                    var result = Conditional(number1, number2);
+                    return new BooleanValue(result);
                 }
                 case RealValue:
                 {
                     var number1 = value1.AsReal();
                     var number2 = value2.AsReal();
 
-                    result = Conditional(number1, number2);
-                    break;
-                }
-                default: result = 0; break;
-            }
+                    var result = Conditional(number1, number2);
+                    return new BooleanValue(result);
 
-            return new IntegerValue(result);
+                }
+                default: return new BooleanValue(false);
+            }
         }
 
         public override string ToString()
             => $"{Expression1} {Operator} {Expression2}";
         
-        private int Conditional(dynamic number1, dynamic number2)
+        private bool Conditional(dynamic number1, dynamic number2)
         {
-            bool result = Operator switch
+            return Operator switch
             {
                 TokenType.Less => number1 < number2,
                 TokenType.LessOrEqual => number1 <= number2,
@@ -62,10 +58,8 @@ namespace Semantic_Interpreter.Core
                 TokenType.Equal => number1 == number2,
                 TokenType.NotEqual => number1 != number2,
                 TokenType.OrOr => number1 || number2,
-                TokenType.AndAnd => number1 && number2,
+                TokenType.AndAnd => number1 && number2
             };
-            
-            return Convert.ToInt32(result);
         }
     }
 }

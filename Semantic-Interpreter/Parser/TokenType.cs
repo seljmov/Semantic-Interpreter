@@ -4,11 +4,13 @@
     {
         Eof,
         Word,
+        Char,
+        Boolean,
         Text,
         Number,
         
         Module,
-        Beginning,
+        Start,
         While,
         If,
         Else,

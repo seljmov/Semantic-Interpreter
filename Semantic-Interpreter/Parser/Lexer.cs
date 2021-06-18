@@ -9,7 +9,7 @@ namespace Semantic_Interpreter.Parser
         private readonly Dictionary<string, TokenType> _operators = new()
         {
             {"module", TokenType.Module},
-            {"beginning", TokenType.Beginning},
+            {"start", TokenType.Start},
             {"while", TokenType.While},
             {"if", TokenType.If},
             {"else", TokenType.Else},
@@ -72,6 +72,10 @@ namespace Semantic_Interpreter.Parser
                 {
                     TokenizeText();
                 }
+                else if (curr == '\'')
+                {
+                    TokenizeChar();
+                }
                 // Example ,./\\;:=+-_*'\"#@!&|<>[]{}
                 else if (IsNotLetterOrDigit(curr))
                 {
@@ -116,11 +120,18 @@ namespace Semantic_Interpreter.Parser
 
             var word = buffer.ToString();
             var cond = _operators.ContainsKey(word);
-            
-            AddToken(
-                cond ? _operators[word] : TokenType.Word, 
-                cond ? "" : word
-            );
+
+            if (word == "true" || word == "false")
+            {
+                AddToken(TokenType.Boolean, word);
+            }
+            else
+            {
+                AddToken(
+                    cond ? _operators[word] : TokenType.Word, 
+                    cond ? "" : word
+                );
+            }
         }
 
         private void TokenizeText()
@@ -152,6 +163,21 @@ namespace Semantic_Interpreter.Parser
             Next(); // Scip closing "
             
             AddToken(TokenType.Text, buffer.ToString());
+        }
+
+        private void TokenizeChar()
+        {
+            Next(); // Skip '
+            var curr = Peek();
+            Next(); // Skip char symbol
+            if (Peek() != '\'')
+            {
+                throw new Exception("Неправильная литера!");
+            }
+
+            Next(); // Skip '
+            
+            AddToken(TokenType.Char, curr.ToString());
         }
 
         private void TokenizeSymbol(char ch)
@@ -189,6 +215,6 @@ namespace Semantic_Interpreter.Parser
             => _tokens.Add(new Token(type, text));
 
         private static bool IsNotLetterOrDigit(char ch)
-            => ",./\\;:=+-_*'\"#@!&|<>()[]".Contains(ch);
+            => ",./\\;:=+-_*#@!&|<>()[]".Contains(ch);
     }
 }

@@ -18,8 +18,10 @@ namespace Semantic_Interpreter.Core
             {
                 SemanticTypes.Integer => new ValueExpression(Convert.ToInt32(value)),
                 SemanticTypes.Real => new ValueExpression(Convert.ToDouble(value)),
-                SemanticTypes.Boolean => new ValueExpression(Convert.ToInt32(value)),
                 SemanticTypes.String => new ValueExpression(value),
+                SemanticTypes.Char => value!.Length == 1 
+                    ? new ValueExpression(Convert.ToChar(value!)) 
+                    : throw new Exception("Неправильная литера!"),
                 _ => throw new ArgumentOutOfRangeException()
             };
             variable.Expression = expression;

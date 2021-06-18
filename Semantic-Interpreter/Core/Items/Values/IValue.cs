@@ -1,4 +1,4 @@
-﻿namespace Semantic_Interpreter.Library
+﻿namespace Semantic_Interpreter.Core
 {
     public interface IValue
     {
@@ -7,6 +7,8 @@
         double AsReal();
 
         bool AsBoolean();
+
+        char AsChar();
 
         string AsString();
     }

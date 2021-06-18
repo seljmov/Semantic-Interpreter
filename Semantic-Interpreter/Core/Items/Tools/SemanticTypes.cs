@@ -5,6 +5,7 @@
         Integer,
         Real,
         Boolean,
+        Char,
         String,
     }
 }

@@ -42,7 +42,7 @@ namespace Semantic_Interpreter.Parser
                     case Module:
                         operatorsStack.Push(newOperator);
                         break;
-                    case Beginning:
+                    case Start:
                         asChild = operatorsStack.Pop().Child == null;
                         operatorsStack.Push(newOperator);
                         break;
@@ -65,7 +65,7 @@ namespace Semantic_Interpreter.Parser
             return token.Type switch
             {
                 TokenType.Module => ParseModuleOperator(),
-                TokenType.Beginning => ParseBeginningOperator(),
+                TokenType.Start => ParseStartOperator(),
                 TokenType.While => ParseWhileOperator(),
                 TokenType.If => ParseIfOperator(),
                 TokenType.Variable => ParseVariableOperator(),
@@ -82,7 +82,7 @@ namespace Semantic_Interpreter.Parser
             return new Module(name);
         }
 
-        private SemanticOperator ParseBeginningOperator() => new Beginning();
+        private SemanticOperator ParseStartOperator() => new Start();
         
         private SemanticOperator ParseWhileOperator()
         {
@@ -160,6 +160,7 @@ namespace Semantic_Interpreter.Parser
                 "integer" => SemanticTypes.Integer,
                 "real" => SemanticTypes.Real,
                 "boolean" => SemanticTypes.Boolean,
+                "char" => SemanticTypes.Char,
                 _ => SemanticTypes.String
             };
             
@@ -358,6 +359,8 @@ namespace Semantic_Interpreter.Parser
             switch (current.Type)
             {
                 case TokenType.Word: return VariablesStorage.At(current.Text);
+                case TokenType.Boolean: return new ValueExpression(current.Text == "true");
+                case TokenType.Char: return new ValueExpression(Convert.ToChar(current.Text));
                 case TokenType.Text: return new ValueExpression(current.Text);
                 case TokenType.Number:
                     // Если точки нет, то число целое, иначе - вещественное

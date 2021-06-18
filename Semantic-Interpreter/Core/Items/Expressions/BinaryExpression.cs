@@ -1,5 +1,4 @@
 ﻿using System;
-using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
