@@ -4,7 +4,7 @@ using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
-    public class Variable : SemanticOperator, IHaveExpression
+    public class Variable : SemanticOperator
     {
         public Variable(SemanticTypes type, string name, IExpression expression)
         {
@@ -29,7 +29,7 @@ namespace Semantic_Interpreter.Core
         public string Name { get; }
         public IExpression Expression { get; set; }
 
-        public IValue Eval()
+        public IValue GetValue()
             => !VariablesStorage.IsExist(Name)
                 ? throw new Exception("Переменной с таким именем не существует!")
                 : Expression != null

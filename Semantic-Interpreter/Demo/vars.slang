@@ -1,5 +1,7 @@
 ﻿module main
 start
-    variable-char var1 := 'c';
-    output "var = ${var1}";
+    variable-integer a := 2;
+    variable-integer b := 4;
+    variable-integer c := a * b;
+    output "${a} + ${b} = ${c};";
 end main.

@@ -358,7 +358,7 @@ namespace Semantic_Interpreter.Parser
             _pos++;
             switch (current.Type)
             {
-                case TokenType.Word: return VariablesStorage.At(current.Text);
+                case TokenType.Word: return new VariableExpression(current.Text);
                 case TokenType.Boolean: return new ValueExpression(current.Text == "true");
                 case TokenType.Char: return new ValueExpression(Convert.ToChar(current.Text));
                 case TokenType.Text: return new ValueExpression(current.Text);

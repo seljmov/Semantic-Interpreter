@@ -12,13 +12,11 @@ start
         let result := 1;
     else
         variable-integer i := 1;
-        while i <= n repeat
+        while i <= n do
             let result := result * i;
             let i := i + 1;
         end while;
     end if;
     
-    output n;
-    output "! = ";
-    output result;
+    output "${n}! = ${result}";
 end main.
