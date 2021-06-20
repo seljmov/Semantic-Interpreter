@@ -2,7 +2,7 @@
 
 namespace Semantic_Interpreter.Core
 {
-    public class If : SemanticOperator
+    public class If : MultilineOperator
     {
         public If(IExpression expression, BlockSemanticOperator ifBlock, List<ElseIf> elseIfs, Else @else)
         {
@@ -10,12 +10,14 @@ namespace Semantic_Interpreter.Core
             IfBlock = ifBlock;
             ElseIfs = elseIfs;
             Else = @else;
+            OperatorID = GenerateOperatorID();
         }
 
         public IExpression Expression { get; }
         public BlockSemanticOperator IfBlock { get; }
         public List<ElseIf> ElseIfs { get; }
         public Else Else { get; }
+        public override string OperatorID { get; set; }
 
         public override void Execute()
         {

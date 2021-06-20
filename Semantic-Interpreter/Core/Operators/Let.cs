@@ -15,10 +15,10 @@ namespace Semantic_Interpreter.Core
 
         public override void Execute()
         {
-            var currVar = VariablesStorage.At(Variable);
+            var currVar = VariablesStorageOld.At(Variable);
             var value = Expression.Eval();
             currVar.Expression = new ValueExpression(value);
-            VariablesStorage.Replace(Variable, currVar);
+            VariablesStorageOld.Replace(Variable, currVar);
         }
     }
 }

@@ -173,7 +173,7 @@ namespace Semantic_Interpreter.Parser
             }
             
             var variable = new Variable(type, name, expression);
-            VariablesStorage.Add(name, variable);
+            VariablesStorageOld.Add(name, variable);
             Consume(TokenType.Semicolon);
             return variable;
         }

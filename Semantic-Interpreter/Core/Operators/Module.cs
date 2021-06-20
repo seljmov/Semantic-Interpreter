@@ -2,16 +2,18 @@
 
 namespace Semantic_Interpreter.Core
 {
-    public class Module : SemanticOperator
+    public class Module : MultilineOperator
     {
         public Module(string name)
         {
             Start = null;
             Name = name;
+            OperatorID = GenerateOperatorID();
         }
         
         private Start Start { get; set; }
         public string Name { get; }
+        public override string OperatorID { get; set; }
 
         public void SetStart(Start start)
         {

@@ -30,7 +30,7 @@ namespace Semantic_Interpreter.Core
         public IExpression Expression { get; set; }
 
         public IValue GetValue()
-            => !VariablesStorage.IsExist(Name)
+            => !VariablesStorageOld.IsExist(Name)
                 ? throw new Exception("Переменной с таким именем не существует!")
                 : Expression != null
                     ? Expression.Eval()

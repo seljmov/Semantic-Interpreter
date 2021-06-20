@@ -13,7 +13,7 @@ namespace Semantic_Interpreter.Core
         public override void Execute()
         {
             var value = Console.ReadLine();
-            var variable = VariablesStorage.At(Name);
+            var variable = VariablesStorageOld.At(Name);
             var expression = variable.Type switch
             {
                 SemanticTypes.Integer => new ValueExpression(Convert.ToInt32(value)),
@@ -25,7 +25,7 @@ namespace Semantic_Interpreter.Core
                 _ => throw new ArgumentOutOfRangeException()
             };
             variable.Expression = expression;
-            VariablesStorage.Replace(Name, variable);
+            VariablesStorageOld.Replace(Name, variable);
         }
     }
 }

@@ -23,7 +23,7 @@ namespace Semantic_Interpreter.Library
             foreach (var program in Programs)
             {
                 RunProgram(program + ".txt");
-                VariablesStorage.Clear();
+                VariablesStorageOld.Clear();
                 Console.WriteLine("\n");
             }
         }

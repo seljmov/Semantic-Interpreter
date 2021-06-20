@@ -33,7 +33,7 @@ namespace Semantic_Interpreter.Core
                             ++i;
                         }
                         
-                        var value = VariablesStorage.At(name).Expression.Eval().AsString();
+                        var value = VariablesStorageOld.At(name).Expression.Eval().AsString();
                         result += value;
                     }
                 }

@@ -12,8 +12,8 @@ namespace Semantic_Interpreter.Core
         
         private string Name { get; }
         public IValue Eval() 
-            => !VariablesStorage.IsExist(Name)
+            => !VariablesStorageOld.IsExist(Name)
                 ? throw new Exception("Переменной с таким именем не существует!")
-                : VariablesStorage.At(Name).GetValue();
+                : VariablesStorageOld.At(Name).GetValue();
     }
 }
