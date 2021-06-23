@@ -12,7 +12,5 @@ start
         end while;
     end if;
     
-    output n;
-    output "! = ";
-    output result;
+    output "${n}! = ${result}";
 end main.
