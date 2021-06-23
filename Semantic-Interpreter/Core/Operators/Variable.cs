@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq.Expressions;
-using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
@@ -28,14 +26,41 @@ namespace Semantic_Interpreter.Core
         public SemanticTypes Type { get; }
         public string Name { get; }
         public IExpression Expression { get; set; }
-
-        public IValue GetValue()
-            => !VariablesStorageOld.IsExist(Name)
-                ? throw new Exception("Переменной с таким именем не существует!")
-                : Expression != null
-                    ? Expression.Eval()
-                    : throw new Exception($"Переменная с именем {Name} не инициализированна!");
         
+        public IValue GetValue()
+        {
+            var fullId = ((MultilineOperator) Parent).OperatorID;
+            var curr = Parent;
+            while (curr.Parent != null)
+            {
+                curr = curr.Parent;
+                fullId = ((MultilineOperator) curr).OperatorID + "^" + fullId;
+            }
+
+            var module = (Module) curr;
+            var subs = fullId.Split("^");
+            
+            for (var i = subs.Length-1; i >= 0; --i)
+            {
+                var varId = "";
+                for (var j = 0; j <= i; ++j)
+                {
+                    varId += subs[j] + "^";
+                }
+
+                varId += Name;
+                if (module.VariableStorage.IsExist(varId))
+                {
+                    var variable = module.VariableStorage.At(varId);
+                    return variable.Expression != null 
+                        ? variable.Expression.Eval() 
+                        : throw new Exception($"Переменная с именем {Name} не инициализированна!");
+                }
+            }
+
+            throw new Exception("Переменной с таким именем не существует!");
+        }
+
         public override void Execute() { }
 
         /**

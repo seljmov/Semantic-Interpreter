@@ -9,11 +9,12 @@ namespace Semantic_Interpreter.Core
             => Name = name;
 
         public string Name { get; }
-
+        
         public override void Execute()
         {
             var value = Console.ReadLine();
-            var variable = VariablesStorageOld.At(Name);
+            var module = FindRoot();
+            var variable = module.VariableStorage.At(Name);
             var expression = variable.Type switch
             {
                 SemanticTypes.Integer => new ValueExpression(Convert.ToInt32(value)),
@@ -24,8 +25,7 @@ namespace Semantic_Interpreter.Core
                     : throw new Exception("Неправильная литера!"),
                 _ => throw new ArgumentOutOfRangeException()
             };
-            variable.Expression = expression;
-            VariablesStorageOld.Replace(Name, variable);
+            module.VariableStorage.Replace(Name, expression);
         }
     }
 }

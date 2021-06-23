@@ -1,26 +1,13 @@
-﻿using System;
-
-namespace Semantic_Interpreter.Core
+﻿namespace Semantic_Interpreter.Core
 {
     public class While : MultilineOperator
     {
-        public While(IExpression expression, BlockSemanticOperator operators)
-        {
-            Expression = expression;
-
-            foreach (var op in operators.Operators)
-            {
-                op.Parent = this;
-            }
-            
-            Operators = operators;
-            OperatorID = GenerateOperatorID();
-        }
+        public While() => OperatorID = GenerateOperatorId();
         
-        public IExpression Expression { get; }
-        public BlockSemanticOperator Operators { get; }
+        public IExpression Expression { get; set; }
+        public BlockSemanticOperator Operators { get; set; }
         
-        public override string OperatorID { get; set; }
+        public sealed override string OperatorID { get; set; }
         
         public override void Execute()
         {

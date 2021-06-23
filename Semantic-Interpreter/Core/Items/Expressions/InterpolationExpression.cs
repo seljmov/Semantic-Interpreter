@@ -10,6 +10,8 @@ namespace Semantic_Interpreter.Core
         
         public IValue Eval()
         {
+            return Expression.Eval();
+            /*
             var text = Expression.Eval().AsString();
             var result = "";
             
@@ -40,6 +42,7 @@ namespace Semantic_Interpreter.Core
             }
             
             return new StringValue(result);
+            */
         }
     }
 }

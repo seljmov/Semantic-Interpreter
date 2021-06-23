@@ -5,7 +5,7 @@ namespace Semantic_Interpreter.Core
     public class Start : MultilineOperator
     {
         public Start() 
-            => OperatorID = GenerateOperatorID();
+            => OperatorID = GenerateOperatorId();
         
         public override string OperatorID { get; set; }
         

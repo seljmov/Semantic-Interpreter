@@ -7,8 +7,10 @@ namespace Semantic_Interpreter.Core
         private readonly uint _idLength = 12;
         
         public abstract string OperatorID { get; set; }
+
+        public virtual void FixVariablesId() {}
         
-        public string GenerateOperatorID()
+        public string GenerateOperatorId()
         { 
             Random rng = new Random();
             var letters = new char[_idLength];

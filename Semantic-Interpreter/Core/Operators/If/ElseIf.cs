@@ -2,16 +2,12 @@
 {
     public class ElseIf : MultilineOperator
     {
-        public ElseIf(IExpression expression, BlockSemanticOperator operators)
-        {
-            Expression = expression;
-            Operators = operators;
-            OperatorID = GenerateOperatorID();
-        }
+        public ElseIf() => OperatorID = GenerateOperatorId();
         
-        public IExpression Expression { get; }
-        public BlockSemanticOperator Operators { get; }
-        public override string OperatorID { get; set; }
+        public IExpression Expression { get; set; }
+        public BlockSemanticOperator Operators { get; set; }
+        public sealed override string OperatorID { get; set; }
+
         public override void Execute() => Operators.Execute();
     }
 }

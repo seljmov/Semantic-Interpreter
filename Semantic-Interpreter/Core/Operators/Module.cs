@@ -1,4 +1,5 @@
 ﻿using Semantic_Interpreter.Core;
+using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
@@ -8,8 +9,10 @@ namespace Semantic_Interpreter.Core
         {
             Start = null;
             Name = name;
-            OperatorID = GenerateOperatorID();
+            OperatorID = GenerateOperatorId();
         }
+
+        public VariableStorage VariableStorage = new();
         
         private Start Start { get; set; }
         public string Name { get; }

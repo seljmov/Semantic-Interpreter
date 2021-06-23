@@ -4,21 +4,14 @@ namespace Semantic_Interpreter.Core
 {
     public class If : MultilineOperator
     {
-        public If(IExpression expression, BlockSemanticOperator ifBlock, List<ElseIf> elseIfs, Else @else)
-        {
-            Expression = expression;
-            IfBlock = ifBlock;
-            ElseIfs = elseIfs;
-            Else = @else;
-            OperatorID = GenerateOperatorID();
-        }
+        public If() => OperatorID = GenerateOperatorId();
 
-        public IExpression Expression { get; }
-        public BlockSemanticOperator IfBlock { get; }
-        public List<ElseIf> ElseIfs { get; }
-        public Else Else { get; }
-        public override string OperatorID { get; set; }
-
+        public IExpression Expression { get; set; }
+        public BlockSemanticOperator IfBlock { get; set; }
+        public List<ElseIf> ElseIfs { get; set; }
+        public Else Else { get; set; }
+        public sealed override string OperatorID { get; set; }
+        
         public override void Execute()
         {
             var result = Expression.Eval().AsBoolean();

@@ -8,5 +8,17 @@
         public SemanticOperator Previous { get; set; }
         
         public abstract void Execute();
+        
+        public Module FindRoot()
+        {
+            var curr = Parent;
+            while (curr.Parent != null && !(curr is Module))
+            {
+                curr = curr.Parent;
+            }
+
+            var module = (Module) curr;
+            return module;
+        }
     }
 }

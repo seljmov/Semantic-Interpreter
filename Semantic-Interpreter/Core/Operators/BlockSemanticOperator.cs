@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Semantic_Interpreter.Core
@@ -13,7 +14,7 @@ namespace Semantic_Interpreter.Core
 
         public void Add(SemanticOperator semanticOperator) 
             => Operators.Add(semanticOperator);
-
+        
         public override void Execute()
         {
             foreach (var @operator in Operators)
