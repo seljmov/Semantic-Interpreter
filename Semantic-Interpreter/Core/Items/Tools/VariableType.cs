@@ -1,6 +1,6 @@
 ﻿namespace Semantic_Interpreter.Core
 {
-    public enum SemanticTypes
+    public enum VariableType
     {
         Integer,
         Real,

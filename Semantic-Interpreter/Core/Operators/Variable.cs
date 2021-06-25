@@ -4,11 +4,14 @@ namespace Semantic_Interpreter.Core
 {
     public class Variable : SemanticOperator
     {
-        public Variable(SemanticTypes type, string name, IExpression expression)
+        public Variable(VariableType type, string name, IExpression expression)
         {
             Type = type;
             Name = name;
-            
+            Expression = expression;
+
+            // TODO: перенести проверку типов в отдельный этап (type inferring)
+            /*
             if (expression != null)
             {
                 var value = expression.Eval();
@@ -21,14 +24,23 @@ namespace Semantic_Interpreter.Core
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
                 }
             }
+            */
         }
 
-        public SemanticTypes Type { get; }
+        public VariableType Type { get; }
         public string Name { get; }
         public IExpression Expression { get; set; }
         
         public IValue GetValue()
         {
+            if (Parent is BaseFunction function)
+            {
+                if (function.ParameterIsExist(Name))
+                {
+                    return function.GetParameterWithName(Name).Expression.Eval();
+                }
+            }
+            
             var fullId = ((MultilineOperator) Parent).OperatorID;
             var curr = Parent;
             while (curr.Parent != null)
@@ -71,15 +83,15 @@ namespace Semantic_Interpreter.Core
          * К типа Char можно присвоить только CharValue,
          * а вот к типа Real можно присвоить RealValue и IntegerValue.
          */
-        private static bool TypeIsCorrect(SemanticTypes type, IValue value)
+        private static bool TypeIsCorrect(VariableType type, IValue value)
         {
             switch (type)
             {
-                case SemanticTypes.String when value is StringValue:
-                case SemanticTypes.Integer when value is IntegerValue:
-                case SemanticTypes.Boolean when value is BooleanValue:
-                case SemanticTypes.Char when value is CharValue:
-                case SemanticTypes.Real when value is RealValue || value is IntegerValue:
+                case VariableType.String when value is StringValue:
+                case VariableType.Integer when value is IntegerValue:
+                case VariableType.Boolean when value is BooleanValue:
+                case VariableType.Char when value is CharValue:
+                case VariableType.Real when value is RealValue || value is IntegerValue:
                     return true;
                 default:
                     return false;

@@ -40,7 +40,8 @@ namespace Semantic_Interpreter.Core
                         }
                         
                         // var value = _module.VariableStorage.At(name).Expression.Eval().AsString();
-                        var value = GetVariableValue(name);
+                        // var value = _parent is BaseFunction ? GetParameterValue(name) : GetVariableValue(name);
+                        var value = GetValue(name).AsString();
                         result += value ?? throw new Exception($"Переменная с именем {name} не инициализированна!");
                     }
                 }
@@ -48,8 +49,43 @@ namespace Semantic_Interpreter.Core
             
             return new StringValue(result);
         }
+
+        private IValue GetValue(string name)
+        {
+            if (_parent is BaseFunction)
+            {
+                var parameterValue = GetParameterValue(name);
+                if (parameterValue != null)
+                {
+                    return parameterValue;
+                }
+            }
+            
+            var variableValue = GetVariableValue(name);
+            if (variableValue != null)
+            {
+                return variableValue;
+            }
+            
+            throw new Exception($"Параметра/переменной {name} не существует!");
+        }
         
-        public IValue GetVariableValue(string name)
+        private IValue GetParameterValue(string name)
+        {
+            var func = (BaseFunction) _parent;
+            var parameters = func.Parameters;
+            foreach (var t in parameters)
+            {
+                if (t.Name == name)
+                {
+                    return t.Expression.Eval();
+                }
+            }
+
+            return null;
+        }
+
+        private IValue GetVariableValue(string name)
         {
             var fullId = ((MultilineOperator) _parent).OperatorID;
             var curr = _parent;

@@ -11,10 +11,6 @@
             {
                 InsertRoot(newOperator);
             }
-            else if (newOperator is Start start)
-            {
-                ((Module) FindOperator(prevOperator)).SetStart(start);
-            }
             else if (asChild)
             {
                 InsertOperatorAsChild(newOperator, FindOperator(prevOperator));
@@ -34,7 +30,10 @@
             var parent = Root;
             while (index != _count)
             {
-                curr?.Execute();
+                if (!(curr is BaseFunction))
+                {
+                    curr?.Execute();
+                }
                 
                 if (curr?.Child != null)
                 {
@@ -49,12 +48,15 @@
                     }
                     else
                     {
-                        curr = parent.Next;
-
-                        while (curr == null && !(parent is Start))
+                        if (!(curr is Start))
                         {
-                            parent = parent.Parent;
                             curr = parent.Next;
+
+                            while (curr == null && !(parent is Start))
+                            {
+                                parent = parent.Parent;
+                                curr = parent.Next;
+                            }
                         }
                     }
                 }

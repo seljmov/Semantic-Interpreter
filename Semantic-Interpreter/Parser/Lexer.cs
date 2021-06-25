@@ -10,6 +10,9 @@ namespace Semantic_Interpreter.Parser
         {
             {"module", TokenType.Module},
             {"start", TokenType.Start},
+            {"function", TokenType.Function},
+            {"procedure", TokenType.Procedure},
+            {"call", TokenType.Call},
             {"while", TokenType.While},
             {"if", TokenType.If},
             {"else", TokenType.Else},
@@ -18,7 +21,8 @@ namespace Semantic_Interpreter.Parser
             {"input", TokenType.Input},
             {"output", TokenType.Output},
             {"end", TokenType.End},
-            
+            {"return", TokenType.Return},
+
             {"+", TokenType.Plus},
             {"-", TokenType.Minus},
             {"*", TokenType.Multiply},
@@ -30,6 +34,7 @@ namespace Semantic_Interpreter.Parser
             {")", TokenType.RParen},
             {".", TokenType.Dot},
             {";", TokenType.Semicolon},
+            {",", TokenType.Comma},
             
             {"!=", TokenType.NotEqual},
             {"==", TokenType.Equal},
@@ -76,7 +81,7 @@ namespace Semantic_Interpreter.Parser
                 {
                     TokenizeChar();
                 }
-                // Example ,./\\;:=+-_*'\"#@!&|<>[]{}
+                // Example ,./\\;:=+-_*#@!&|<>()[]
                 else if (IsNotLetterOrDigit(curr))
                 {
                     TokenizeSymbol(curr);
@@ -124,6 +129,14 @@ namespace Semantic_Interpreter.Parser
             if (word == "true" || word == "false")
             {
                 AddToken(TokenType.Boolean, word);
+            }
+            else if (word == "private" || word == "public")
+            {
+                AddToken(TokenType.VisibilityType, word);
+            }
+            else if (word == "in" || word == "var")
+            {
+                AddToken(TokenType.ParameterType, word);
             }
             else
             {

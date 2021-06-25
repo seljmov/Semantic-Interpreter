@@ -1,5 +1,4 @@
-﻿using Semantic_Interpreter.Core;
-using Semantic_Interpreter.Library;
+﻿using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
@@ -7,23 +6,15 @@ namespace Semantic_Interpreter.Core
     {
         public Module(string name)
         {
-            Start = null;
             Name = name;
             OperatorID = GenerateOperatorId();
         }
 
-        public VariableStorage VariableStorage = new();
+        public readonly VariableStorage VariableStorage = new();
+        public readonly FunctionStorage FunctionStorage = new();
         
-        private Start Start { get; set; }
         public string Name { get; }
-        public override string OperatorID { get; set; }
-
-        public void SetStart(Start start)
-        {
-            Start = start;
-            Start.Parent = this;
-            Child = Start;
-        }
+        public sealed override string OperatorID { get; set; }
         
         public override void Execute() { }
     }

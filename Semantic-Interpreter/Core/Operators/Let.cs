@@ -19,10 +19,24 @@ namespace Semantic_Interpreter.Core
             var value = Expression.Eval();
             var expression = new ValueExpression(value);
 
-            if (module.VariableStorage.IsExist(Name))
+            if (Parent is BaseFunction function)
             {
-                module.VariableStorage.Replace(Name, expression);
-                return;
+                foreach (var t in function.Parameters)
+                {
+                    if (t.Name == Name)
+                    {
+                        t.Expression = expression;
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                if (module.VariableStorage.IsExist(Name))
+                {
+                    module.VariableStorage.Replace(Name, expression);
+                    return;
+                }
             }
 
             throw new Exception("Переменной с таким именем не существует!");

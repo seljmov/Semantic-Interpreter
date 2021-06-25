@@ -14,18 +14,27 @@ namespace Semantic_Interpreter.Core
         {
             var value = Console.ReadLine();
             var module = FindRoot();
-            var variable = module.VariableStorage.At(Name);
-            var expression = variable.Type switch
+            var type = Parent is BaseFunction function
+                ? function.GetParameterWithName(Name).VariableType
+                : module.VariableStorage.At(Name).Type;
+            var expression = type switch
             {
-                SemanticTypes.Integer => new ValueExpression(Convert.ToInt32(value)),
-                SemanticTypes.Real => new ValueExpression(Convert.ToDouble(value)),
-                SemanticTypes.String => new ValueExpression(value),
-                SemanticTypes.Char => value!.Length == 1 
+                VariableType.Integer => new ValueExpression(Convert.ToInt32(value)),
+                VariableType.Real => new ValueExpression(Convert.ToDouble(value)),
+                VariableType.String => new ValueExpression(value),
+                VariableType.Char => value!.Length == 1 
                     ? new ValueExpression(Convert.ToChar(value!)) 
                     : throw new Exception("Неправильная литера!"),
                 _ => throw new ArgumentOutOfRangeException()
             };
-            module.VariableStorage.Replace(Name, expression);
+            if (Parent is BaseFunction function2)
+            {
+                function2.GetParameterWithName(Name).Expression = expression;
+            }
+            else
+            {
+                module.VariableStorage.Replace(Name, expression);   
+            }
         }
     }
 }

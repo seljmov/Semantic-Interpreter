@@ -11,6 +11,9 @@
         
         Module,
         Start,
+        Function,
+        Procedure,
+        Call,
         While,
         If,
         Else,
@@ -19,6 +22,7 @@
         Variable,
         Assing,
         Let,
+        Return,
         
         Plus,
         Minus,
@@ -37,7 +41,10 @@
         OrOr,
         End,
         
+        VisibilityType,
+        ParameterType,
         Semicolon,
+        Comma,
         Dot,
         NotFound,
     }
