@@ -44,6 +44,7 @@
         VisibilityType,
         ParameterType,
         Semicolon,
+        Colon,
         Comma,
         Dot,
         NotFound,

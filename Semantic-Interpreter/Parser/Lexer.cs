@@ -34,6 +34,7 @@ namespace Semantic_Interpreter.Parser
             {")", TokenType.RParen},
             {".", TokenType.Dot},
             {";", TokenType.Semicolon},
+            {":", TokenType.Colon},
             {",", TokenType.Comma},
             
             {"!=", TokenType.NotEqual},
@@ -134,7 +135,7 @@ namespace Semantic_Interpreter.Parser
             {
                 AddToken(TokenType.VisibilityType, word);
             }
-            else if (word == "in" || word == "var")
+            else if ((word == "in" || word == "var") && (_tokens[^1].Type == TokenType.LParen || _tokens[^1].Type == TokenType.Comma))
             {
                 AddToken(TokenType.ParameterType, word);
             }

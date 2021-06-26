@@ -6,16 +6,16 @@ namespace Semantic_Interpreter.Library
 {
     public class FunctionStorage
     {
-        private readonly Dictionary<string, BaseFunction> _functions = new();
+        private readonly Dictionary<string, DefineFunction> _functions = new();
 
         public bool IsExist(string name) => _functions.ContainsKey(name);
 
-        public BaseFunction At(string name)
+        public DefineFunction At(string name)
             => IsExist(name) 
                 ? _functions[name] 
                 : throw new Exception("Функции/Процедуры с таким именем не существует!");
         
-        public void Add(string name, BaseFunction function)
+        public void Add(string name, DefineFunction function)
         {
             if (IsExist(name))
             {
