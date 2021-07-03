@@ -25,19 +25,21 @@ namespace Semantic_Interpreter.Core
 
         protected void VerifyParametersExpressions()
         {
-            /*
-            var module = FindRoot();
             if (Parameters != null)
             {
+                var module = FindRoot();
                 foreach (var t in Parameters)
                 {
-                    if (t.ParameterType == ParameterType.Var && t.InitExpression != t.Expression)
+                    if (t.ParameterType == ParameterType.Var)
                     {
-                        module.VariableStorage.Replace(t.VariableId, t.Expression);
+                        var variable = module.VariableStorage.At(t.VariableId);
+                        if (t.Expression != variable.Expression)
+                        {
+                            module.VariableStorage.Replace(t.VariableId, t.Expression);
+                        }
                     }
                 }
             }
-            */
         }
     }
 }

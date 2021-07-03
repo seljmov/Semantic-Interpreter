@@ -17,6 +17,7 @@ namespace Semantic_Interpreter.Core
             var type = Parent is BaseFunction function
                 ? function.GetParameterWithName(Name).VariableType
                 : module.VariableStorage.At(Name).Type;
+            
             var expression = type switch
             {
                 VariableType.Integer => new ValueExpression(Convert.ToInt32(value)),
@@ -27,6 +28,7 @@ namespace Semantic_Interpreter.Core
                     : throw new Exception("Неправильная литера!"),
                 _ => throw new ArgumentOutOfRangeException()
             };
+            
             if (Parent is BaseFunction function2)
             {
                 function2.GetParameterWithName(Name).Expression = expression;

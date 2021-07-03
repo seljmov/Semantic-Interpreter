@@ -1,79 +1,42 @@
 ﻿using System;
+using Semantic_Interpreter.Core.Items;
 
 namespace Semantic_Interpreter.Core
 {
-    public class Variable : SemanticOperator
+    public class Variable : SemanticOperator, ICalculated
     {
-        public Variable(VariableType type, string name, IExpression expression)
+        public Variable(VariableType type, string name, string id, IExpression expression)
         {
             Type = type;
             Name = name;
+            Id = id;
             Expression = expression;
-
-            // TODO: перенести проверку типов в отдельный этап (type inferring)
-            /*
-            if (expression != null)
-            {
-                var value = expression.Eval();
-                if (TypeIsCorrect(type, value))
-                {
-                    Expression = expression;
-                }
-                else
-                {
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
-                }
-            }
-            */
         }
 
         public VariableType Type { get; }
         public string Name { get; }
+        public string Id { get; }
         public IExpression Expression { get; set; }
         
         public IValue GetValue()
         {
-            if (Parent is BaseFunction function)
-            {
-                if (function.ParameterIsExist(Name))
-                {
-                    return function.GetParameterWithName(Name).Expression.Eval();
-                }
-            }
-            
-            var fullId = ((MultilineOperator) Parent).OperatorID;
-            var curr = Parent;
-            while (curr.Parent != null)
-            {
-                curr = curr.Parent;
-                fullId = ((MultilineOperator) curr).OperatorID + "^" + fullId;
-            }
-
-            var module = (Module) curr;
-            var subs = fullId.Split("^");
-            
-            for (var i = subs.Length-1; i >= 0; --i)
-            {
-                var varId = "";
-                for (var j = 0; j <= i; ++j)
-                {
-                    varId += subs[j] + "^";
-                }
-
-                varId += Name;
-                if (module.VariableStorage.IsExist(varId))
-                {
-                    var variable = module.VariableStorage.At(varId);
-                    return variable.Expression != null 
-                        ? variable.Expression.Eval() 
-                        : throw new Exception($"Переменная с именем {Name} не инициализированна!");
-                }
-            }
-
-            throw new Exception("Переменной с таким именем не существует!");
+            var module = FindRoot();
+            return module.VariableStorage.IsExist(Id) 
+                ? module.VariableStorage.At(Id).Expression.Eval() 
+                : throw new Exception($"Переменная {Name} не инициализированна!");
         }
 
-        public override void Execute() { }
+        public override void Execute()
+        {
+            if (Expression != null)
+            {
+                var value = Expression.Eval();
+                var expression = new ValueExpression(value);
+                var module = FindRoot();
+                module.VariableStorage.Replace(Id, expression);
+                Expression = new ValueExpression(value);
+            }
+        }
 
         /**
          * Проверка типа и значения переменной. Правила.

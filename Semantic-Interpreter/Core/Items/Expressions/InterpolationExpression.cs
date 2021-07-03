@@ -52,15 +52,21 @@ namespace Semantic_Interpreter.Core
 
         private IValue GetValue(string name)
         {
-            if (_parent is BaseFunction)
+            var curr = _parent;
+            while (curr.Parent != null)
             {
-                var parameterValue = GetParameterValue(name);
-                if (parameterValue != null)
+                if (curr is BaseFunction function)
                 {
-                    return parameterValue;
+                    var parameterValue = GetParameterValue(name, function);
+                    if (parameterValue != null)
+                    {
+                        return parameterValue;
+                    }
                 }
+
+                curr = curr.Parent;
             }
-            
+
             var variableValue = GetVariableValue(name);
             if (variableValue != null)
             {
@@ -70,10 +76,9 @@ namespace Semantic_Interpreter.Core
             throw new Exception($"Параметра/переменной {name} не существует!");
         }
         
-        private IValue GetParameterValue(string name)
+        private IValue GetParameterValue(string name, BaseFunction function)
         {
-            var func = (BaseFunction) _parent;
-            var parameters = func.Parameters;
+            var parameters = function.Parameters;
             foreach (var t in parameters)
             {
                 if (t.Name == name)
@@ -87,31 +92,20 @@ namespace Semantic_Interpreter.Core
 
         private IValue GetVariableValue(string name)
         {
-            var fullId = ((MultilineOperator) _parent).OperatorID;
+            var module = _parent.FindRoot();
             var curr = _parent;
             while (curr.Parent != null)
             {
-                curr = curr.Parent;
-                fullId = ((MultilineOperator) curr).OperatorID + "^" + fullId;
-            }
+                var parentId = ((MultilineOperator) curr).OperatorID;
+                var variableId = $"{parentId}^{name}";
 
-            var module = (Module) curr;
-            var subs = fullId.Split("^");
-            
-            for (var i = subs.Length-1; i >= 0; --i)
-            {
-                var varId = "";
-                for (var j = 0; j <= i; ++j)
+                if (module.VariableStorage.IsExist(variableId))
                 {
-                    varId += subs[j] + "^";
-                }
-
-                varId += name;
-                if (module.VariableStorage.IsExist(varId))
-                {
-                    var variable = module.VariableStorage.At(varId);
+                    var variable = module.VariableStorage.At(variableId);
                     return variable.Expression?.Eval();
                 }
+
+                curr = curr.Parent;
             }
 
             return null;

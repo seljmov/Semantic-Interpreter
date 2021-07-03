@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Semantic_Interpreter.Core
 {
@@ -10,7 +11,7 @@ namespace Semantic_Interpreter.Core
             Expression = expression;
         }
         
-        public string Name { get; set; }
+        public string Name { get; }
         public IExpression Expression { get; }
 
         public override void Execute()
@@ -19,24 +20,22 @@ namespace Semantic_Interpreter.Core
             var value = Expression.Eval();
             var expression = new ValueExpression(value);
 
-            if (Parent is BaseFunction function)
+            var curr = Parent;
+            while (curr.Parent != null)
             {
-                foreach (var t in function.Parameters)
+                if (curr is BaseFunction function && function.ParameterIsExist(Name))
                 {
-                    if (t.Name == Name)
-                    {
-                        t.Expression = expression;
-                        return;
-                    }
-                }
-            }
-            else
-            {
-                if (module.VariableStorage.IsExist(Name))
-                {
-                    module.VariableStorage.Replace(Name, expression);
+                    function.Parameters.Single(t => t.Name == Name).Expression = expression;
                     return;
                 }
+                
+                curr = curr.Parent;
+            }
+            
+            if (module.VariableStorage.IsExist(Name))
+            {
+                module.VariableStorage.Replace(Name, expression);
+                return;
             }
 
             throw new Exception("Переменной с таким именем не существует!");

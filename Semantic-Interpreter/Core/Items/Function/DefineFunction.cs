@@ -9,12 +9,12 @@ namespace Semantic_Interpreter.Core
             BaseFunction = baseFunction;
         }
         
-        public BaseFunction BaseFunction { get; set; }
+        public BaseFunction BaseFunction { get; }
 
         public IValue Execute()
         {
-            BaseFunction.Parameters.ForEach(x => x.Execute());
-            
+            BaseFunction.Parameters?.ForEach(x => x.Execute());
+
             try
             {
                 BaseFunction.Execute();

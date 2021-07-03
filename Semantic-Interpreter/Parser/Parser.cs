@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Semantic_Interpreter.Core;
 
 namespace Semantic_Interpreter.Parser
@@ -314,6 +315,7 @@ namespace Semantic_Interpreter.Parser
         {
             var functionName = Consume(TokenType.Word).Text;
             ParseFunctionArguments(functionName);
+            Consume(TokenType.Semicolon);
             
             return new Call(functionName);
         }
@@ -378,9 +380,12 @@ namespace Semantic_Interpreter.Parser
                 expression = ParseExpression();
             }
             
-            var variable = new Variable(type, name, expression);
-            var id = GetVariableId() + name;
-            ((Module) _semanticTree.Root).VariableStorage.Add(id, variable);
+            var parentId = ((MultilineOperator) _operatorsStack.Peek()).OperatorID;
+            var variableId = $"{parentId}^{name}";
+            
+            var variable = new Variable(type, name, variableId, expression);
+            ((Module) _semanticTree.Root).VariableStorage.Add(variableId, variable);
+            
             Consume(TokenType.Semicolon);
             return variable;
         }
@@ -411,61 +416,32 @@ namespace Semantic_Interpreter.Parser
 
             return new Output(expression);
         }
-
-        private string GetVariableId()
-        {
-            var stack = new Stack<SemanticOperator>(_operatorsStack);
-            var id = "";
-            while (stack.Count > 0)
-            {
-                id += ((MultilineOperator) stack.Pop()).OperatorID + "^";
-            }
-
-            return id;
-        }
         
         private string GetVariableScopeId(string name)
         {
-            var parent = _operatorsStack.Peek();
-            if (parent is BaseFunction function)
+            var stack1 = new Stack<SemanticOperator>(_operatorsStack);
+            while (stack1.Count > 0)
             {
-                foreach (var t in function.Parameters)
+                if (stack1.Pop() is BaseFunction function && function.ParameterIsExist(name))
                 {
-                    if (t.Name == name)
-                    {
-                        return name;
-                    }
+                    return name;
                 }
             }
-            
-            var stack = new Stack<SemanticOperator>(_operatorsStack);
-            var fullId = "";
-            while (stack.Count > 0)
-            {
-                fullId += ((MultilineOperator) stack.Pop()).OperatorID + "^";
-            }
 
-            fullId = fullId.Remove(fullId.Length - 1); // Удаление последней ^
-            
             var module = (Module) _semanticTree.Root;
-            var subs = fullId.Split("^");
-            
-            for (var i = subs.Length-1; i >= 0; --i)
+            var stack2 = new Stack<SemanticOperator>(_operatorsStack);
+            while (stack2.Count > 0)
             {
-                var varId = "";
-                for (var j = 0; j <= i; ++j)
-                {
-                    varId += subs[j] + "^";
-                }
+                var parentId = ((MultilineOperator) stack2.Pop()).OperatorID;
+                var variableId = $"{parentId}^{name}";
 
-                varId += name;
-                if (module.VariableStorage.IsExist(varId))
+                if (module.VariableStorage.IsExist(variableId))
                 {
-                    return varId;
+                    return variableId;
                 }
             }
 
-            throw new Exception($"Переменной с именем {name} не существует!");
+            throw new Exception($"Переменной/параметра {name} не существует!");
         }
 
         private IExpression ParseExpression()
@@ -637,20 +613,18 @@ namespace Semantic_Interpreter.Parser
                         return new ValueExpression(value);
                     }
                     var name = GetVariableScopeId(current.Text);
-                    if (_operatorsStack.Peek() is BaseFunction function)
+                    var stack1 = new Stack<SemanticOperator>(_operatorsStack);
+                    while (stack1.Count > 0)
                     {
-                        if (function.ParameterIsExist(name))
+                        if (stack1.Pop() is BaseFunction function && function.ParameterIsExist(name))
                         {
                             var parameter = function.GetParameterWithName(name);
-                            var type = parameter.VariableType;
-                            var expression = parameter.Expression;
-                            var variable = new Variable(type, name, expression);
-                            variable.Parent = _operatorsStack.Peek();
-                            return new VariableExpression(variable);
+                            return new CalculatedExpression(parameter);
                         }
                     }
+
                     var variable2 = ((Module) _semanticTree.Root).VariableStorage.At(name);
-                    return new VariableExpression(variable2);
+                    return new CalculatedExpression(variable2);
                 case TokenType.Number:
                     // Если точки нет, то число целое, иначе - вещественное
                     if (!current.Text.Contains('.'))
