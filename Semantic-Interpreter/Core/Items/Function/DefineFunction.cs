@@ -13,6 +13,8 @@ namespace Semantic_Interpreter.Core
 
         public IValue Execute()
         {
+            BaseFunction.Parameters.ForEach(x => x.Execute());
+            
             try
             {
                 BaseFunction.Execute();

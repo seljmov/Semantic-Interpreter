@@ -105,16 +105,11 @@ namespace Semantic_Interpreter.Parser
 
             return new Return(expression);
         }
-        
-        private SemanticOperator ParseFunctionOperator()
+
+        private List<Parameter> GetFunctionParameters()
         {
-            var function = new Function();
-            List <Parameter> parameters = null;
-            var visibilityToken = Get(-2);
-            var visibilityType = visibilityToken.Text == "public" ? VisibilityType.Public : VisibilityType.Private;
-            var name = Get().Text;
-            _pos++;
-            
+            List<Parameter> parameters = null;
+
             Consume(TokenType.LParen);
             while (!Match(TokenType.RParen))
             {
@@ -136,7 +131,20 @@ namespace Semantic_Interpreter.Parser
                 parameters.Add(parameter);
                 Match(TokenType.Comma);
             }
-
+            
+            return parameters;
+        }
+        
+        private SemanticOperator ParseFunctionOperator()
+        {
+            var function = new Function();
+            var visibilityToken = Get(-2);
+            var visibilityType = visibilityToken.Text == "public" ? VisibilityType.Public : VisibilityType.Private;
+            var name = Get().Text;
+            _pos++;
+            
+            var parameters = GetFunctionParameters();
+            
             Consume(TokenType.Colon);
             var returnType = Consume(TokenType.Word).Text switch
             {
@@ -165,42 +173,21 @@ namespace Semantic_Interpreter.Parser
             function.Parameters = parameters;
             function.Operators = block;
             function.ReturnType = returnType;
-            var id = name;
-            ((Module) _semanticTree.Root).FunctionStorage.Add(id, new DefineFunction(function));
+            // var id = name;
+            ((Module) _semanticTree.Root).FunctionStorage.Add(name, new DefineFunction(function));
             return function;
         }
 
         private SemanticOperator ParseProcedureOperator()
         {
             var procedure = new Procedure();
-            List <Parameter> parameters = null;
             var visibilityToken = Get(-2);
             var visibilityType = visibilityToken.Text == "public" ? VisibilityType.Public : VisibilityType.Private;
             var name = Get().Text;
             _pos++;
             
-            Consume(TokenType.LParen);
-            while (!Match(TokenType.RParen))
-            {
-                parameters ??= new List<Parameter>();
-                var parameter = new Parameter();
-                var parameterTypeToken = Consume(TokenType.ParameterType);
-                var variableTypeToken = Consume(TokenType.Word);
-                var variableNameToken = Consume(TokenType.Word);
-                parameter.ParameterType = parameterTypeToken.Text == "in" ? ParameterType.In : ParameterType.Var;
-                parameter.VariableType = variableTypeToken.Text switch
-                {
-                    "integer" => VariableType.Integer,
-                    "real" => VariableType.Real,
-                    "boolean" => VariableType.Boolean,
-                    "char" => VariableType.Char,
-                    _ => VariableType.String
-                };
-                parameter.Name = variableNameToken.Text;
-                parameters.Add(parameter);
-                Match(TokenType.Comma);
-            }
-
+            var parameters = GetFunctionParameters();
+            
             procedure.Parent = _operatorsStack.Peek();
             procedure.Parameters = parameters;
             var block = new BlockSemanticOperator();
@@ -218,8 +205,8 @@ namespace Semantic_Interpreter.Parser
             procedure.Name = name;
             procedure.Parameters = parameters;
             procedure.Operators = block;
-            var id = name;
-            ((Module) _semanticTree.Root).FunctionStorage.Add(id, new DefineFunction(procedure));
+            // var id = name;
+            ((Module) _semanticTree.Root).FunctionStorage.Add(name, new DefineFunction(procedure));
             return procedure;
         }
         
@@ -325,38 +312,50 @@ namespace Semantic_Interpreter.Parser
 
         private SemanticOperator ParseCallOperator()
         {
-            var funcName = Consume(TokenType.Word).Text;
-            var parameters = new List<string>();
+            var functionName = Consume(TokenType.Word).Text;
+            ParseFunctionArguments(functionName);
+            
+            return new Call(functionName);
+        }
+
+        private void ParseFunctionArguments(string functionName)
+        {
+            var module = (Module) _semanticTree.Root;
+            var function = module.FunctionStorage.At(functionName).BaseFunction;
+            
+            var arguments = new List<string>();
             Consume(TokenType.LParen);
             while (!Match(TokenType.RParen))
             {
                 var name = Consume(TokenType.Word).Text;
-                parameters.Add(name);
+                arguments.Add(name);
                 Match(TokenType.Comma);
             }
-            Consume(TokenType.Semicolon);
-
-            var module = (Module) _semanticTree.Root;
-            var func = module.FunctionStorage.At(funcName).BaseFunction;
-
-            if (func.Parameters != null)
+            // Consume(TokenType.Semicolon);
+            
+            if (function.Parameters != null)
             {
-                if (func.Parameters.Count != parameters.Count)
+                if (function.Parameters.Count != arguments.Count)
                 {
-                    throw new Exception($"Указано неправильное количество параметров для {funcName}");
+                    // Проверяем не указанные параметры
+                    var message = $"Для {functionName} не были указаны аргументы - ";
+                    for (var i = arguments.Count; i < function.Parameters.Count; i++)
+                    {
+                        message += $"{function.Parameters[i].Name}";
+                        if (i != function.Parameters.Count - 1)
+                            message += ", ";
+                    }
+                    
+                    throw new Exception($"{message}.");
                 }
 
-                for (var i = 0; i < parameters.Count; i++)
+                for (var i = 0; i < arguments.Count; i++)
                 {
-                    var id = GetVariableScopeId(parameters[i]);
-                    var variable = module.VariableStorage.At(id);
-                    func.Parameters[i].VariableId = id;
-                    func.Parameters[i].InitExpression = variable.Expression;
-                    func.Parameters[i].Expression = variable.Expression;
+                    var id = GetVariableScopeId(arguments[i]);
+                    function.Parameters[i].VariableId = id;
+                    function.Parameters[i].Parent = function;
                 }
             }
-            
-            return new Call(funcName);
         }
         
         private SemanticOperator ParseVariableOperator()
@@ -627,41 +626,15 @@ namespace Semantic_Interpreter.Parser
                 case TokenType.Char: return new ValueExpression(Convert.ToChar(current.Text));
                 case TokenType.Text: return new ValueExpression(current.Text);
                 case TokenType.Word:
-                    if (Match(TokenType.LParen))
+                    if (Next(TokenType.LParen))
                     {
-                        var parameters = new List<string>();
-                        while (!Match(TokenType.RParen))
-                        {
-                            var parameterName = Consume(TokenType.Word).Text;
-                            parameters.Add(parameterName);
-                            Match(TokenType.Comma);
-                        }
+                        var functionName = current.Text;
+                        ParseFunctionArguments(functionName);
                         
-                        // var func = ((Module) _semanticTree.Root).FunctionStorage.At(current.Text);
+                        var functionDefine = ((Module) _semanticTree.Root).FunctionStorage.At(functionName);
+                        var value = functionDefine.Execute();
 
-                        var funcName = current.Text;
-                        var module = (Module) _semanticTree.Root;
-                        var funcDefine = module.FunctionStorage.At(funcName);
-                        var func = funcDefine.BaseFunction;
-
-                        if (func.Parameters != null)
-                        {
-                            if (func.Parameters.Count != parameters.Count)
-                            {
-                                throw new Exception($"Указано неправильное количество параметров для {funcName}");
-                            }
-
-                            for (var i = 0; i < parameters.Count; i++)
-                            {
-                                var id = GetVariableScopeId(parameters[i]);
-                                var variable = module.VariableStorage.At(id);
-                                func.Parameters[i].VariableId = id;
-                                func.Parameters[i].InitExpression = variable.Expression;
-                                func.Parameters[i].Expression = variable.Expression;
-                            }
-                        }
-                        
-                        return new ValueExpression(funcDefine.Execute());
+                        return new ValueExpression(value);
                     }
                     var name = GetVariableScopeId(current.Text);
                     if (_operatorsStack.Peek() is BaseFunction function)
@@ -712,6 +685,11 @@ namespace Semantic_Interpreter.Parser
             
             _pos++;
             return true;
+        }
+        
+        private bool Next(TokenType type)
+        {
+            return Get().Type == type;
         }
 
         private Token Get(int i = 0)

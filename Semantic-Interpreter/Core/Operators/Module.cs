@@ -11,11 +11,17 @@ namespace Semantic_Interpreter.Core
         }
 
         public readonly VariableStorage VariableStorage = new();
+        
         public readonly FunctionStorage FunctionStorage = new();
         
         public string Name { get; }
         public sealed override string OperatorID { get; set; }
         
         public override void Execute() { }
+
+        public SemanticOperator FindVariable(string name, SemanticOperator semanticOperator)
+        {
+            return null;
+        }
     }
 }

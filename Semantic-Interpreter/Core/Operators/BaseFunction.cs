@@ -13,15 +13,9 @@ namespace Semantic_Interpreter.Core
 
         public Parameter GetParameterWithName(string name)
         {
-            foreach (var t in Parameters)
-            {
-                if (t.Name == name)
-                {
-                    return t;
-                }
-            }
-
-            throw new Exception($"Параметра {name} не существует!");
+            return ParameterIsExist(name) 
+                ? Parameters.Single(x => x.Name == name) 
+                : throw new Exception($"Параметра {name} не существует!");
         }
 
         public bool ParameterIsExist(string name)
@@ -31,6 +25,7 @@ namespace Semantic_Interpreter.Core
 
         protected void VerifyParametersExpressions()
         {
+            /*
             var module = FindRoot();
             if (Parameters != null)
             {
@@ -42,6 +37,7 @@ namespace Semantic_Interpreter.Core
                     }
                 }
             }
+            */
         }
     }
 }
