@@ -23,20 +23,19 @@ namespace Semantic_Interpreter.Core
             {
                 if (ElseIfs != null)
                 {
-                    var beExecuted = false;
                     foreach (var elseIf in ElseIfs)
                     {
                         var elseIfResult = elseIf.Expression.Eval().AsBoolean();
                         if (elseIfResult)
                         {
                             elseIf.Execute();
-                            beExecuted = true;
-                            break;
+                            return;
                         }
                     }
                     
-                    if (!beExecuted) Else.Execute();
                 }
+                
+                Else?.Execute();
             }
         }
     }
