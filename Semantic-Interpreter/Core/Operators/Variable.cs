@@ -28,7 +28,7 @@ namespace Semantic_Interpreter.Core
 
         public override void Execute()
         {
-            if (Expression != null)
+            if (Expression != null && !(Expression is ArrayExpression))
             {
                 var value = Expression.Eval();
                 var expression = new ValueExpression(value);

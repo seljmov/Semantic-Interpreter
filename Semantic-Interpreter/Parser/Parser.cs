@@ -382,15 +382,27 @@ namespace Semantic_Interpreter.Parser
                     : throw new Exception("Только целое число может быть размером массива");
                 Consume(TokenType.RBracket);
 
-                var name = Get().Text;
+                var arrayType = Consume(TokenType.Word).Text switch
+                {
+                    "integer" => VariableType.Integer,
+                    "real" => VariableType.Real,
+                    "boolean" => VariableType.Boolean,
+                    "char" => VariableType.Char,
+                    "string" => VariableType.String,
+                    _ => VariableType.Array
+                };
+                
+                var name = Consume(TokenType.Word).Text;
                 Consume(TokenType.Semicolon);
                 
                 var parentId = ((MultilineOperator) _operatorsStack.Peek()).OperatorID;
                 var variableId = $"{parentId}^{name}";
 
-                var variable = new Variable(type, name, variableId, new ValueExpression(size));
+                var arrayExpression = new ArrayExpression(name, size, arrayType);
+                var variable = new Variable(type, name, variableId, arrayExpression);
+                ((Module) _semanticTree.Root).VariableStorage.Add(variableId, variable);
                 
-                return null;
+                return variable;
             }
             else
             {
@@ -401,14 +413,14 @@ namespace Semantic_Interpreter.Parser
                     Consume(TokenType.Assign);
                     expression = ParseExpression();
                 }
-            
+                Consume(TokenType.Semicolon);
+                
                 var parentId = ((MultilineOperator) _operatorsStack.Peek()).OperatorID;
                 var variableId = $"{parentId}^{name}";
             
                 var variable = new Variable(type, name, variableId, expression);
                 ((Module) _semanticTree.Root).VariableStorage.Add(variableId, variable);
-            
-                Consume(TokenType.Semicolon);
+                
                 return variable;
             }
         }
@@ -417,10 +429,18 @@ namespace Semantic_Interpreter.Parser
         {
             var name = Consume(TokenType.Word).Text;
             var scopeId = GetVariableScopeId(name);
+            IExpression bracketExpression = null;
+            if (Next(TokenType.LBracket))
+            {
+                Consume(TokenType.LBracket);
+                bracketExpression = ParseExpression();
+                Consume(TokenType.RBracket);
+            }
             Consume(TokenType.Assign);
             var expression = ParseExpression();
             Consume(TokenType.Semicolon);
-            return new Let(scopeId, expression);
+            
+            return new Let(scopeId, expression, bracketExpression);
         }
 
         private SemanticOperator ParseInputOperator()
@@ -634,6 +654,20 @@ namespace Semantic_Interpreter.Parser
                         var value = functionDefine.Execute();
 
                         return new ValueExpression(value);
+                    }
+                    else if (Next(TokenType.LBracket))
+                    {
+                        var arrayName = current.Text;
+                        var scopeId = GetVariableScopeId(arrayName);
+                        Consume(TokenType.LBracket);
+                        var indexExpression = ParseExpression();
+                        Consume(TokenType.RBracket);
+
+                        var module = (Module) _semanticTree.Root;
+                        var arrayExpression = (ArrayExpression) module.VariableStorage.At(scopeId).Expression;
+
+                        return new ArrayAccessExpression(indexExpression, arrayExpression);
+
                     }
                     var name = GetVariableScopeId(current.Text);
                     var stack1 = new Stack<SemanticOperator>(_operatorsStack);

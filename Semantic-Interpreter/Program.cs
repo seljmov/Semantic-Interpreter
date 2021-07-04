@@ -11,16 +11,16 @@ namespace Semantic_Interpreter
         public static void Main()
         {
             Console.WriteLine();
-            using var reader = new StreamReader(Demo + "array.slang");
+            using var reader = new StreamReader(Demo + "array2.slang");
             var program = reader.ReadToEnd();
             
             var lexer = new Lexer(program);
             var tokens = lexer.Tokenize();
             
-            PrintTokens(tokens);
+            // PrintTokens(tokens);
             
-            // var tree = new Parser.Parser(tokens).Parse();
-            // tree.TraversalTree();
+            var tree = new Parser.Parser(tokens).Parse();
+            tree.TraversalTree();
 
             // DocumentRW.Save(tree);
         }
