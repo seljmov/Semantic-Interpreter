@@ -27,11 +27,13 @@ namespace Semantic_Interpreter.Parser
             {"-", TokenType.Minus},
             {"*", TokenType.Multiply},
             {"/", TokenType.Divide},
-            {":=", TokenType.Assing},
+            {":=", TokenType.Assign},
             {"<", TokenType.Less},
             {">", TokenType.Greater},
             {"(", TokenType.LParen},
             {")", TokenType.RParen},
+            {"[", TokenType.LBracket},
+            {"]", TokenType.RBracket},
             {".", TokenType.Dot},
             {";", TokenType.Semicolon},
             {":", TokenType.Colon},
@@ -135,6 +137,7 @@ namespace Semantic_Interpreter.Parser
             {
                 AddToken(TokenType.VisibilityType, word);
             }
+            // TODO: Убрать
             else if ((word == "in" || word == "var") && (_tokens[^1].Type == TokenType.LParen || _tokens[^1].Type == TokenType.Comma))
             {
                 AddToken(TokenType.ParameterType, word);

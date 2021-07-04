@@ -7,5 +7,6 @@
         Boolean,
         Char,
         String,
+        Array,
     }
 }

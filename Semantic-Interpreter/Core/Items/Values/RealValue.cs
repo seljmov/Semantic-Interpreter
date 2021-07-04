@@ -19,6 +19,9 @@ namespace Semantic_Interpreter.Core
 
         public string AsString() => Convert.ToString(Value, CultureInfo.InvariantCulture);
         
+        public IValue[] AsArray()
+            => throw new Exception("Невозможно преобразовать вещественное число к массиву");
+        
         public override string ToString() => AsString();
     }
 }

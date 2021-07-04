@@ -14,19 +14,6 @@ namespace Semantic_Interpreter.Library
             => IsExist(name) 
                 ? _variables[name] 
                 : throw new Exception("Переменной с таким именем не существует!");
-
-        public string AtId(Variable variable)
-        {
-            foreach (var (key, value) in _variables)
-            {
-                if (value == variable)
-                {
-                    return key;
-                }
-            }
-
-            return null;
-        }
         
         public void Add(string name, Variable variable)
         {
@@ -37,16 +24,6 @@ namespace Semantic_Interpreter.Library
 
             _variables.Add(name, variable);
         }
-
-        public void Replace(string name, Variable variable)
-        {
-            if (!IsExist(name))
-            {
-                throw new Exception("Переменной с таким именем не существует!");
-            }
-
-            _variables[name] = variable;
-        }
         
         public void Replace(string name, IExpression expression)
         {
@@ -56,13 +33,6 @@ namespace Semantic_Interpreter.Library
             }
 
             _variables[name].Expression = expression;
-        }
-
-        public void RenameKey(string oldKey, string newKey)
-        {
-            var value = _variables[oldKey];
-            _variables.Remove(oldKey);
-            _variables.Add(newKey, value);
         }
 
         public void Clear() => _variables.Clear();

@@ -20,7 +20,7 @@
         Output,
         Input,
         Variable,
-        Assing,
+        Assign,
         Let,
         Return,
         
@@ -31,6 +31,8 @@
         
         LParen,
         RParen,
+        LBracket,
+        RBracket,
         Equal,
         NotEqual,
         Greater,

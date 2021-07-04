@@ -11,5 +11,7 @@
         char AsChar();
 
         string AsString();
+
+        IValue[] AsArray();
     }
 }

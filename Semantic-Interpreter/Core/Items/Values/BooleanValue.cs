@@ -18,6 +18,9 @@ namespace Semantic_Interpreter.Core
 
         public string AsString() => Convert.ToString(Value);
 
+        public IValue[] AsArray()
+            => throw new Exception("Невозможно преобразовать булевское значение к массиву");
+
         public override string ToString() => AsString();
     }
 }

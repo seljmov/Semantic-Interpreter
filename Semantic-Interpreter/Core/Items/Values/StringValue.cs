@@ -17,6 +17,9 @@ namespace Semantic_Interpreter.Core
         public char AsChar() => Convert.ToChar(Value);
 
         public string AsString() => Value;
+        
+        public IValue[] AsArray()
+            => throw new Exception("Невозможно преобразовать строку к массиву");
 
         public override string ToString() => AsString();
     }

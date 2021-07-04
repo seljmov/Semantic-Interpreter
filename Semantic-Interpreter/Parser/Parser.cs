@@ -369,32 +369,55 @@ namespace Semantic_Interpreter.Parser
                 "real" => VariableType.Real,
                 "boolean" => VariableType.Boolean,
                 "char" => VariableType.Char,
-                _ => VariableType.String
+                "string" => VariableType.String,
+                _ => VariableType.Array
             };
-            
-            var name = Get().Text;
-            IExpression expression = null;
-            if (Match(TokenType.Word) && Get().Type == TokenType.Assing)
-            {
-                Consume(TokenType.Assing);
-                expression = ParseExpression();
-            }
-            
-            var parentId = ((MultilineOperator) _operatorsStack.Peek()).OperatorID;
-            var variableId = $"{parentId}^{name}";
-            
-            var variable = new Variable(type, name, variableId, expression);
-            ((Module) _semanticTree.Root).VariableStorage.Add(variableId, variable);
-            
-            Consume(TokenType.Semicolon);
-            return variable;
-        }
 
+            if (type == VariableType.Array)
+            {
+                Consume(TokenType.LBracket);
+                var expression = ParseExpression();
+                var size = expression.Eval() is IntegerValue value 
+                    ? value.AsInteger() 
+                    : throw new Exception("Только целое число может быть размером массива");
+                Consume(TokenType.RBracket);
+
+                var name = Get().Text;
+                Consume(TokenType.Semicolon);
+                
+                var parentId = ((MultilineOperator) _operatorsStack.Peek()).OperatorID;
+                var variableId = $"{parentId}^{name}";
+
+                var variable = new Variable(type, name, variableId, new ValueExpression(size));
+                
+                return null;
+            }
+            else
+            {
+                var name = Get().Text;
+                IExpression expression = null;
+                if (Match(TokenType.Word) && Get().Type == TokenType.Assign)
+                {
+                    Consume(TokenType.Assign);
+                    expression = ParseExpression();
+                }
+            
+                var parentId = ((MultilineOperator) _operatorsStack.Peek()).OperatorID;
+                var variableId = $"{parentId}^{name}";
+            
+                var variable = new Variable(type, name, variableId, expression);
+                ((Module) _semanticTree.Root).VariableStorage.Add(variableId, variable);
+            
+                Consume(TokenType.Semicolon);
+                return variable;
+            }
+        }
+        
         private SemanticOperator ParseLetOperator()
         {
             var name = Consume(TokenType.Word).Text;
             var scopeId = GetVariableScopeId(name);
-            Consume(TokenType.Assing);
+            Consume(TokenType.Assign);
             var expression = ParseExpression();
             Consume(TokenType.Semicolon);
             return new Let(scopeId, expression);
