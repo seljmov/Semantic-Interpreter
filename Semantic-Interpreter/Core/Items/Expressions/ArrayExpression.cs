@@ -1,13 +1,16 @@
-﻿namespace Semantic_Interpreter.Core
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace Semantic_Interpreter.Core
 {
     public class ArrayExpression : IExpression
     {
-        public ArrayExpression(string name, int size, VariableType type)
+        public ArrayExpression(string name, VariableType type, ArrayValue arrayValue)
         {
             Name = name;
-            Size = size;
             Type = type;
-            ArrayValue = new ArrayValue(size);
+            Size = arrayValue.Size;
+            ArrayValue = arrayValue;
         }
         
         private string Name { get; }
@@ -20,8 +23,30 @@
             return ArrayValue;
         }
 
-        public IValue Get(int index) => ArrayValue.Get(index);
+        public void Set(List<IExpression> indexes, IValue value)
+        {
+            ArrayValue array = null;
+            for (int i = 0; i < indexes.Count-1; i++)
+            {
+                var arrayIndex = indexes[i].Eval().AsInteger();
+                array = (ArrayValue) ArrayValue.Get(arrayIndex);
+            }
 
-        public void Set(int index, IValue value) => ArrayValue.Set(index, value);
+            var index = indexes.Last().Eval().AsInteger();
+            array?.Set(index, value);
+        }
+
+        public IValue Get(List<IExpression> indexes)
+        {
+            ArrayValue array = null;
+            for (int i = 0; i < indexes.Count-1; i++)
+            {
+                var arrayIndex = indexes[i].Eval().AsInteger();
+                array = (ArrayValue) ArrayValue.Get(arrayIndex);
+            }
+
+            var index = indexes.Last().Eval().AsInteger();
+            return array?.Get(index);
+        }
     }
 }

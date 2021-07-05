@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace Semantic_Interpreter.Core
 {
-    public class ArrayValue : IValue
+    public class ArrayValue : IValue, ICloneable
     {
         public ArrayValue(int size)
         {
@@ -11,19 +11,25 @@ namespace Semantic_Interpreter.Core
             {
                 throw new Exception("Длина массива не может быть меньше 1");
             }
-            
+
+            Size = size;
             Values = new IValue[size];
         }
 
         public ArrayValue(IValue[] values)
-            => Array.Copy(values, Values, values.Length);
-        
+        {
+            Values ??= new IValue[values.Length];
+            Array.Copy(values, Values, values.Length);
+            Size = values.Length;
+        }
+
+        public int Size { get; }
         private IValue[] Values { get; }
 
         public IValue Get(int index) => Values[index];
 
         public void Set(int index, IValue value) => Values[index] = value;
-        
+
         public int AsInteger()
             => throw new Exception("Невозможно преобразовать массив к целому числу");
 
@@ -40,5 +46,9 @@ namespace Semantic_Interpreter.Core
         public IValue[] AsArray() => Values;
 
         public override string ToString() => AsString();
+        public object Clone()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

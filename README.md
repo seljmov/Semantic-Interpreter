@@ -4,7 +4,7 @@
 
 __Реализованные операторы:__
 - Module
-- Beginning
+- Start
 - Variable
 - Input
 - Output
@@ -13,3 +13,16 @@ __Реализованные операторы:__
 - If
 - Else
 - Else if
+- Call
+- Parameter
+- Procedure
+- Function
+- Return
+
+__Реализованные типы данных:__
+- Integer
+- Real
+- Boolean
+- Char
+- String
+- Array (Multi-Array)

@@ -375,30 +375,49 @@ namespace Semantic_Interpreter.Parser
 
             if (type == VariableType.Array)
             {
-                Consume(TokenType.LBracket);
-                var expression = ParseExpression();
-                var size = expression.Eval() is IntegerValue value 
-                    ? value.AsInteger() 
-                    : throw new Exception("Только целое число может быть размером массива");
-                Consume(TokenType.RBracket);
+                List<ArrayValue> list = new();
 
-                var arrayType = Consume(TokenType.Word).Text switch
+                while (type == VariableType.Array)
                 {
-                    "integer" => VariableType.Integer,
-                    "real" => VariableType.Real,
-                    "boolean" => VariableType.Boolean,
-                    "char" => VariableType.Char,
-                    "string" => VariableType.String,
-                    _ => VariableType.Array
-                };
-                
+                    Consume(TokenType.LBracket);
+                    var expression = ParseExpression();
+                    // TODO: добавить проверку на отрицательность
+                    var size = expression.Eval() is IntegerValue value 
+                        ? value.AsInteger() 
+                        : throw new Exception("Только целое число может быть размером массива");
+                    Consume(TokenType.RBracket);
+
+                    var array = new ArrayValue(size);
+                    list.Add(array);
+                    
+                    // TODO: вынести определение типа в самостоятельную функцию
+                    type = Consume(TokenType.Word).Text switch
+                    {
+                        "integer" => VariableType.Integer,
+                        "real" => VariableType.Real,
+                        "boolean" => VariableType.Boolean,
+                        "char" => VariableType.Char,
+                        "string" => VariableType.String,
+                        _ => VariableType.Array
+                    };
+                }
+
+                for (int i = 0; i < list.Count-1; i++)
+                {
+                    for (int j = 0; j < list[i].Size; j++)
+                    {
+                        var copyArr = new ArrayValue(list[i + 1].AsArray());
+                        list[i].Set(j, copyArr);
+                    }
+                }
+
                 var name = Consume(TokenType.Word).Text;
                 Consume(TokenType.Semicolon);
                 
                 var parentId = ((MultilineOperator) _operatorsStack.Peek()).OperatorID;
                 var variableId = $"{parentId}^{name}";
 
-                var arrayExpression = new ArrayExpression(name, size, arrayType);
+                var arrayExpression = new ArrayExpression(name, type, list.First());
                 var variable = new Variable(type, name, variableId, arrayExpression);
                 ((Module) _semanticTree.Root).VariableStorage.Add(variableId, variable);
                 
@@ -429,18 +448,20 @@ namespace Semantic_Interpreter.Parser
         {
             var name = Consume(TokenType.Word).Text;
             var scopeId = GetVariableScopeId(name);
-            IExpression bracketExpression = null;
-            if (Next(TokenType.LBracket))
+            List<IExpression> indexes = null;
+            while (Next(TokenType.LBracket))
             {
+                indexes ??= new List<IExpression>();
                 Consume(TokenType.LBracket);
-                bracketExpression = ParseExpression();
+                var index = ParseExpression();
+                indexes.Add(index);
                 Consume(TokenType.RBracket);
             }
             Consume(TokenType.Assign);
             var expression = ParseExpression();
             Consume(TokenType.Semicolon);
             
-            return new Let(scopeId, expression, bracketExpression);
+            return new Let(scopeId, expression, indexes);
         }
 
         private SemanticOperator ParseInputOperator()
@@ -659,14 +680,21 @@ namespace Semantic_Interpreter.Parser
                     {
                         var arrayName = current.Text;
                         var scopeId = GetVariableScopeId(arrayName);
-                        Consume(TokenType.LBracket);
-                        var indexExpression = ParseExpression();
-                        Consume(TokenType.RBracket);
+                        
+                        List<IExpression> indexes = null;
+                        while (Next(TokenType.LBracket))
+                        {
+                            indexes ??= new List<IExpression>();
+                            Consume(TokenType.LBracket);
+                            var index = ParseExpression();
+                            indexes.Add(index);
+                            Consume(TokenType.RBracket);
+                        }
 
                         var module = (Module) _semanticTree.Root;
                         var arrayExpression = (ArrayExpression) module.VariableStorage.At(scopeId).Expression;
 
-                        return new ArrayAccessExpression(indexExpression, arrayExpression);
+                        return new ArrayAccessExpression(indexes, arrayExpression);
 
                     }
                     var name = GetVariableScopeId(current.Text);

@@ -1,19 +1,18 @@
-﻿namespace Semantic_Interpreter.Core
+﻿using System.Collections.Generic;
+
+namespace Semantic_Interpreter.Core
 {
     public class ArrayAccessExpression : IExpression
     {
-        public ArrayAccessExpression(IExpression indexExpression, ArrayExpression arrayExpression)
+        public ArrayAccessExpression(List<IExpression> indexes, ArrayExpression arrayExpression)
         {
-            IndexExpression = indexExpression;
+            Indexes = indexes;
             ArrayExpression = arrayExpression;
         }
         
-        private IExpression IndexExpression { get; }
+        private List<IExpression> Indexes { get; }
         private ArrayExpression ArrayExpression { get; }
         
-        public IValue Eval()
-        {
-            return ArrayExpression.Get(IndexExpression.Eval().AsInteger());
-        }
+        public IValue Eval() => ArrayExpression.Get(Indexes);
     }
 }

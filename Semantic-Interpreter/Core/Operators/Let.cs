@@ -1,20 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Semantic_Interpreter.Core
 {
     public class Let : SemanticOperator
     {
-        public Let(string name, IExpression expression, IExpression bracketExpression)
+        public Let(string name, IExpression expression, List<IExpression> indexes)
         {
             Name = name;
             Expression = expression;
-            BracketExpression = bracketExpression;
+            Indexes = indexes;
         }
         
         public string Name { get; }
         public IExpression Expression { get; }
-        public IExpression BracketExpression { get; }
+        public List<IExpression> Indexes { get; }
 
         public override void Execute()
         {
@@ -22,15 +23,14 @@ namespace Semantic_Interpreter.Core
             var value = Expression.Eval();
             var expression = new ValueExpression(value);
 
-            if (BracketExpression != null)
+            if (Indexes != null)
             {
-                var arrayIndex = BracketExpression.Eval().AsInteger();
-
                 if (module.VariableStorage.IsExist(Name))
                 {
                     var arrayExpression = (ArrayExpression) module.VariableStorage.At(Name).Expression;
-                    arrayExpression.Set(arrayIndex, Expression.Eval());
-                    
+
+                    arrayExpression.Set(Indexes, value);
+
                     module.VariableStorage.Replace(Name, arrayExpression);
                 }
                 
