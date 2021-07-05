@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
@@ -27,16 +28,12 @@ namespace Semantic_Interpreter.Core
         {
             if (Parameters != null)
             {
-                var module = FindRoot();
-                foreach (var t in Parameters)
+                foreach (var t in Parameters.Where(x => x.ParameterType == ParameterType.Var))
                 {
-                    if (t.ParameterType == ParameterType.Var)
+                    var variable = VariableStorage.At(t.VariableId);
+                    if (t.Expression != variable.Expression)
                     {
-                        var variable = module.VariableStorage.At(t.VariableId);
-                        if (t.Expression != variable.Expression)
-                        {
-                            module.VariableStorage.Replace(t.VariableId, t.Expression);
-                        }
+                        VariableStorage.Replace(t.VariableId, t.Expression);
                     }
                 }
             }

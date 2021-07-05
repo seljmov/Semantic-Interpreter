@@ -1,4 +1,5 @@
 ﻿using Semantic_Interpreter.Core.Items;
+using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
@@ -15,9 +16,7 @@ namespace Semantic_Interpreter.Core
         
         public override void Execute()
         {
-            var module = FindRoot();
-            var variable = module.VariableStorage.At(VariableId);
-            Expression = variable.Expression;
+            Expression = VariableStorage.At(VariableId).Expression;
         }
     }
 }

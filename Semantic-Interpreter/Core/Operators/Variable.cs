@@ -1,5 +1,6 @@
 ﻿using System;
 using Semantic_Interpreter.Core.Items;
+using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
@@ -21,19 +22,20 @@ namespace Semantic_Interpreter.Core
         public IValue GetValue()
         {
             var module = FindRoot();
-            return module.VariableStorage.IsExist(Id) 
-                ? module.VariableStorage.At(Id).Expression.Eval() 
+            return VariableStorage.IsExist(Id) 
+                ? VariableStorage.At(Id).Expression.Eval() 
                 : throw new Exception($"Переменная {Name} не инициализированна!");
         }
 
         public override void Execute()
         {
+            VariableStorage.Add(Id, this);
+            
             if (Expression != null && !(Expression is ArrayExpression))
             {
                 var value = Expression.Eval();
                 var expression = new ValueExpression(value);
-                var module = FindRoot();
-                module.VariableStorage.Replace(Id, expression);
+                VariableStorage.Replace(Id, expression);
                 Expression = new ValueExpression(value);
             }
         }

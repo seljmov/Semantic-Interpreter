@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
@@ -19,19 +20,18 @@ namespace Semantic_Interpreter.Core
 
         public override void Execute()
         {
-            var module = FindRoot();
             var value = Expression.Eval();
             var expression = new ValueExpression(value);
 
             if (Indexes != null)
             {
-                if (module.VariableStorage.IsExist(Name))
+                if (VariableStorage.IsExist(Name))
                 {
-                    var arrayExpression = (ArrayExpression) module.VariableStorage.At(Name).Expression;
+                    var arrayExpression = (ArrayExpression) VariableStorage.At(Name).Expression;
 
                     arrayExpression.Set(Indexes, value);
 
-                    module.VariableStorage.Replace(Name, arrayExpression);
+                    VariableStorage.Replace(Name, arrayExpression);
                 }
                 
                 return;
@@ -49,9 +49,9 @@ namespace Semantic_Interpreter.Core
                 curr = curr.Parent;
             }
             
-            if (module.VariableStorage.IsExist(Name))
+            if (VariableStorage.IsExist(Name))
             {
-                module.VariableStorage.Replace(Name, expression);
+                VariableStorage.Replace(Name, expression);
                 return;
             }
 

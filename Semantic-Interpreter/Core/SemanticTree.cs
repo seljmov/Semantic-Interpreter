@@ -64,6 +64,50 @@
                 index++;
             }
         }
+
+        public Variable FindVariableWithId(string id)
+        {
+            var index = 0;
+            var curr = Root;
+            var parent = Root;
+            while (index != _count)
+            {
+                if (curr is Variable variable && variable.Id == id)
+                {
+                    return variable;
+                }
+
+                if (curr?.Child != null)
+                {
+                    parent = curr;
+                    curr = curr.Child;
+                }
+                else
+                {
+                    if (curr?.Next != null)
+                    {
+                        curr = curr.Next;
+                    }
+                    else
+                    {
+                        if (!(curr is Start))
+                        {
+                            curr = parent.Next;
+
+                            while (curr == null && !(parent is Start))
+                            {
+                                parent = parent.Parent;
+                                curr = parent.Next;
+                            }
+                        }
+                    }
+                }
+
+                index++;
+            }
+            
+            return null;
+        }
         
         private SemanticOperator FindOperator(SemanticOperator @operator)
         {

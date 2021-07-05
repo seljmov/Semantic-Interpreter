@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Semantic_Interpreter.Core;
+using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Parser
 {
@@ -48,7 +49,6 @@ namespace Semantic_Interpreter.Parser
                         break;
                     default:
                         asChild = _operatorsStack.Peek().Child == null;
-                        // newOperator.Parent = _operatorsStack.Peek();
                         break;
                 }
                 
@@ -233,6 +233,7 @@ namespace Semantic_Interpreter.Parser
             return whileOperator;
         }
 
+        // TODO: вытащить парсинг else-if и else в отдельные функции
         private SemanticOperator ParseIfOperator()
         {
             var ifOperator = new If();
@@ -360,6 +361,7 @@ namespace Semantic_Interpreter.Parser
             }
         }
         
+        // TODO: вытащить парсинг массива и переменной в отдельные функции
         private SemanticOperator ParseVariableOperator()
         {
             Consume(TokenType.Minus);  // Skip -
@@ -419,7 +421,7 @@ namespace Semantic_Interpreter.Parser
 
                 var arrayExpression = new ArrayExpression(name, type, list.First());
                 var variable = new Variable(type, name, variableId, arrayExpression);
-                ((Module) _semanticTree.Root).VariableStorage.Add(variableId, variable);
+                // VariableStorage.Add(variableId, variable);
                 
                 return variable;
             }
@@ -438,7 +440,7 @@ namespace Semantic_Interpreter.Parser
                 var variableId = $"{parentId}^{name}";
             
                 var variable = new Variable(type, name, variableId, expression);
-                ((Module) _semanticTree.Root).VariableStorage.Add(variableId, variable);
+                // VariableStorage.Add(variableId, variable);
                 
                 return variable;
             }
@@ -491,18 +493,33 @@ namespace Semantic_Interpreter.Parser
                     return name;
                 }
             }
-
-            var module = (Module) _semanticTree.Root;
+            
             var stack2 = new Stack<SemanticOperator>(_operatorsStack);
             while (stack2.Count > 0)
             {
-                var parentId = ((MultilineOperator) stack2.Pop()).OperatorID;
+                var t = stack2.Pop();
+                var parentId = ((MultilineOperator) t).OperatorID;
                 var variableId = $"{parentId}^{name}";
 
-                if (module.VariableStorage.IsExist(variableId))
+                var variable = _semanticTree.FindVariableWithId(variableId);
+                if (variable != null)
+                {
+                    if (t is Else el)
+                    {
+                        var any = el.Operators.Operators.Any(x => x is Variable v && v.Id == variableId);
+                        if (any)
+                        {
+                            return variableId;
+                        }
+                    }
+                }
+                
+                /*
+                if (VariableStorage.IsExist(variableId))
                 {
                     return variableId;
                 }
+                */
             }
 
             throw new Exception($"Переменной/параметра {name} не существует!");
@@ -690,9 +707,9 @@ namespace Semantic_Interpreter.Parser
                             indexes.Add(index);
                             Consume(TokenType.RBracket);
                         }
-
-                        var module = (Module) _semanticTree.Root;
-                        var arrayExpression = (ArrayExpression) module.VariableStorage.At(scopeId).Expression;
+                        
+                        // var arrayExpression = (ArrayExpression) VariableStorage.At(scopeId).Expression;
+                        var arrayExpression = (ArrayExpression) _semanticTree.FindVariableWithId(scopeId).Expression;
 
                         return new ArrayAccessExpression(indexes, arrayExpression);
 
@@ -708,7 +725,8 @@ namespace Semantic_Interpreter.Parser
                         }
                     }
 
-                    var variable2 = ((Module) _semanticTree.Root).VariableStorage.At(name);
+                    // var variable2 = VariableStorage.At(name);
+                    var variable2 = _semanticTree.FindVariableWithId(name);
                     return new CalculatedExpression(variable2);
                 case TokenType.Number:
                     // Если точки нет, то число целое, иначе - вещественное

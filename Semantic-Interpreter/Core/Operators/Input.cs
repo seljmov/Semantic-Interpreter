@@ -13,10 +13,9 @@ namespace Semantic_Interpreter.Core
         public override void Execute()
         {
             var value = Console.ReadLine();
-            var module = FindRoot();
             var type = Parent is BaseFunction function
                 ? function.GetParameterWithName(Name).VariableType
-                : module.VariableStorage.At(Name).Type;
+                : VariableStorage.At(Name).Type;
             
             var expression = type switch
             {
@@ -35,7 +34,7 @@ namespace Semantic_Interpreter.Core
             }
             else
             {
-                module.VariableStorage.Replace(Name, expression);   
+                VariableStorage.Replace(Name, expression);   
             }
         }
     }

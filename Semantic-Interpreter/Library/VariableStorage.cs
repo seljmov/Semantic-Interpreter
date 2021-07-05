@@ -4,37 +4,37 @@ using Semantic_Interpreter.Core;
 
 namespace Semantic_Interpreter.Library
 {
-    public class VariableStorage
+    public static class VariableStorage
     {
-        private readonly Dictionary<string, Variable> _variables = new();
+        private static readonly Dictionary<string, Variable> Variables = new();
 
-        public bool IsExist(string name) => _variables.ContainsKey(name);
+        public static bool IsExist(string name) => Variables.ContainsKey(name);
 
-        public Variable At(string name)
+        public static Variable At(string name)
             => IsExist(name) 
-                ? _variables[name] 
+                ? Variables[name] 
                 : throw new Exception("Переменной с таким именем не существует!");
         
-        public void Add(string name, Variable variable)
+        public static void Add(string name, Variable variable)
         {
             if (IsExist(name))
             {
                 throw new Exception("Переменная с таким именем уже есть!");
             }
 
-            _variables.Add(name, variable);
+            Variables.Add(name, variable);
         }
         
-        public void Replace(string name, IExpression expression)
+        public static void Replace(string name, IExpression expression)
         {
             if (!IsExist(name))
             {
                 throw new Exception("Переменной с таким именем не существует!");
             }
 
-            _variables[name].Expression = expression;
+            Variables[name].Expression = expression;
         }
 
-        public void Clear() => _variables.Clear();
+        public static void Clear() => Variables.Clear();
     }
 }

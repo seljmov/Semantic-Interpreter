@@ -99,9 +99,9 @@ namespace Semantic_Interpreter.Core
                 var parentId = ((MultilineOperator) curr).OperatorID;
                 var variableId = $"{parentId}^{name}";
 
-                if (module.VariableStorage.IsExist(variableId))
+                if (VariableStorage.IsExist(variableId))
                 {
-                    var variable = module.VariableStorage.At(variableId);
+                    var variable = VariableStorage.At(variableId);
                     return variable.Expression?.Eval();
                 }
 
