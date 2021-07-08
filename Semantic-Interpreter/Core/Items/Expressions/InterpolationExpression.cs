@@ -96,7 +96,7 @@ namespace Semantic_Interpreter.Core
             var curr = _parent;
             while (curr.Parent != null)
             {
-                var parentId = ((MultilineOperator) curr).OperatorID;
+                var parentId = ((MultilineOperator) curr).OperatorId;
                 var variableId = $"{parentId}^{name}";
 
                 if (VariableStorage.IsExist(variableId))

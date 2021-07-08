@@ -17,6 +17,7 @@ namespace Semantic_Interpreter.Parser
         private int _pos;
         private readonly SemanticTree _semanticTree = new();
         private readonly Stack<SemanticOperator> _operatorsStack = new();
+        private delegate bool ParseBlockPredicate();
 
         public Parser(List<Token> tokens)
         {
@@ -158,21 +159,16 @@ namespace Semantic_Interpreter.Parser
 
             function.Parent = _operatorsStack.Peek();
             function.Parameters = parameters;
-            var block = new BlockSemanticOperator();
-            _operatorsStack.Push(function);
-            while (!Match(TokenType.End))
-            {
-                block.Add(ParseOperator());
-            }
-            _operatorsStack.Pop();
-
+            
+            ParseBlock(function, () => !Match(TokenType.End));
+            
             Consume(TokenType.Word);   // Skip function name
             Consume(TokenType.Semicolon);   // Skip ;
             
             function.VisibilityType = visibilityType;
             function.Name = name;
             function.Parameters = parameters;
-            function.Operators = block;
+            // function.Operators = block;
             function.ReturnType = returnType;
             // var id = name;
             ((Module) _semanticTree.Root).FunctionStorage.Add(name, new DefineFunction(function));
@@ -191,24 +187,30 @@ namespace Semantic_Interpreter.Parser
             
             procedure.Parent = _operatorsStack.Peek();
             procedure.Parameters = parameters;
-            var block = new BlockSemanticOperator();
-            _operatorsStack.Push(procedure);
-            while (!Match(TokenType.End))
-            {
-                block.Add(ParseOperator());
-            }
-            _operatorsStack.Pop();
-
+            
+            ParseBlock(procedure, () => !Match(TokenType.End));
+            
             Consume(TokenType.Word);   // Skip procedure name
             Consume(TokenType.Semicolon);   // Skip ;
 
             procedure.VisibilityType = visibilityType;
             procedure.Name = name;
             procedure.Parameters = parameters;
-            procedure.Operators = block;
+            // procedure.Operators = block;
             // var id = name;
             ((Module) _semanticTree.Root).FunctionStorage.Add(name, new DefineFunction(procedure));
             return procedure;
+        }
+
+        private void ParseBlock(MultilineOperator multiline, ParseBlockPredicate predicate)
+        {
+            multiline.Operators.Parent = multiline;
+            _operatorsStack.Push(multiline);
+            while (predicate())
+            {
+                multiline.Operators.Add(ParseOperator());
+            }
+            _operatorsStack.Pop();
         }
         
         private SemanticOperator ParseWhileOperator()
@@ -217,19 +219,12 @@ namespace Semantic_Interpreter.Parser
             var expression = ParseExpression();
             Consume(TokenType.Word); // Skip repeat
             
-            var block = new BlockSemanticOperator();
-            _operatorsStack.Push(whileOperator);
-            while (!Match(TokenType.End))
-            {
-                block.Add(ParseOperator());
-            }
-            _operatorsStack.Pop();
+            ParseBlock(whileOperator, () => !Match(TokenType.End));
 
             Consume(TokenType.While);   // Skip while word
             Consume(TokenType.Semicolon);   // Skip ;
 
             whileOperator.Expression = expression;
-            whileOperator.Operators = block;
             return whileOperator;
         }
 
@@ -240,7 +235,7 @@ namespace Semantic_Interpreter.Parser
             var expression = ParseExpression();
             Consume(TokenType.Word);    // Skip then
             
-            var ifBlock = new BlockSemanticOperator();
+            // var ifBlock = new BlockSemanticOperator();
             List<ElseIf> elseIfs = null;
             Else elseOperator = null;
             
@@ -249,12 +244,7 @@ namespace Semantic_Interpreter.Parser
             {
                 if (currentToken.Type != TokenType.Else)
                 {
-                    _operatorsStack.Push(ifOperator);
-                    while (Get().Type != TokenType.Else && Get().Type != TokenType.End)
-                    {
-                        ifBlock.Add(ParseOperator());
-                    }
-                    _operatorsStack.Pop();
+                    ParseBlock(ifOperator, () => !Next(TokenType.Else) && !Next(TokenType.End));
                 }
                 else
                 {
@@ -266,17 +256,13 @@ namespace Semantic_Interpreter.Parser
                         var elseIfExpr = ParseExpression();
                         Consume(TokenType.Word);    // Skip then
                         
-                        var elseIfBlock = new BlockSemanticOperator();
-                        _operatorsStack.Push(elseIfOperator);
-                        while (Get().Type != TokenType.Else && Get().Type != TokenType.End)
-                        {
-                            elseIfBlock.Add(ParseOperator());
-                        }
-                        _operatorsStack.Pop();
-
-                        elseIfBlock.Parent = elseIfOperator;
+                        // var elseIfBlock = new BlockSemanticOperator();
+                        
+                        ParseBlock(elseIfOperator, () => !Next(TokenType.Else) && !Next(TokenType.End));
+                        
+                        // elseIfBlock.Parent = elseIfOperator;
                         elseIfOperator.Expression = elseIfExpr;
-                        elseIfOperator.Operators = elseIfBlock;
+                        // elseIfOperator.Operators = elseIfBlock;
                         elseIfOperator.Parent = _operatorsStack.Peek();
                         elseIfs.Add(elseIfOperator);
                     }
@@ -284,16 +270,12 @@ namespace Semantic_Interpreter.Parser
                     {
                         elseOperator = new Else();
                         
-                        var elseBlock = new BlockSemanticOperator();
-                        _operatorsStack.Push(elseOperator);
-                        while (Get().Type != TokenType.End)
-                        {
-                            elseBlock.Add(ParseOperator());
-                        }
-                        _operatorsStack.Pop();
+                        // var elseBlock = new BlockSemanticOperator();
                         
-                        elseBlock.Parent = elseOperator;
-                        elseOperator.Operators = elseBlock;
+                        ParseBlock(elseOperator, () => !Next(TokenType.End));
+
+                        // elseBlock.Parent = elseOperator;
+                        // elseOperator.Operators = elseBlock;
                         elseOperator.Parent = _operatorsStack.Peek();
                     }
                 }
@@ -304,14 +286,14 @@ namespace Semantic_Interpreter.Parser
             Consume(TokenType.If);      // Skip if word
             Consume(TokenType.Semicolon);   // Skip ;
 
-            ifBlock.Parent = ifOperator;
+            // ifBlock.Parent = ifOperator;
             ifOperator.Expression = expression;
-            ifOperator.IfBlock = ifBlock;
+            // ifOperator.Operators = ifBlock;
             ifOperator.ElseIfs = elseIfs;
             ifOperator.Else = elseOperator;
             return ifOperator;
         }
-
+        
         private SemanticOperator ParseCallOperator()
         {
             var functionName = Consume(TokenType.Word).Text;
@@ -416,7 +398,7 @@ namespace Semantic_Interpreter.Parser
                 var name = Consume(TokenType.Word).Text;
                 Consume(TokenType.Semicolon);
                 
-                var parentId = ((MultilineOperator) _operatorsStack.Peek()).OperatorID;
+                var parentId = ((MultilineOperator) _operatorsStack.Peek()).OperatorId;
                 var variableId = $"{parentId}^{name}";
 
                 var arrayExpression = new ArrayExpression(name, type, list.First());
@@ -436,7 +418,7 @@ namespace Semantic_Interpreter.Parser
                 }
                 Consume(TokenType.Semicolon);
                 
-                var parentId = ((MultilineOperator) _operatorsStack.Peek()).OperatorID;
+                var parentId = ((MultilineOperator) _operatorsStack.Peek()).OperatorId;
                 var variableId = $"{parentId}^{name}";
             
                 var variable = new Variable(type, name, variableId, expression);
@@ -485,7 +467,7 @@ namespace Semantic_Interpreter.Parser
         
         private string GetVariableScopeId(string name)
         {
-            var stack1 = new Stack<SemanticOperator>(_operatorsStack);
+            var stack1 = new Stack<SemanticOperator>(_operatorsStack.Reverse());
             while (stack1.Count > 0)
             {
                 if (stack1.Pop() is BaseFunction function && function.ParameterIsExist(name))
@@ -494,24 +476,26 @@ namespace Semantic_Interpreter.Parser
                 }
             }
             
-            var stack2 = new Stack<SemanticOperator>(_operatorsStack);
+            var stack2 = new Stack<SemanticOperator>(_operatorsStack.Reverse());
             while (stack2.Count > 0)
             {
-                var t = stack2.Pop();
-                var parentId = ((MultilineOperator) t).OperatorID;
+                var t = (MultilineOperator) stack2.Pop();
+                var parentId = t.OperatorId;
                 var variableId = $"{parentId}^{name}";
 
+                if (t.Operators != null)
+                {
+                    var any = t.Operators.Operators.Any(x => x is Variable v && v.Id == variableId);
+                    if (any)
+                    {
+                        return variableId;
+                    }
+                }
+                
                 var variable = _semanticTree.FindVariableWithId(variableId);
                 if (variable != null)
                 {
-                    if (t is Else el)
-                    {
-                        var any = el.Operators.Operators.Any(x => x is Variable v && v.Id == variableId);
-                        if (any)
-                        {
-                            return variableId;
-                        }
-                    }
+                    return variableId;
                 }
                 
                 /*
@@ -689,9 +673,8 @@ namespace Semantic_Interpreter.Parser
                         ParseFunctionArguments(functionName);
                         
                         var functionDefine = ((Module) _semanticTree.Root).FunctionStorage.At(functionName);
-                        var value = functionDefine.Execute();
 
-                        return new ValueExpression(value);
+                        return new CalculatedExpression(functionDefine);
                     }
                     else if (Next(TokenType.LBracket))
                     {
@@ -715,7 +698,7 @@ namespace Semantic_Interpreter.Parser
 
                     }
                     var name = GetVariableScopeId(current.Text);
-                    var stack1 = new Stack<SemanticOperator>(_operatorsStack);
+                    var stack1 = new Stack<SemanticOperator>(_operatorsStack.Reverse());
                     while (stack1.Count > 0)
                     {
                         if (stack1.Pop() is BaseFunction function && function.ParameterIsExist(name))
@@ -727,6 +710,23 @@ namespace Semantic_Interpreter.Parser
 
                     // var variable2 = VariableStorage.At(name);
                     var variable2 = _semanticTree.FindVariableWithId(name);
+                    if (variable2 == null)
+                    {
+                        var stack2 = new Stack<SemanticOperator>(_operatorsStack.Reverse());
+                        while (stack2.Count > 0)
+                        {
+                            var parent = (MultilineOperator) stack2.Pop();
+                            if (parent.Operators != null)
+                            {
+                                var any = parent.Operators.Operators.Any(x => x is Variable v && v.Id == name);
+                                if (any)
+                                {
+                                    variable2 = (Variable) parent.Operators.Operators.Single(x => x is Variable v && v.Id == name);
+                                    return new CalculatedExpression(variable2);
+                                }
+                            }
+                        }
+                    }
                     return new CalculatedExpression(variable2);
                 case TokenType.Number:
                     // Если точки нет, то число целое, иначе - вещественное

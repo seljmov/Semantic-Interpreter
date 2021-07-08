@@ -2,12 +2,16 @@
 {
     public class While : MultilineOperator
     {
-        public While() => OperatorID = GenerateOperatorId();
+        public While()
+        {
+            OperatorId = GenerateOperatorId();
+            Operators = new BlockSemanticOperator();
+        }
         
         public IExpression Expression { get; set; }
-        public BlockSemanticOperator Operators { get; set; }
+        public sealed override BlockSemanticOperator Operators { get; set; }
         
-        public sealed override string OperatorID { get; set; }
+        public sealed override string OperatorId { get; set; }
         
         public override void Execute()
         {

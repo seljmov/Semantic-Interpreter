@@ -2,10 +2,14 @@
 {
     public class Else : MultilineOperator
     {
-        public Else() => OperatorID = GenerateOperatorId();
+        public Else()
+        {
+            OperatorId = GenerateOperatorId();
+            Operators = new BlockSemanticOperator();
+        }
         
-        public BlockSemanticOperator Operators { get; set; }
-        public sealed override string OperatorID { get; set; }
+        public sealed override BlockSemanticOperator Operators { get; set; }
+        public sealed override string OperatorId { get; set; }
         
         public override void Execute() => Operators.Execute();
     }

@@ -19,9 +19,8 @@ namespace Semantic_Interpreter.Core
         public string Id { get; }
         public IExpression Expression { get; set; }
         
-        public IValue GetValue()
+        public IValue Calculate()
         {
-            var module = FindRoot();
             return VariableStorage.IsExist(Id) 
                 ? VariableStorage.At(Id).Expression.Eval() 
                 : throw new Exception($"Переменная {Name} не инициализированна!");

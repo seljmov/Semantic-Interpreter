@@ -90,7 +90,7 @@
                     }
                     else
                     {
-                        if (!(curr is Start))
+                        if (!(curr is Module) && !(curr is Start))
                         {
                             curr = parent.Next;
 

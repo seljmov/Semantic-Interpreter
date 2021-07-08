@@ -7,13 +7,16 @@ namespace Semantic_Interpreter.Core
         public Module(string name)
         {
             Name = name;
-            OperatorID = GenerateOperatorId();
+            OperatorId = GenerateOperatorId();
+            Operators = new BlockSemanticOperator();
         }
         public readonly FunctionStorage FunctionStorage = new();
         
         public string Name { get; }
-        public sealed override string OperatorID { get; set; }
+        public sealed override string OperatorId { get; set; }
         
+        public sealed override BlockSemanticOperator Operators { get; set; }
+
         public override void Execute() { }
     }
 }

@@ -1,8 +1,9 @@
 ﻿using System;
+using Semantic_Interpreter.Core.Items;
 
 namespace Semantic_Interpreter.Core
 {
-    public class DefineFunction
+    public class DefineFunction : ICalculated
     {
         public DefineFunction(BaseFunction baseFunction)
         {
@@ -25,5 +26,7 @@ namespace Semantic_Interpreter.Core
                 return ((Function) BaseFunction).Return.Result;
             }
         }
+
+        public IValue Calculate() => Execute();
     }
 }

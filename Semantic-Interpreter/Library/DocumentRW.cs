@@ -40,7 +40,7 @@ namespace Semantic_Interpreter.Library
                     break;
                 case If @if:
                     writer.WriteAttributeString("Expression", @if.Expression.ToString() ?? string.Empty);
-                    WriteBlock(@if.IfBlock, writer);
+                    WriteBlock(@if.Operators, writer);
 
                     // Запись веток ElseIf (при наличии)
                     if (@if.ElseIfs != null)

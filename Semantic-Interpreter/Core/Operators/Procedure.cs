@@ -2,9 +2,13 @@
 {
     public class Procedure : BaseFunction
     {
-        public Procedure() => OperatorID = GenerateOperatorId();
-        
-        public sealed override string OperatorID { get; set; }
+        public Procedure() 
+        {
+            OperatorId = GenerateOperatorId();
+            Operators = new BlockSemanticOperator();
+        }
+
+        public sealed override string OperatorId { get; set; }
         
         public override void Execute()
         {

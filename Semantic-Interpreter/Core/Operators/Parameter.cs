@@ -12,8 +12,8 @@ namespace Semantic_Interpreter.Core
 
         public IExpression Expression { get; set; }
 
-        public IValue GetValue() => Expression.Eval();
-        
+        public IValue Calculate() => Expression.Eval();
+
         public override void Execute()
         {
             Expression = VariableStorage.At(VariableId).Expression;

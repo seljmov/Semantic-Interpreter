@@ -10,7 +10,7 @@ namespace Semantic_Interpreter.Core
         public VisibilityType VisibilityType { get; set; }
         public string Name { get; set; }
         public List<Parameter> Parameters { get; set; }
-        public BlockSemanticOperator Operators { get; set; }
+        public sealed override BlockSemanticOperator Operators { get; set; }
 
         public Parameter GetParameterWithName(string name)
         {

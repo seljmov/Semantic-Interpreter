@@ -6,9 +6,9 @@ namespace Semantic_Interpreter.Core
     {
         private readonly uint _idLength = 12;
         
-        public abstract string OperatorID { get; set; }
-
-        public virtual void FixVariablesId() {}
+        public abstract string OperatorId { get; set; }
+        
+        public abstract BlockSemanticOperator Operators { get; set; }
         
         public string GenerateOperatorId()
         { 
