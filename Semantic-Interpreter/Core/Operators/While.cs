@@ -19,6 +19,8 @@
             while (result)
             {
                 Operators.Execute();
+                
+                ClearVariableStorage();
                 result = Expression.Eval().AsBoolean();
             }
         }

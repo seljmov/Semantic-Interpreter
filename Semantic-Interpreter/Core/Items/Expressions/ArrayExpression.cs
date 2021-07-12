@@ -25,8 +25,8 @@ namespace Semantic_Interpreter.Core
 
         public void Set(List<IExpression> indexes, IValue value)
         {
-            ArrayValue array = null;
-            for (int i = 0; i < indexes.Count-1; i++)
+            var array = ArrayValue;
+            for (var i = 0; i < indexes.Count-1; i++)
             {
                 var arrayIndex = indexes[i].Eval().AsInteger();
                 array = (ArrayValue) ArrayValue.Get(arrayIndex);
@@ -38,8 +38,8 @@ namespace Semantic_Interpreter.Core
 
         public IValue Get(List<IExpression> indexes)
         {
-            ArrayValue array = null;
-            for (int i = 0; i < indexes.Count-1; i++)
+            var array = ArrayValue;
+            for (var i = 0; i < indexes.Count-1; i++)
             {
                 var arrayIndex = indexes[i].Eval().AsInteger();
                 array = (ArrayValue) ArrayValue.Get(arrayIndex);

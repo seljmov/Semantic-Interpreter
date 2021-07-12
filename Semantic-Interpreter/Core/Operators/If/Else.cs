@@ -10,7 +10,11 @@
         
         public sealed override BlockSemanticOperator Operators { get; set; }
         public sealed override string OperatorId { get; set; }
-        
-        public override void Execute() => Operators.Execute();
+
+        public override void Execute()
+        {
+            Operators.Execute();
+            ClearVariableStorage();
+        }
     }
 }

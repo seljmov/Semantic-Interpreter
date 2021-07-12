@@ -22,12 +22,14 @@ namespace Semantic_Interpreter.Core
                 {
                     t.Execute();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     Return = (Return) t;
                     throw new Exception();
                 }
             }
+            
+            ClearVariableStorage();
         }
     }
 }

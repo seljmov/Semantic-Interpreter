@@ -18,24 +18,21 @@ namespace Semantic_Interpreter.Core
         public string Name { get; }
         public string Id { get; }
         public IExpression Expression { get; set; }
-        
-        public IValue Calculate()
-        {
-            return VariableStorage.IsExist(Id) 
+
+        public IValue Calculate() =>
+            VariableStorage.IsExist(Id) 
                 ? VariableStorage.At(Id).Expression.Eval() 
-                : throw new Exception($"Переменная {Name} не инициализированна!");
-        }
+                : Expression.Eval();
 
         public override void Execute()
         {
-            VariableStorage.Add(Id, this);
+            VariableStorage.Add(Id, new Variable(Type, Name, Id, Expression));
             
             if (Expression != null && !(Expression is ArrayExpression))
             {
-                var value = Expression.Eval();
+                var value = VariableStorage.At(Id).Expression.Eval();
                 var expression = new ValueExpression(value);
                 VariableStorage.Replace(Id, expression);
-                Expression = new ValueExpression(value);
             }
         }
 

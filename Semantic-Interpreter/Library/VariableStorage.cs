@@ -1,40 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Semantic_Interpreter.Core;
 
 namespace Semantic_Interpreter.Library
 {
     public static class VariableStorage
     {
-        private static readonly Dictionary<string, Variable> Variables = new();
+        public static readonly Dictionary<string, Variable> Variables = new();
 
-        public static bool IsExist(string name) => Variables.ContainsKey(name);
+        public static bool IsExist(string id) => Variables.ContainsKey(id);
 
-        public static Variable At(string name)
-            => IsExist(name) 
-                ? Variables[name] 
-                : throw new Exception("Переменной с таким именем не существует!");
+        public static Variable At(string id)
+            => IsExist(id) 
+                ? Variables[id] 
+                : throw new Exception($"Переменная {GetName(id)} не определена в модуле!");
         
-        public static void Add(string name, Variable variable)
+        public static void Add(string id, Variable variable)
         {
-            if (IsExist(name))
+            if (IsExist(id))
             {
-                throw new Exception("Переменная с таким именем уже есть!");
+                throw new Exception($"Переменная {GetName(id)} уже определена в этом блоке!");
             }
 
-            Variables.Add(name, variable);
+            Variables.Add(id, variable);
+        }
+
+        public static void Remove(string id)
+        {
+            if (!IsExist(id))
+            {
+                throw new Exception($"Переменная {GetName(id)} не определена в модуле!");
+            }
+
+            Variables.Remove(id);
         }
         
-        public static void Replace(string name, IExpression expression)
+        public static void Replace(string id, IExpression expression)
         {
-            if (!IsExist(name))
+            if (!IsExist(id))
             {
-                throw new Exception("Переменной с таким именем не существует!");
+                throw new Exception($"Переменная {GetName(id)} не определена в модуле!");
             }
 
-            Variables[name].Expression = expression;
+            Variables[id].Expression = expression;
         }
 
         public static void Clear() => Variables.Clear();
+
+        private static string GetName(string id)
+            => id.Split("^").Last();
     }
 }

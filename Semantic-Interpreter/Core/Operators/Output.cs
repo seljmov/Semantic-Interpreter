@@ -10,6 +10,7 @@ namespace Semantic_Interpreter.Core
         public IExpression Expression { get; }
 
         public override void Execute() 
-            => Console.Write(new InterpolationExpression(Expression, Parent).Eval());
+            => Console.Write(Expression.Eval());
+            // => Console.Write(new InterpolationExpression(Expression, Parent).Eval());
     }
 }

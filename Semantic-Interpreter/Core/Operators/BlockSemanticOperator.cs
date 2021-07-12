@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Semantic_Interpreter.Core
 {
@@ -17,10 +14,7 @@ namespace Semantic_Interpreter.Core
         
         public override void Execute()
         {
-            foreach (var @operator in Operators)
-            {
-                @operator.Execute();
-            }
+            Operators.ForEach(t => t.Execute());
         }
     }
 }

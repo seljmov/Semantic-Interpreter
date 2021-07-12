@@ -42,6 +42,8 @@ namespace Semantic_Interpreter.Core
                 
                 Else?.Execute();
             }
+            
+            ClearVariableStorage();
         }
     }
 }
