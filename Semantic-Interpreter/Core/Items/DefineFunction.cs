@@ -21,7 +21,7 @@ namespace Semantic_Interpreter.Core
                 BaseFunction.Execute();
                 return new IntegerValue(0);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return ((Function) BaseFunction).Return.Result;
             }

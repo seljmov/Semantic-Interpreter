@@ -10,7 +10,7 @@ namespace Semantic_Interpreter.Core
             Operators = new BlockSemanticOperator();
         }
         
-        public VariableType ReturnType { get; set; }
+        public SemanticType ReturnSemanticType { get; set; }
         public Return Return { get; set; }
         public sealed override string OperatorId { get; set; }
         
@@ -24,7 +24,6 @@ namespace Semantic_Interpreter.Core
                 }
                 catch (Exception)
                 {
-                    Return = (Return) t;
                     throw new Exception();
                 }
             }

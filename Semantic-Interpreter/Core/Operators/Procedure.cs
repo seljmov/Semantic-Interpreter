@@ -12,10 +12,7 @@
         
         public override void Execute()
         {
-            foreach (var t in Operators.Operators)
-            {
-                t.Execute();
-            }
+            Operators.Operators.ForEach(x => x.Execute());
             
             VerifyParametersExpressions();
             ClearVariableStorage();

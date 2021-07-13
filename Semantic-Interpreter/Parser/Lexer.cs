@@ -137,11 +137,6 @@ namespace Semantic_Interpreter.Parser
             {
                 AddToken(TokenType.VisibilityType, word);
             }
-            // TODO: Убрать
-            else if ((word == "in" || word == "var") && (_tokens[^1].Type == TokenType.LParen || _tokens[^1].Type == TokenType.Comma))
-            {
-                AddToken(TokenType.ParameterType, word);
-            }
             else
             {
                 AddToken(

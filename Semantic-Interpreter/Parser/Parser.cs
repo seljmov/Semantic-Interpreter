@@ -22,7 +22,6 @@ namespace Semantic_Interpreter.Parser
         private List<Parameter> _parameters = new();
         
         private Func<bool> IsFunctionParsed => () => _operatorsStack.Any(x => x is BaseFunction);
-        private Func<BaseFunction> GetBaseFunction => () => (BaseFunction) _operatorsStack.Single(x => x is BaseFunction);
 
         private delegate bool ParseBlockPredicate();
 
@@ -123,25 +122,31 @@ namespace Semantic_Interpreter.Parser
             while (!Match(TokenType.RParen))
             {
                 parameters ??= new List<Parameter>();
-                var parameter = new Parameter();
-                var parameterTypeToken = Consume(TokenType.ParameterType);
-                var variableTypeToken = Consume(TokenType.Word);
-                var variableNameToken = Consume(TokenType.Word);
-                parameter.ParameterType = parameterTypeToken.Text == "in" ? ParameterType.In : ParameterType.Var;
-                parameter.VariableType = variableTypeToken.Text switch
+
+                parameters.Add(new Parameter
                 {
-                    "integer" => VariableType.Integer,
-                    "real" => VariableType.Real,
-                    "boolean" => VariableType.Boolean,
-                    "char" => VariableType.Char,
-                    _ => VariableType.String
-                };
-                parameter.Name = variableNameToken.Text;
-                parameters.Add(parameter);
+                    ParameterType = Consume(TokenType.Word).Text == "in" ? ParameterType.In : ParameterType.Var,
+                    SemanticType = GetSemanticType(Consume(TokenType.Word).Text),
+                    Name = Consume(TokenType.Word).Text
+                });
                 Match(TokenType.Comma);
             }
             
             return parameters;
+        }
+
+        private SemanticType GetSemanticType(string text)
+        {
+            return text switch
+            {
+                "integer" => SemanticType.Integer,
+                "real" => SemanticType.Real,
+                "boolean" => SemanticType.Boolean,
+                "char" => SemanticType.Char,
+                "string" => SemanticType.String,
+                "array" => SemanticType.Array,
+                _ => throw new Exception($"{text} - неизвестный тип данных!")
+            };
         }
         
         private SemanticOperator ParseFunctionOperator()
@@ -155,14 +160,7 @@ namespace Semantic_Interpreter.Parser
             _parameters = GetFunctionParameters();
             
             Consume(TokenType.Colon);
-            var returnType = Consume(TokenType.Word).Text switch
-            {
-                "integer" => VariableType.Integer,
-                "real" => VariableType.Real,
-                "boolean" => VariableType.Boolean,
-                "char" => VariableType.Char,
-                _ => VariableType.String
-            };
+            var returnType = GetSemanticType(Consume(TokenType.Word).Text);
 
             function.Parent = _operatorsStack.Peek();
             function.Parameters = _parameters;
@@ -175,9 +173,7 @@ namespace Semantic_Interpreter.Parser
             function.VisibilityType = visibilityType;
             function.Name = name;
             function.Parameters = _parameters;
-            // function.Operators = block;
-            function.ReturnType = returnType;
-            // var id = name;
+            function.ReturnSemanticType = returnType;
             ((Module) _semanticTree.Root).FunctionStorage.Add(name, new DefineFunction(function));
             return function;
         }
@@ -203,8 +199,6 @@ namespace Semantic_Interpreter.Parser
             procedure.VisibilityType = visibilityType;
             procedure.Name = name;
             procedure.Parameters = _parameters;
-            // procedure.Operators = block;
-            // var id = name;
             ((Module) _semanticTree.Root).FunctionStorage.Add(name, new DefineFunction(procedure));
             return procedure;
         }
@@ -234,15 +228,13 @@ namespace Semantic_Interpreter.Parser
             whileOperator.Expression = expression;
             return whileOperator;
         }
-
-        // TODO: вытащить парсинг else-if и else в отдельные функции
+        
         private SemanticOperator ParseIfOperator()
         {
             var ifOperator = new If();
             var expression = ParseExpression();
             Consume(TokenType.Word);    // Skip then
             
-            // var ifBlock = new BlockSemanticOperator();
             List<ElseIf> elseIfs = null;
             Else elseOperator = null;
             
@@ -258,32 +250,13 @@ namespace Semantic_Interpreter.Parser
                     Consume(TokenType.Else);
                     if (Match(TokenType.If))
                     {
-                        var elseIfOperator = new ElseIf();
                         elseIfs ??= new List<ElseIf>();
-                        var elseIfExpr = ParseExpression();
-                        Consume(TokenType.Word);    // Skip then
-                        
-                        // var elseIfBlock = new BlockSemanticOperator();
-                        
-                        ParseBlock(elseIfOperator, () => !Next(TokenType.Else) && !Next(TokenType.End));
-                        
-                        // elseIfBlock.Parent = elseIfOperator;
-                        elseIfOperator.Expression = elseIfExpr;
-                        // elseIfOperator.Operators = elseIfBlock;
-                        elseIfOperator.Parent = _operatorsStack.Peek();
+                        var elseIfOperator = ParseElseIfOperator();
                         elseIfs.Add(elseIfOperator);
                     }
                     else
                     {
-                        elseOperator = new Else();
-                        
-                        // var elseBlock = new BlockSemanticOperator();
-                        
-                        ParseBlock(elseOperator, () => !Next(TokenType.End));
-
-                        // elseBlock.Parent = elseOperator;
-                        // elseOperator.Operators = elseBlock;
-                        elseOperator.Parent = _operatorsStack.Peek();
+                        elseOperator = ParseElseOperator();
                     }
                 }
                 
@@ -292,13 +265,36 @@ namespace Semantic_Interpreter.Parser
             
             Consume(TokenType.If);      // Skip if word
             Consume(TokenType.Semicolon);   // Skip ;
-
-            // ifBlock.Parent = ifOperator;
+            
             ifOperator.Expression = expression;
-            // ifOperator.Operators = ifBlock;
             ifOperator.ElseIfs = elseIfs;
             ifOperator.Else = elseOperator;
             return ifOperator;
+        }
+
+        private ElseIf ParseElseIfOperator()
+        {
+            var elseIfOperator = new ElseIf();
+            
+            var elseIfExpr = ParseExpression();
+            Consume(TokenType.Word);    // Skip then
+                        
+            ParseBlock(elseIfOperator, () => !Next(TokenType.Else) && !Next(TokenType.End));
+                        
+            elseIfOperator.Expression = elseIfExpr;
+            elseIfOperator.Parent = _operatorsStack.Peek();
+
+            return elseIfOperator;
+        }
+        
+        private Else ParseElseOperator()
+        {
+            var elseOperator = new Else();
+                        
+            ParseBlock(elseOperator, () => !Next(TokenType.End));
+                        
+            elseOperator.Parent = _operatorsStack.Peek();
+            return elseOperator;
         }
         
         private SemanticOperator ParseCallOperator()
@@ -323,8 +319,7 @@ namespace Semantic_Interpreter.Parser
                 arguments.Add(name);
                 Match(TokenType.Comma);
             }
-            // Consume(TokenType.Semicolon);
-            
+
             if (function.Parameters != null)
             {
                 if (function.Parameters.Count != arguments.Count)
@@ -350,93 +345,77 @@ namespace Semantic_Interpreter.Parser
             }
         }
         
-        // TODO: вытащить парсинг массива и переменной в отдельные функции
         private SemanticOperator ParseVariableOperator()
         {
             Consume(TokenType.Minus);  // Skip -
-            var type = Consume(TokenType.Word).Text switch
+            var type = GetSemanticType(Consume(TokenType.Word).Text);
+
+            var variable = type switch
             {
-                "integer" => VariableType.Integer,
-                "real" => VariableType.Real,
-                "boolean" => VariableType.Boolean,
-                "char" => VariableType.Char,
-                "string" => VariableType.String,
-                _ => VariableType.Array
+                SemanticType.Array => ParseArray(),
+                _ => ParseSimpleVariable(type)
             };
 
-            if (type == VariableType.Array)
-            {
-                List<ArrayValue> list = new();
-
-                while (type == VariableType.Array)
-                {
-                    Consume(TokenType.LBracket);
-                    var expression = ParseExpression();
-                    // TODO: добавить проверку на отрицательность
-                    var size = expression.Eval() is IntegerValue value 
-                        ? value.AsInteger() 
-                        : throw new Exception("Только целое число может быть размером массива");
-                    Consume(TokenType.RBracket);
-
-                    var array = new ArrayValue(size);
-                    list.Add(array);
-                    
-                    // TODO: вынести определение типа в самостоятельную функцию
-                    type = Consume(TokenType.Word).Text switch
-                    {
-                        "integer" => VariableType.Integer,
-                        "real" => VariableType.Real,
-                        "boolean" => VariableType.Boolean,
-                        "char" => VariableType.Char,
-                        "string" => VariableType.String,
-                        _ => VariableType.Array
-                    };
-                }
-
-                for (int i = 0; i < list.Count-1; i++)
-                {
-                    for (int j = 0; j < list[i].Size; j++)
-                    {
-                        var copyArr = new ArrayValue(list[i + 1].AsArray());
-                        list[i].Set(j, copyArr);
-                    }
-                }
-
-                var name = Consume(TokenType.Word).Text;
-                Consume(TokenType.Semicolon);
-                
-                var parentId = ((MultilineOperator) _operatorsStack.Peek()).OperatorId;
-                var variableId = $"{parentId}^{name}";
-
-                var arrayExpression = new ArrayExpression(name, type, list.First());
-                var variable = new Variable(type, name, variableId, arrayExpression);
-                
-                _variables.Add(variable);
-                // VariableStorage.Add(variableId, variable);
-                
-                return variable;
-            }
-            else
-            {
-                var name = Get().Text;
-                IExpression expression = null;
-                if (Match(TokenType.Word) && Get().Type == TokenType.Assign)
-                {
-                    Consume(TokenType.Assign);
-                    expression = ParseExpression();
-                }
-                Consume(TokenType.Semicolon);
-                
-                var parentId = ((MultilineOperator) _operatorsStack.Peek()).OperatorId;
-                var variableId = $"{parentId}^{name}";
+            _variables.Add(variable);
             
-                var variable = new Variable(type, name, variableId, expression);
+            return variable;
+        }
+
+        private Variable ParseArray()
+        {
+            var type = SemanticType.Array;
+            var list = new List<ArrayValue>();
+
+            while (type == SemanticType.Array)
+            {
+                Consume(TokenType.LBracket);
+                var expression = ParseExpression();
                 
-                _variables.Add(variable);
-                // VariableStorage.Add(variableId, variable);
+                var size = expression.Eval() is IntegerValue value && value.AsInteger() >= 1 
+                    ? value.AsInteger() 
+                    : throw new Exception("Только натуральное число может быть размером массива.");
+                Consume(TokenType.RBracket);
+
+                var array = new ArrayValue(size);
+                list.Add(array);
                 
-                return variable;
+                type = GetSemanticType(Consume(TokenType.Word).Text);
             }
+
+            for (var i = 0; i < list.Count-1; i++)
+            {
+                for (var j = 0; j < list[i].Size; j++)
+                {
+                    var copyArr = new ArrayValue(list[i + 1].AsArray());
+                    list[i].Set(j, copyArr);
+                }
+            }
+
+            var name = Consume(TokenType.Word).Text;
+            Consume(TokenType.Semicolon);
+                
+            var parentId = _operatorsStack.Peek().OperatorId;
+            var variableId = $"{parentId}^{name}";
+
+            var arrayExpression = new ArrayExpression(name, type, list.First());
+            return new Variable(type, name, variableId, arrayExpression);
+        }
+        
+        private Variable ParseSimpleVariable(SemanticType type)
+        {
+            var name = Get().Text;
+            IExpression expression = null;
+            if (Match(TokenType.Word) && Get().Type == TokenType.Assign)
+            {
+                Consume(TokenType.Assign);
+                expression = ParseExpression();
+            }
+            Consume(TokenType.Semicolon);
+                
+            var parentId = _operatorsStack.Peek().OperatorId;
+            var variableId = $"{parentId}^{name}";
+            
+            return new Variable(type, name, variableId, expression);
         }
         
         private SemanticOperator ParseLetOperator()
@@ -459,6 +438,51 @@ namespace Semantic_Interpreter.Parser
             return new Let(scopeId, expression, indexes);
         }
 
+        private SemanticOperator ParseInputOperator()
+        {
+            var name = Consume(TokenType.Word).Text;
+            var scopeId = GetVariableScopeId(name);
+            Consume(TokenType.Semicolon);
+
+            return new Input(scopeId);
+        }
+
+        private SemanticOperator ParseOutputOperator()
+        {
+            var expression = ParseExpression();
+            Consume(TokenType.Semicolon);
+
+            return new Output(expression);
+        }
+        
+        private string GetVariableScopeId(string name)
+        {
+            if (IsFunctionParsed())
+            {
+                var parameter = _parameters.FirstOrDefault(x => x.Name == name);
+                if (parameter != null)
+                {
+                    return name;
+                }
+            }
+
+            var stack = new Stack<MultilineOperator>(_operatorsStack.Reverse());
+            while (stack.Count > 0)
+            {
+                var t = stack.Pop();
+                var parentId = t.OperatorId;
+                var variableId = $"{parentId}^{name}";
+
+                var variable = _variables.FirstOrDefault(x => x.Id == variableId);
+                if (variable != null)
+                {
+                    return variableId;
+                }
+            }
+            
+            throw new Exception($"Переменной/параметра {name} не существует!");
+        }
+        
         private SemanticOperator GetVariableOrParameterByName(string name)
         {
             if (IsFunctionParsed())
@@ -485,88 +509,6 @@ namespace Semantic_Interpreter.Parser
             }
             
             throw new Exception($"Переменной/параметра {name} не существует!");
-        }
-
-        private SemanticOperator ParseInputOperator()
-        {
-            var name = Consume(TokenType.Word).Text;
-            var scopeId = GetVariableScopeId(name);
-            Consume(TokenType.Semicolon);
-
-            return new Input(scopeId);
-        }
-
-        private SemanticOperator ParseOutputOperator()
-        {
-            var expression = ParseExpression();
-            Consume(TokenType.Semicolon);
-
-            return new Output(expression);
-        }
-        
-        private string GetVariableScopeId(string name)
-        {
-            if (IsFunctionParsed())
-            {
-                var any = _parameters.Any(x => x.Name == name);
-                if (any)
-                {
-                    return name;
-                }
-            }
-
-            var stack = new Stack<SemanticOperator>(_operatorsStack.Reverse());
-            while (stack.Count > 0)
-            {
-                var t = (MultilineOperator) stack.Pop();
-                var parentId = t.OperatorId;
-                var variableId = $"{parentId}^{name}";
-
-                var any = _variables.Any(x => x.Id == variableId);
-                if (any)
-                {
-                    return variableId;
-                }
-            }
-            
-            throw new Exception($"Переменной/параметра {name} не существует!");
-            
-            /*
-            var stack1 = new Stack<SemanticOperator>(_operatorsStack.Reverse());
-            while (stack1.Count > 0)
-            {
-                if (stack1.Pop() is BaseFunction function && function.ParameterIsExist(name))
-                {
-                    return name;
-                }
-            }
-            
-            var stack2 = new Stack<SemanticOperator>(_operatorsStack.Reverse());
-            while (stack2.Count > 0)
-            {
-                var t = (MultilineOperator) stack2.Pop();
-                var parentId = t.OperatorId;
-                var variableId = $"{parentId}^{name}";
-
-                if (t.Operators != null)
-                {
-                    var any = t.Operators.Operators.Any(x => x is Variable v && v.Id == variableId);
-                    if (any)
-                    {
-                        return variableId;
-                    }
-                }
-                
-                var variable = _semanticTree.FindVariableWithId(variableId);
-                if (variable != null)
-                {
-                    return variableId;
-                }
-            
-            }
-
-            throw new Exception($"Переменной/параметра {name} не существует!");
-            */
         }
 
         private IExpression ParseExpression()
@@ -759,85 +701,12 @@ namespace Semantic_Interpreter.Parser
                         }
                         
                         return new ArrayAccessExpression(indexes, arrayExpression);
-                        
-                        
-                        /*
-                        var scopeId = GetVariableScopeId(arrayName);
-                        
-                        List<IExpression> indexes = null;
-                        while (Next(TokenType.LBracket))
-                        {
-                            indexes ??= new List<IExpression>();
-                            Consume(TokenType.LBracket);
-                            var index = ParseExpression();
-                            indexes.Add(index);
-                            Consume(TokenType.RBracket);
-                        }
-                        
-                        // var arrayExpression = (ArrayExpression) VariableStorage.At(scopeId).Expression;
-                        // var arrayExpression = (ArrayExpression) _semanticTree.FindVariableWithId(scopeId).Expression;
-                        var arrayExpression = (ArrayExpression) _variables.First(x => x.Id == scopeId).Expression;
-
-                        return new ArrayAccessExpression(indexes, arrayExpression);
-                        */
-
                     }
 
                     var name = current.Text;
                     var variableOrParameter = (ICalculated) GetVariableOrParameterByName(name);
 
                     return new CalculatedExpression(variableOrParameter);
-                  
-                    /*
-                    var name = GetVariableScopeId(current.Text);
-
-                    if (IsFunctionParsed())
-                    {
-                        var any = _parameters.Any(x => x.Name == name);
-                        if (any)
-                        {
-                            var parameter = _parameters.First(x => x.Name == name);
-                            return new CalculatedExpression(parameter);
-                        }
-                    }
-
-                    var variable2 = _variables.First(x => x.Id == name);
-                    return new CalculatedExpression(variable2);
-                */
-                    
-                    /*
-                    var stack1 = new Stack<SemanticOperator>(_operatorsStack.Reverse());
-                    while (stack1.Count > 0)
-                    {
-                        if (stack1.Pop() is BaseFunction function && function.ParameterIsExist(name))
-                        {
-                            var parameter = function.GetParameterWithName(name);
-                            return new CalculatedExpression(parameter);
-                        }
-                    }
-                    
-
-                    // var variable2 = VariableStorage.At(name);
-                    var variable2 = _semanticTree.FindVariableWithId(name);
-                    if (variable2 == null)
-                    {
-                        var stack2 = new Stack<SemanticOperator>(_operatorsStack.Reverse());
-                        while (stack2.Count > 0)
-                        {
-                            var parent = (MultilineOperator) stack2.Pop();
-                            if (parent.Operators != null)
-                            {
-                                var any = parent.Operators.Operators.Any(x => x is Variable v && v.Id == name);
-                                if (any)
-                                {
-                                    variable2 = (Variable) parent.Operators.Operators.Single(x => x is Variable v && v.Id == name);
-                                    return new CalculatedExpression(variable2);
-                                }
-                            }
-                        }
-                    }
-                    return new CalculatedExpression(variable2);
-                    */
                 case TokenType.Number:
                     // Если точки нет, то число целое, иначе - вещественное
                     if (!current.Text.Contains('.'))

@@ -11,7 +11,7 @@ namespace Semantic_Interpreter
         public static void Main()
         {
             Console.WriteLine();
-            using var reader = new StreamReader(Demo + "scope.slang");
+            using var reader = new StreamReader(Demo + "while2.slang");
             var program = reader.ReadToEnd();
             
             var lexer = new Lexer(program);

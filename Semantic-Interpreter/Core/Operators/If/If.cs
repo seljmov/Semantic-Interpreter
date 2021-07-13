@@ -39,8 +39,12 @@ namespace Semantic_Interpreter.Core
                     }
                     
                 }
-                
-                Else?.Execute();
+
+                if (Else != null)
+                {
+                    Else.Execute();
+                    return;
+                }
             }
             
             ClearVariableStorage();

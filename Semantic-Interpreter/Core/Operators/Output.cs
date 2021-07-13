@@ -11,6 +11,5 @@ namespace Semantic_Interpreter.Core
 
         public override void Execute() 
             => Console.Write(Expression.Eval());
-            // => Console.Write(new InterpolationExpression(Expression, Parent).Eval());
     }
 }

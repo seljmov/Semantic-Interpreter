@@ -6,7 +6,7 @@ namespace Semantic_Interpreter.Core
     public class Parameter : SemanticOperator, ICalculated
     {
         public ParameterType ParameterType { get; set; }
-        public VariableType VariableType { get; set; }
+        public SemanticType SemanticType { get; set; }
         public string Name { get; set; }
         public string VariableId { get; set; }
 

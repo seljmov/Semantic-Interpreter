@@ -6,15 +6,15 @@ namespace Semantic_Interpreter.Core
 {
     public class Variable : SemanticOperator, ICalculated
     {
-        public Variable(VariableType type, string name, string id, IExpression expression)
+        public Variable(SemanticType semanticType, string name, string id, IExpression expression)
         {
-            Type = type;
+            SemanticType = semanticType;
             Name = name;
             Id = id;
             Expression = expression;
         }
 
-        public VariableType Type { get; }
+        public SemanticType SemanticType { get; }
         public string Name { get; }
         public string Id { get; }
         public IExpression Expression { get; set; }
@@ -26,7 +26,7 @@ namespace Semantic_Interpreter.Core
 
         public override void Execute()
         {
-            VariableStorage.Add(Id, new Variable(Type, Name, Id, Expression));
+            VariableStorage.Add(Id, new Variable(SemanticType, Name, Id, Expression));
             
             if (Expression != null && !(Expression is ArrayExpression))
             {
@@ -44,15 +44,15 @@ namespace Semantic_Interpreter.Core
          * К типа Char можно присвоить только CharValue,
          * а вот к типа Real можно присвоить RealValue и IntegerValue.
          */
-        private static bool TypeIsCorrect(VariableType type, IValue value)
+        private static bool TypeIsCorrect(SemanticType semanticType, IValue value)
         {
-            switch (type)
+            switch (semanticType)
             {
-                case VariableType.String when value is StringValue:
-                case VariableType.Integer when value is IntegerValue:
-                case VariableType.Boolean when value is BooleanValue:
-                case VariableType.Char when value is CharValue:
-                case VariableType.Real when value is RealValue || value is IntegerValue:
+                case SemanticType.String when value is StringValue:
+                case SemanticType.Integer when value is IntegerValue:
+                case SemanticType.Boolean when value is BooleanValue:
+                case SemanticType.Char when value is CharValue:
+                case SemanticType.Real when value is RealValue || value is IntegerValue:
                     return true;
                 default:
                     return false;

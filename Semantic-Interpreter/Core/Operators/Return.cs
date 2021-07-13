@@ -15,6 +15,15 @@ namespace Semantic_Interpreter.Core
         public override void Execute()
         {
             Result = Expression.Eval();
+
+            var curr = Parent;
+            while (!(curr is Function))
+            {
+                curr = curr.Parent;
+            }
+
+            ((Function) curr).Return = this;
+
             throw new Exception();
         }
     }

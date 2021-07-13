@@ -6,8 +6,8 @@ namespace Semantic_Interpreter.Core
 {
     public abstract class MultilineOperator : SemanticOperator
     {
-        private readonly uint _idLength = 12;
-        
+        private const uint IdLength = 12;
+
         public abstract string OperatorId { get; set; }
         
         public abstract BlockSemanticOperator Operators { get; set; }
@@ -15,8 +15,8 @@ namespace Semantic_Interpreter.Core
         protected string GenerateOperatorId()
         { 
             Random rng = new Random();
-            var letters = new char[_idLength];
-            for (var i = 0; i < _idLength; i++)
+            var letters = new char[IdLength];
+            for (var i = 0; i < IdLength; i++)
             {
                 letters[i] = (char) (rng.Next('A', 'Z' + 1));
             }

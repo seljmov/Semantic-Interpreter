@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Reflection;
 
 namespace Semantic_Interpreter.Core
 {
-    public class ArrayValue : IValue, ICloneable
+    public class ArrayValue : IValue
     {
         public ArrayValue(int size)
         {
-            if (size <= 0)
-            {
-                throw new Exception("Длина массива не может быть меньше 1");
-            }
-
             Size = size;
             Values = new IValue[size];
         }
@@ -31,24 +25,20 @@ namespace Semantic_Interpreter.Core
         public void Set(int index, IValue value) => Values[index] = value;
 
         public int AsInteger()
-            => throw new Exception("Невозможно преобразовать массив к целому числу");
+            => throw new Exception("Невозможно преобразовать массив в целое числу");
 
         public double AsReal()
-            => throw new Exception("Невозможно преобразовать массив к вещественному числу");
+            => throw new Exception("Невозможно преобразовать массив в вещественное числу");
 
         public bool AsBoolean() => Values.Length != 0;
 
         public char AsChar()
-            => throw new Exception("Невозможно преобразовать массив к символу");
+            => throw new Exception("Невозможно преобразовать массив в символ");
 
         public string AsString() => Values.ToString();
 
         public IValue[] AsArray() => Values;
 
         public override string ToString() => AsString();
-        public object Clone()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

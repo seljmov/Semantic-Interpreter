@@ -14,15 +14,15 @@ namespace Semantic_Interpreter.Core
         {
             var value = Console.ReadLine();
             var type = Parent is BaseFunction function
-                ? function.GetParameterWithName(Name).VariableType
-                : VariableStorage.At(Name).Type;
+                ? function.GetParameterWithName(Name).SemanticType
+                : VariableStorage.At(Name).SemanticType;
             
             var expression = type switch
             {
-                VariableType.Integer => new ValueExpression(Convert.ToInt32(value)),
-                VariableType.Real => new ValueExpression(Convert.ToDouble(value)),
-                VariableType.String => new ValueExpression(value),
-                VariableType.Char => value!.Length == 1 
+                SemanticType.Integer => new ValueExpression(Convert.ToInt32(value)),
+                SemanticType.Real => new ValueExpression(Convert.ToDouble(value)),
+                SemanticType.String => new ValueExpression(value),
+                SemanticType.Char => value!.Length == 1 
                     ? new ValueExpression(Convert.ToChar(value!)) 
                     : throw new Exception("Неправильная литера!"),
                 _ => throw new ArgumentOutOfRangeException()

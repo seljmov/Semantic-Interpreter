@@ -44,7 +44,6 @@
         End,
         
         VisibilityType,
-        ParameterType,
         Semicolon,
         Colon,
         Comma,
