@@ -16,7 +16,10 @@ namespace Semantic_Interpreter.Core
 
         public override void Execute()
         {
-            Expression = VariableStorage.At(VariableId).Expression;
+            if (VariableId != null)
+            {
+                Expression = VariableStorage.At(VariableId).Expression;
+            }
         }
     }
 }

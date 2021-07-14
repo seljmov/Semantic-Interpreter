@@ -4,12 +4,12 @@ namespace Semantic_Interpreter.Core
 {
     public class CalculatedExpression : IExpression
     {
-        private ICalculated _calculated;
+        public ICalculated Calculated { get; }
 
         public CalculatedExpression(ICalculated calculated)
-            => _calculated = calculated;
+            => Calculated = calculated;
 
         public IValue Eval()
-            => _calculated.Calculate();
+            => Calculated.Calculate();
     }
 }

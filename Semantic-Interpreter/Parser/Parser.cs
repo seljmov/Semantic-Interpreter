@@ -311,12 +311,12 @@ namespace Semantic_Interpreter.Parser
             var module = (Module) _semanticTree.Root;
             var function = module.FunctionStorage.At(functionName).BaseFunction;
             
-            var arguments = new List<string>();
+            var arguments = new List<IExpression>();
             Consume(TokenType.LParen);
             while (!Match(TokenType.RParen))
             {
-                var name = Consume(TokenType.Word).Text;
-                arguments.Add(name);
+                var expression = ParseExpression();
+                arguments.Add(expression);
                 Match(TokenType.Comma);
             }
 
@@ -338,8 +338,21 @@ namespace Semantic_Interpreter.Parser
 
                 for (var i = 0; i < arguments.Count; i++)
                 {
-                    var id = GetVariableScopeId(arguments[i]);
-                    function.Parameters[i].VariableId = id;
+                    if (arguments[i] is CalculatedExpression calculatedExpression)
+                    {
+                        var id = calculatedExpression.Calculated switch
+                        {
+                            Variable variable => variable.Id,
+                            // Parameter parameter => parameter.Name,
+                            _ => throw new Exception("Что-то пошло не так при парсинге аргументов!")
+                        };
+                        // var id = GetVariableScopeId(name);
+                        function.Parameters[i].VariableId = id;
+                    }
+                    else
+                    {
+                        function.Parameters[i].Expression = arguments[i];
+                    }
                     function.Parameters[i].Parent = function;
                 }
             }
