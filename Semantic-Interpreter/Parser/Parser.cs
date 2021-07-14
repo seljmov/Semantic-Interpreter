@@ -513,7 +513,36 @@ namespace Semantic_Interpreter.Parser
 
         private IExpression ParseExpression()
         {
-            return LogicalOr();
+            return ParseInterpolationExpression();
+        }
+
+        private IExpression ParseInterpolationExpression()
+        {
+            var result = LogicalOr();
+
+            // Если это выражение, которое может содержать строку.
+            // PS. Только ValueExpression может содержать в себе строку,
+            // в которой возможно наличие символа $, добавляемого для идентификации интерполяции.
+            if (result is ValueExpression valueExpression && valueExpression.Eval().AsString().Contains("$"))
+            {
+                List<IExpression> expressions = new();
+                var value = valueExpression.Eval().AsString();
+                while (value.Contains("$"))
+                {
+                    var prefix = value.Remove(value.Length - 1);
+                    var expression = LogicalOr();
+                    
+                    expressions.Add(new ValueExpression(prefix));
+                    expressions.Add(expression);
+
+                    value = LogicalOr().Eval().AsString();
+                }
+                
+                expressions.Add(new ValueExpression(value));
+                result = new InterpolationExpression(expressions);
+            }
+
+            return result;
         }
 
         private IExpression LogicalOr()

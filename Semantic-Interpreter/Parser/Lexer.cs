@@ -166,13 +166,45 @@ namespace Semantic_Interpreter.Parser
                     buffer.Append('\\');
                     continue;
                 }
+
+                if (curr == '$')
+                {
+                    if (Next() == '{')
+                    {
+                        buffer.Append(curr);
+                        AddToken(TokenType.Text, buffer.ToString());
+
+                        curr = Next();
+                        while (curr != '}')
+                        {
+                            curr = Peek();
+                            if (char.IsDigit(curr))
+                            {
+                                TokenizeNumber();
+                            }
+                            else if (char.IsLetter(curr))
+                            {
+                                TokenizeWord();
+                            }
+                            // Example ,./\\;:=+-_*#@!&|<>()[]
+                            else if (IsNotLetterOrDigit(curr))
+                            {
+                                TokenizeSymbol(curr);
+                            }
+                            else Next();
+                        }
+
+                        curr = Peek(); // Peek closing "
+                        buffer.Clear();
+                    }
+                }
                 
                 if (curr == '"') break;
                 buffer.Append(curr);
                 curr = Next();
             }
 
-            Next(); // Scip closing "
+            Next(); // Skip closing "
             
             AddToken(TokenType.Text, buffer.ToString());
         }
