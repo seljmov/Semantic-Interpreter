@@ -8,5 +8,6 @@
         Char,
         String,
         Array,
+        Object,
     }
 }

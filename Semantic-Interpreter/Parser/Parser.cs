@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Semantic_Interpreter.Core;
 using Semantic_Interpreter.Core.Items;
+using Semantic_Interpreter.Core.Operators;
 
 namespace Semantic_Interpreter.Parser
 {
@@ -20,6 +21,7 @@ namespace Semantic_Interpreter.Parser
         
         private List<Variable> _variables = new();
         private List<Parameter> _parameters = new();
+        private List<Class> _classes = new();
         
         private Func<bool> IsFunctionParsed => () => _operatorsStack.Any(x => x is BaseFunction);
 
@@ -63,6 +65,7 @@ namespace Semantic_Interpreter.Parser
                 lastOperator = newOperator;
             }
 
+            Console.WriteLine("");
             return _semanticTree;
         }
 
@@ -102,10 +105,135 @@ namespace Semantic_Interpreter.Parser
             SemanticOperator @operator = null;
             if (Match(TokenType.Function)) @operator = ParseFunctionOperator();
             if (Match(TokenType.Procedure)) @operator = ParseProcedureOperator();
+            if (Match(TokenType.Class)) @operator = ParseClassOperator();
+            // if (Match(TokenType.Field)) @operator = ParseFieldOperator();
 
             return @operator;
         }
 
+        private SemanticOperator ParseClassOperator()
+        {
+            var classOperator = new Class();
+            List<Field> fields = null;
+            List<DefineFunction> methods = null;
+            
+            var visibilityToken = Get(-2);
+            var visibilityType = visibilityToken.Text == "public" ? VisibilityType.Public : VisibilityType.Private;
+            var name = Get().Text;
+            _pos++;
+
+            Consume(TokenType.Inherits);
+            var baseClassName = Consume(TokenType.Word).Text;
+            var baseClass = _classes.FirstOrDefault(x => x.Name == baseClassName);
+            if (baseClass == null && baseClassName != "Object")
+            {
+                throw new Exception($"Класс {baseClassName} не объявлен!");
+            }
+
+            if (baseClass?.Fields != null)
+            {
+                fields = new List<Field>(baseClass.Fields);
+            }
+
+            if (baseClass?.Methods != null)
+            {
+                methods = new List<DefineFunction>(baseClass.Methods);
+            }
+
+            _operatorsStack.Push(classOperator);
+            while (Get(1).Type == TokenType.Field)
+            {
+                fields ??= new List<Field>();
+                var field = ParseFieldOperator();
+                fields.Add(field);
+            }
+            
+            while (Get(1).Type == TokenType.Method)
+            {
+                methods ??= new List<DefineFunction>();
+                var method = ParseMethodOperator();
+                methods.Add(new DefineFunction(method));
+            }
+            _operatorsStack.Pop();
+
+            Consume(TokenType.End);
+            Consume(TokenType.Word);
+            Consume(TokenType.Semicolon);
+
+            classOperator.Parent = _operatorsStack.Peek();
+            classOperator.VisibilityType = visibilityType;
+            classOperator.Name = name;
+            classOperator.Fields = fields;
+            classOperator.Methods = methods;
+            
+            _classes.Add(classOperator);
+            return classOperator;
+        }
+
+        private Field ParseFieldOperator()
+        {
+            var visibilityToken = Consume(TokenType.VisibilityType);
+            var visibilityType = visibilityToken.Text == "public" ? VisibilityType.Public : VisibilityType.Private;
+            
+            Consume(TokenType.Field);
+            Consume(TokenType.Minus);
+            
+            var type = GetSemanticType(Consume(TokenType.Word).Text);
+            var name = Get().Text;
+            
+            IExpression expression = null;
+            if (Match(TokenType.Word) && Get().Type == TokenType.Assign)
+            {
+                Consume(TokenType.Assign);
+                expression = ParseExpression();
+            }
+            Consume(TokenType.Semicolon);
+            
+            var field = new Field(visibilityType, type, name, expression) {Parent = _operatorsStack.Peek()};
+            return field;
+        }
+
+        private BaseFunction ParseMethodOperator()
+        {
+            var visibilityToken = Consume(TokenType.VisibilityType);
+            var visibilityType = visibilityToken.Text == "public" ? VisibilityType.Public : VisibilityType.Private;
+
+            Consume(TokenType.Method);
+            
+            var name = Get().Text;
+            _pos++;
+            
+            Consume(TokenType.LParen);
+            var classParameterType = Consume(TokenType.Word).Text;
+            var classParameterName = Consume(TokenType.Word).Text;
+            Consume(TokenType.RParen);
+            
+            _parameters = GetFunctionParameters();
+
+            BaseFunction method;
+            if (Next(TokenType.Colon))
+            {
+                Consume(TokenType.Colon);
+                method = new MethodFunction {SemanticType = GetSemanticType(Consume(TokenType.Word).Text)};
+
+            }
+            else method = new MethodProcedure();
+
+            method.Parent = _operatorsStack.Peek();
+            method.Parameters = _parameters;
+            
+            ParseBlock(method, () => !Match(TokenType.End));
+            
+            Consume(TokenType.Word);   // Skip function name
+            Consume(TokenType.Semicolon);   // Skip ;
+
+            method.VisibilityType = visibilityType;
+            method.Name = name;
+            method.Parameters = _parameters;
+            ((IMethod) method).ClassParameter = new ClassParameter(classParameterName);
+            return method;
+        }
+        
         private SemanticOperator ParseReturnOperator()
         {
             var expression = ParseExpression();
@@ -145,7 +273,7 @@ namespace Semantic_Interpreter.Parser
                 "char" => SemanticType.Char,
                 "string" => SemanticType.String,
                 "array" => SemanticType.Array,
-                _ => throw new Exception($"{text} - неизвестный тип данных!")
+                _ => SemanticType.Object
             };
         }
         
@@ -173,7 +301,7 @@ namespace Semantic_Interpreter.Parser
             function.VisibilityType = visibilityType;
             function.Name = name;
             function.Parameters = _parameters;
-            function.ReturnSemanticType = returnType;
+            function.SemanticType = returnType;
             ((Module) _semanticTree.Root).FunctionStorage.Add(name, new DefineFunction(function));
             return function;
         }
@@ -299,18 +427,41 @@ namespace Semantic_Interpreter.Parser
         
         private SemanticOperator ParseCallOperator()
         {
-            var functionName = Consume(TokenType.Word).Text;
-            ParseFunctionArguments(functionName);
+            var name = Consume(TokenType.Word).Text;
+            // Если вызывается просто процедура
+            if (!Next(TokenType.Dot))
+            {
+                var function = ((Module) _semanticTree.Root).FunctionStorage.At(name);
+                ParseFunctionArguments(function.BaseFunction);
+                Consume(TokenType.Semicolon);
+
+                return new Call(function);
+            }
+
+            Consume(TokenType.Dot);
+            var methodName = Consume(TokenType.Word).Text;
+            
+            var classVariable = _variables.FirstOrDefault(x => x.Name == name);
+            if (classVariable == null)
+            {
+                throw new Exception($"Переменная {name} не объявлена!");
+            }
+            var value = (ClassValue) classVariable.Expression.Eval();
+            
+            var method = value.Class.Methods.FirstOrDefault(x => x.BaseFunction.Name == methodName);
+            if (method == null)
+            {
+                throw new Exception($"В классе {name} не объявлен метод {methodName}");
+            }
+            
+            ParseFunctionArguments(method.BaseFunction);
             Consume(TokenType.Semicolon);
             
-            return new Call(functionName);
+            return new Call(method);
         }
 
-        private void ParseFunctionArguments(string functionName)
+        private void ParseFunctionArguments(BaseFunction function)
         {
-            var module = (Module) _semanticTree.Root;
-            var function = module.FunctionStorage.At(functionName).BaseFunction;
-            
             var arguments = new List<IExpression>();
             Consume(TokenType.LParen);
             while (!Match(TokenType.RParen))
@@ -325,7 +476,7 @@ namespace Semantic_Interpreter.Parser
                 if (function.Parameters.Count != arguments.Count)
                 {
                     // Проверяем не указанные параметры
-                    var message = $"Для {functionName} не были указаны аргументы - ";
+                    var message = $"Для {function.Name} не были указаны аргументы - ";
                     for (var i = arguments.Count; i < function.Parameters.Count; i++)
                     {
                         message += $"{function.Parameters[i].Name}";
@@ -357,7 +508,9 @@ namespace Semantic_Interpreter.Parser
                 }
             }
         }
-        
+
+
+        #region ParseVariableFunctions
         private SemanticOperator ParseVariableOperator()
         {
             Consume(TokenType.Minus);  // Skip -
@@ -366,9 +519,11 @@ namespace Semantic_Interpreter.Parser
             var variable = type switch
             {
                 SemanticType.Array => ParseArray(),
+                SemanticType.Object => ParseObject(Get(-1).Text),
                 _ => ParseSimpleVariable(type)
             };
 
+            variable.Parent = _operatorsStack.Peek();
             _variables.Add(variable);
             
             return variable;
@@ -413,6 +568,25 @@ namespace Semantic_Interpreter.Parser
             var arrayExpression = new ArrayExpression(name, type, list.First());
             return new Variable(type, name, variableId, arrayExpression);
         }
+
+        private Variable ParseObject(string className)
+        {
+            var type = SemanticType.Object;
+            var classType = _classes.FirstOrDefault(x => x.Name == className);
+            if (className == null)
+            {
+                throw new Exception($"Класс {className} не объявлен!");
+            }
+            var name = Consume(TokenType.Word).Text;
+            var expression = new ValueExpression(classType);
+
+            Consume(TokenType.Semicolon);
+            
+            var parentId = _operatorsStack.Peek().OperatorId;
+            var variableId = $"{parentId}^{name}";
+
+            return new Variable(type, name, variableId, expression);
+        }
         
         private Variable ParseSimpleVariable(SemanticType type)
         {
@@ -430,6 +604,7 @@ namespace Semantic_Interpreter.Parser
             
             return new Variable(type, name, variableId, expression);
         }
+        #endregion ParseVariableFunctions
         
         private SemanticOperator ParseLetOperator()
         {
@@ -524,6 +699,8 @@ namespace Semantic_Interpreter.Parser
             throw new Exception($"Переменной/параметра {name} не существует!");
         }
 
+
+        #region RecursiveDescentMethod
         private IExpression ParseExpression()
         {
             return ParseInterpolationExpression();
@@ -714,10 +891,9 @@ namespace Semantic_Interpreter.Parser
                     if (Next(TokenType.LParen))
                     {
                         var functionName = current.Text;
-                        ParseFunctionArguments(functionName);
-                        
                         var functionDefine = ((Module) _semanticTree.Root).FunctionStorage.At(functionName);
-
+                        ParseFunctionArguments(functionDefine.BaseFunction);
+                        
                         return new CalculatedExpression(functionDefine);
                     }
                     else if (Next(TokenType.LBracket))
@@ -744,6 +920,44 @@ namespace Semantic_Interpreter.Parser
                         
                         return new ArrayAccessExpression(indexes, arrayExpression);
                     }
+                    else if (Match(TokenType.Dot))
+                    {
+                        var operatorName = current.Text;
+                        // Если выбираем у модуля
+                        if (((Module) _semanticTree.Root).Name == operatorName)
+                        {
+                            
+                        }
+                        
+                        var classVariable = _variables.FirstOrDefault(x => x.Name == operatorName);
+                        if (classVariable == null)
+                        {
+                            throw new Exception($"Переменная {operatorName} не объявлена!");
+                        }
+                        var value = (ClassValue) classVariable.Expression.Eval();
+                        
+                        var classItemName = Consume(TokenType.Word).Text;
+                        // Если выбираем функцию
+                        if (Next(TokenType.LParen))
+                        {
+                            var method = value.Class.Methods.FirstOrDefault(x => x.BaseFunction.Name == classItemName);
+                            if (method == null)
+                            {
+                                throw new Exception($"В классе {operatorName} не объявлен метод {classItemName}");
+                            }
+
+                            ParseFunctionArguments(method.BaseFunction);
+                            return new CalculatedExpression(method);
+                        }
+                        
+                        var field = value.Class.Fields.FirstOrDefault(x => x.Name == classItemName);
+                        if (field == null)
+                        {
+                            throw new Exception($"В классе {operatorName} не объявлено поле {classItemName}");
+                        }
+
+                        return new CalculatedExpression(field);
+                    }
 
                     var name = current.Text;
                     var variableOrParameter = (ICalculated) GetVariableOrParameterByName(name);
@@ -764,6 +978,8 @@ namespace Semantic_Interpreter.Parser
             
             throw new Exception("Неизвестный оператор.");
         }
+        
+        #endregion RecursiveDescentMethod
         
         private Token Consume(TokenType type)
         {

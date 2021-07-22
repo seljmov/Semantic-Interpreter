@@ -11,6 +11,10 @@
         
         Module,
         Start,
+        Class,
+        Inherits,
+        Field,
+        Method,
         Function,
         Procedure,
         Call,

@@ -11,6 +11,7 @@
         public ValueExpression(char value) => Value = new CharValue(value);
         
         public ValueExpression(string value) => Value = new StringValue(value);
+        public ValueExpression(Class value) => Value = new ClassValue(value);
 
         public ValueExpression(IValue value) => Value = value;
 

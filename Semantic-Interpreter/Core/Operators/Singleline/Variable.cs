@@ -4,7 +4,7 @@ using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
-    public class Variable : SemanticOperator, ICalculated
+    public class Variable : SemanticOperator, ICalculated, IHaveType
     {
         public Variable(SemanticType semanticType, string name, string id, IExpression expression)
         {

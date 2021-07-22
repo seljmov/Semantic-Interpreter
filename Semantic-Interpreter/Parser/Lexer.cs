@@ -10,6 +10,10 @@ namespace Semantic_Interpreter.Parser
         {
             {"module", TokenType.Module},
             {"start", TokenType.Start},
+            {"class", TokenType.Class},
+            {"inherits", TokenType.Inherits},
+            {"field", TokenType.Field},
+            {"method", TokenType.Method},
             {"function", TokenType.Function},
             {"procedure", TokenType.Procedure},
             {"call", TokenType.Call},

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Semantic_Interpreter.Core.Operators;
 using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
-    public abstract class BaseFunction : MultilineOperator
+    public abstract class BaseFunction : MultilineOperator, IHaveVisibility, IHaveName
     {
         public VisibilityType VisibilityType { get; set; }
         public string Name { get; set; }

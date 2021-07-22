@@ -17,13 +17,21 @@ namespace Semantic_Interpreter.Core
             Result = Expression.Eval();
 
             var curr = Parent;
-            while (!(curr is Function))
+            while (!(curr is Function) && !(curr is MethodFunction))
             {
                 curr = curr.Parent;
             }
 
-            ((Function) curr).Return = this;
-
+            switch (curr)
+            {
+                case Function function:
+                    function.Return = this;
+                    break;
+                case MethodFunction methodFunction:
+                    methodFunction.Return = this;
+                    break;
+            }
+            
             throw new Exception();
         }
     }

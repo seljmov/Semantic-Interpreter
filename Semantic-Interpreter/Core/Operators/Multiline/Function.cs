@@ -2,7 +2,7 @@
 
 namespace Semantic_Interpreter.Core
 {
-    public class Function : BaseFunction
+    public class Function : BaseFunction, IHaveType
     {
         public Function()
         {
@@ -10,7 +10,7 @@ namespace Semantic_Interpreter.Core
             Operators = new BlockSemanticOperator();
         }
         
-        public SemanticType ReturnSemanticType { get; set; }
+        public SemanticType SemanticType { get; set; }
         public Return Return { get; set; }
         public sealed override string OperatorId { get; set; }
         
@@ -28,6 +28,7 @@ namespace Semantic_Interpreter.Core
                 }
             }
             
+            VerifyParametersExpressions();
             ClearVariableStorage();
         }
     }
