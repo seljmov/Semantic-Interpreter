@@ -64,8 +64,7 @@ namespace Semantic_Interpreter.Parser
                 _semanticTree.InsertOperator(prevOperator, newOperator, asChild);
                 lastOperator = newOperator;
             }
-
-            Console.WriteLine("");
+            
             return _semanticTree;
         }
 
@@ -610,20 +609,41 @@ namespace Semantic_Interpreter.Parser
         {
             var name = Consume(TokenType.Word).Text;
             var scopeId = GetVariableScopeId(name);
-            List<IExpression> indexes = null;
-            while (Next(TokenType.LBracket))
+
+            if (Next(TokenType.LBracket))
             {
-                indexes ??= new List<IExpression>();
-                Consume(TokenType.LBracket);
-                var index = ParseExpression();
-                indexes.Add(index);
-                Consume(TokenType.RBracket);
-            }
-            Consume(TokenType.Assign);
-            var expression = ParseExpression();
-            Consume(TokenType.Semicolon);
+                List<IExpression> indexes = null;
+                while (Next(TokenType.LBracket))
+                {
+                    indexes ??= new List<IExpression>();
+                    Consume(TokenType.LBracket);
+                    var index = ParseExpression();
+                    indexes.Add(index);
+                    Consume(TokenType.RBracket);
+                }
+                Consume(TokenType.Assign);
+                var expression1 = ParseExpression();
+                Consume(TokenType.Semicolon);
             
-            return new Let(scopeId, expression, indexes);
+                return new Let(scopeId, indexes, expression1) {LetType = LetType.AssignToArrayIndex};
+            }
+
+            if (Next(TokenType.Dot))
+            {
+                Consume(TokenType.Dot);
+                var fieldName = Consume(TokenType.Word).Text;
+                Consume(TokenType.Assign);
+                var expression2 = ParseExpression();
+                Consume(TokenType.Semicolon);
+
+                return new Let(scopeId, fieldName, expression2) {LetType = LetType.AssignToClassField};
+            }
+            
+            Consume(TokenType.Assign);
+            var expression3 = ParseExpression();
+            Consume(TokenType.Semicolon);
+
+            return new Let(scopeId, expression3) {LetType = LetType.AssignToVariable};
         }
 
         private SemanticOperator ParseInputOperator()

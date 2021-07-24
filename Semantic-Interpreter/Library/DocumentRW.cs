@@ -68,7 +68,7 @@ namespace Semantic_Interpreter.Library
                     writer.WriteAttributeString("Expression", variable.Expression?.ToString() ?? string.Empty);
                     break;
                 case Let let:
-                    writer.WriteAttributeString("Variable", let.Name);
+                    writer.WriteAttributeString("Variable", let.VariableName);
                     writer.WriteAttributeString("Expression", let.Expression.ToString() ?? string.Empty);
                     break;
                 case Output output:

@@ -28,7 +28,7 @@ namespace Semantic_Interpreter.Core
         {
             VariableStorage.Add(Id, new Variable(SemanticType, Name, Id, Expression));
             
-            if (Expression != null && !(Expression is ArrayExpression))
+            if (Expression != null && !(Expression is ArrayExpression) && !(Expression.Eval() is ClassValue))
             {
                 var value = VariableStorage.At(Id).Expression.Eval();
                 var expression = new ValueExpression(value);
