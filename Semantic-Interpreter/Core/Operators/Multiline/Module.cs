@@ -9,13 +9,13 @@ namespace Semantic_Interpreter.Core
             Name = name;
             OperatorId = GenerateOperatorId();
         }
-
+        
         public readonly VariableStorage VariableStorage = new();
         public readonly FunctionStorage FunctionStorage = new();
         
         public string Name { get; set; }
-        public sealed override string OperatorId { get; }
+        public override string OperatorId { get; }
 
-        public override void Execute() { }
+        public override void Execute() {}
     }
 }

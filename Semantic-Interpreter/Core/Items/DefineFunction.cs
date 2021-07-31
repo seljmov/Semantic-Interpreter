@@ -3,7 +3,7 @@ using Semantic_Interpreter.Core.Items;
 
 namespace Semantic_Interpreter.Core
 {
-    public class DefineFunction : ICalculated
+    public class DefineFunction : IFunction, ICalculated
     {
         public DefineFunction(BaseFunction baseFunction)
         {
@@ -12,7 +12,7 @@ namespace Semantic_Interpreter.Core
         
         public BaseFunction BaseFunction { get; }
 
-        public IValue Execute()
+        public IValue Execute(params IValue[] args)
         {
             BaseFunction.Parameters?.ForEach(x => x.Execute());
 

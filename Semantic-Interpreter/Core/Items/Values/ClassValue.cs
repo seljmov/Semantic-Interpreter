@@ -35,5 +35,7 @@
         {
             throw new System.NotImplementedException();
         }
+        
+        public object AsObject() => Class;
     }
 }

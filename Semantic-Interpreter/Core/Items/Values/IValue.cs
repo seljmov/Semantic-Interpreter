@@ -1,4 +1,6 @@
-﻿namespace Semantic_Interpreter.Core
+﻿using System;
+
+namespace Semantic_Interpreter.Core
 {
     public interface IValue
     {
@@ -13,5 +15,7 @@
         string AsString();
 
         IValue[] AsArray();
+
+        object AsObject();
     }
 }

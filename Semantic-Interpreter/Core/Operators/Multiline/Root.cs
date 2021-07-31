@@ -10,9 +10,6 @@ namespace Semantic_Interpreter.Core
         public List<Module> Imports = new();
         public Module Module { get; set; }
         
-        public override void Execute()
-        {
-            Imports.ForEach(x => x.Execute());
-        }
+        public override void Execute() {}
     }
 }

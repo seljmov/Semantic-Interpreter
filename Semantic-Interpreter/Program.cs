@@ -11,7 +11,7 @@ namespace Semantic_Interpreter
         public static void Main()
         {
             Console.WriteLine();
-            using var reader = new StreamReader(Demo + "arith.slang");
+            using var reader = new StreamReader(Demo + "import.slang");
             var program = reader.ReadToEnd();
             
             var lexer = new Lexer(program);
@@ -25,6 +25,8 @@ namespace Semantic_Interpreter
         
         private static void PrintTokens(List<Token> tokens)
         {
+            // tokens.ForEach(token => Console.WriteLine(token.Text == "" ? $"{token.Type} \n" : $"{token.Type} -> {token.Text} \n"));
+            
             foreach (var token in tokens)
             {
                 Console.Write(token.Type);

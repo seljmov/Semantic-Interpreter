@@ -1,28 +1,35 @@
-# Semantic Interpreter
+# Semantic Language
 
-Интерпретатор новой версии интегрированной среды [«Semantic IDE».](https://github.com/seljmov/Semantic-IDE)
-
-__Реализованные операторы:__
-- Module
-- Start
-- Variable
-- Input
-- Output
-- Let
-- While
-- If
-- Else
-- Else if
-- Call
-- Parameter
-- Procedure
-- Function
-- Return
+Интерпретатор учебного языка __«Semantic Language»__.
 
 __Реализованные типы данных:__
-- Integer
-- Real
-- Boolean
-- Char
-- String
-- Array (Multi-Array)
+1. Integer
+2. Real
+3. Boolean
+4. Char
+5. String
+6. Array (Multi-Array)
+7. Class
+
+__Реализованные операторы:__
+1. Root - корень семантического дерева
+2. Import - оператора импорта модулей
+3. Module - модуль программы
+4. Start - точка входа
+5. Variable - оператор переменной
+6. Input - оператор ввода с клавиатуры
+7. Output - оператор вывода в консоль
+8. Let - оператор присвоения
+9. While - оператора цикла с предусловием
+10. If - оператор проверки на равенство
+11. Else
+12. Else if
+13. Call - оператор вызова процедуры
+14. Parameter
+15. Procedure
+16. Function
+17. Return - оператор возврата выражения из функции
+18. Class
+19. Field - оператор поля класса
+20. MethodFunction - оператор функции как метода класса
+21. MethodProcedure - оператор процедуры как метода класса

@@ -100,7 +100,11 @@ namespace Semantic_Interpreter.Parser
         {
             var name = Consume(TokenType.Word).Text;
             Consume(TokenType.Semicolon);
-            return new Import(name);
+            var import = new Import(name);
+            var module = import.GetImportedModule();
+            var root = (Root) _semanticTree.Root;
+            root.Imports.Add(module);
+            return import;
         }
         
         private SemanticOperator ParseModuleOperator()
@@ -442,7 +446,7 @@ namespace Semantic_Interpreter.Parser
             // Если вызывается просто процедура
             if (!Next(TokenType.Dot))
             {
-                var function = ((Root) _semanticTree.Root).Module.FunctionStorage.At(name);
+                var function = (DefineFunction) ((Root) _semanticTree.Root).Module.FunctionStorage.At(name);
                 ParseFunctionArguments(function.BaseFunction);
                 Consume(TokenType.Semicolon);
 
@@ -923,7 +927,7 @@ namespace Semantic_Interpreter.Parser
                     if (Next(TokenType.LParen))
                     {
                         var functionName = current.Text;
-                        var functionDefine = ((Root) _semanticTree.Root).Module.FunctionStorage.At(functionName);
+                        var functionDefine = (DefineFunction) ((Root) _semanticTree.Root).Module.FunctionStorage.At(functionName);
                         ParseFunctionArguments(functionDefine.BaseFunction);
                         
                         return new CalculatedExpression(functionDefine);
@@ -956,9 +960,35 @@ namespace Semantic_Interpreter.Parser
                     {
                         var operatorName = current.Text;
                         // Если выбираем у модуля
-                        if (((Root) _semanticTree.Root).Module.Name == operatorName)
+                        var root = (Root) _semanticTree.Root;
+                        if (root.Module.Name == operatorName || root.Imports.Any(x => x.Name == operatorName))
                         {
+                            // Работа с модулем из стандартной библиотеки языка и пользовательким различается.
+                            // Определяем требуемый модуль
+                            var module = root.Module.Name == operatorName
+                                ? root.Module
+                                : root.Imports.Single(x => x.Name == operatorName);
+
+                            var functionName = Consume(TokenType.Word).Text;
+                            var function = module.FunctionStorage.At(functionName);
                             
+                            // Если модуль пользовательский
+                            if (module == root.Module)
+                            {
+                                
+                            }
+                            
+                            // Иначе модуль из стандартной библиотеки языка
+                            var arguments = new List<IExpression>();
+                            Consume(TokenType.LParen);
+                            while (!Match(TokenType.RParen))
+                            {
+                                var expression = ParseExpression();
+                                arguments.Add(expression);
+                                Match(TokenType.Comma);
+                            }
+
+                            return new NativeFunctionExpression(arguments, function);
                         }
                         
                         var classVariable = _variables.FirstOrDefault(x => x.Name == operatorName);

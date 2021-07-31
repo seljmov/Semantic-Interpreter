@@ -21,6 +21,8 @@ namespace Semantic_Interpreter.Core
         public IValue[] AsArray()
             => throw new Exception("Невозможно преобразовать строку к массиву");
 
+        public object AsObject() => Value;
+        
         public override string ToString() => AsString();
     }
 }

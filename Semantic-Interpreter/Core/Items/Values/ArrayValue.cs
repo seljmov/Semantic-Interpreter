@@ -39,6 +39,8 @@ namespace Semantic_Interpreter.Core
 
         public IValue[] AsArray() => Values;
 
+        public object AsObject() => Values;
+        
         public override string ToString() => AsString();
     }
 }
