@@ -10,7 +10,7 @@ namespace Semantic_Interpreter
         private const string Demo = @"E:\Education\Github\Own\Semantic-Interpreter\Semantic-Interpreter\Demo\";
         public static void Main()
         {
-            Console.WriteLine();
+            Console.WriteLine(Math.Acos(1));
             using var reader = new StreamReader(Demo + "import.slang");
             var program = reader.ReadToEnd();
             
