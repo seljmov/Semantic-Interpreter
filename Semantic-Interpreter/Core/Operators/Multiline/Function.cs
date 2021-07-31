@@ -2,34 +2,30 @@
 
 namespace Semantic_Interpreter.Core
 {
-    public class Function : BaseFunction, IHaveType
+    public class Function : BaseFunction, IHaveReturn
     {
-        public Function()
-        {
-            OperatorId = GenerateOperatorId();
-            Operators = new BlockSemanticOperator();
-        }
+        public Function() => OperatorId = GenerateOperatorId();
         
         public SemanticType SemanticType { get; set; }
         public Return Return { get; set; }
-        public sealed override string OperatorId { get; set; }
+        public sealed override string OperatorId { get; }
         
         public override void Execute()
         {
-            foreach (var t in Operators.Operators)
+            Block.ForEach(x =>
             {
                 try
                 {
-                    t.Execute();
+                    x.Execute();
                 }
                 catch (Exception)
                 {
-                    throw new Exception();
+                    throw new  Exception();
                 }
-            }
+            });
             
             VerifyParametersExpressions();
-            ClearVariableStorage();
+            IHaveBlock.ClearVariableStorage(Block);
         }
     }
 }

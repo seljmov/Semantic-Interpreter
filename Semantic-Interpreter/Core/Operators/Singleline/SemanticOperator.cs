@@ -9,16 +9,16 @@
         
         public abstract void Execute();
         
-        public Module FindRoot()
+        public Root GetRoot()
         {
             var curr = Parent;
-            while (curr.Parent != null && !(curr is Module))
+            while (curr.Parent != null && !(curr is Root))
             {
                 curr = curr.Parent;
             }
 
-            var module = (Module) curr;
-            return module;
+            var root = (Root) curr;
+            return root;
         }
     }
 }

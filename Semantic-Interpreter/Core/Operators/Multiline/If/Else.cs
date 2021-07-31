@@ -1,20 +1,18 @@
-﻿namespace Semantic_Interpreter.Core
+﻿using System.Collections.Generic;
+
+namespace Semantic_Interpreter.Core
 {
-    public class Else : MultilineOperator
+    public class Else : MultilineOperator, IHaveBlock
     {
-        public Else()
-        {
-            OperatorId = GenerateOperatorId();
-            Operators = new BlockSemanticOperator();
-        }
+        public Else() => OperatorId = GenerateOperatorId();
         
-        public sealed override BlockSemanticOperator Operators { get; set; }
-        public sealed override string OperatorId { get; set; }
+        public List<SemanticOperator> Block { get; set; }
+        public sealed override string OperatorId { get; }
 
         public override void Execute()
         {
-            Operators.Execute();
-            ClearVariableStorage();
+            Block.ForEach(x => x.Execute());
+            IHaveBlock.ClearVariableStorage(Block);
         }
     }
 }

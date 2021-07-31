@@ -9,6 +9,7 @@
         Text,
         Number,
         
+        Import,
         Module,
         Start,
         Class,

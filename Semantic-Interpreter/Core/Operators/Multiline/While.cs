@@ -1,26 +1,25 @@
-﻿namespace Semantic_Interpreter.Core
+﻿using System.Collections.Generic;
+
+namespace Semantic_Interpreter.Core
 {
-    public class While : MultilineOperator
+    public class While : MultilineOperator, IHaveBlock
     {
-        public While()
-        {
-            OperatorId = GenerateOperatorId();
-            Operators = new BlockSemanticOperator();
-        }
+        public While() => OperatorId = GenerateOperatorId();
         
         public IExpression Expression { get; set; }
-        public sealed override BlockSemanticOperator Operators { get; set; }
+
+        public sealed override string OperatorId { get; }
         
-        public sealed override string OperatorId { get; set; }
+        public List<SemanticOperator> Block { get; set; }
         
         public override void Execute()
         {
             var result = Expression.Eval().AsBoolean();
             while (result)
             {
-                Operators.Execute();
-                
-                ClearVariableStorage();
+                Block.ForEach(x => x.Execute());
+                IHaveBlock.ClearVariableStorage(Block);
+
                 result = Expression.Eval().AsBoolean();
             }
         }

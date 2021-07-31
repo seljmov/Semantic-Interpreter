@@ -8,6 +8,7 @@ namespace Semantic_Interpreter.Parser
     {
         private readonly Dictionary<string, TokenType> _operators = new()
         {
+            {"import", TokenType.Import},
             {"module", TokenType.Module},
             {"start", TokenType.Start},
             {"class", TokenType.Class},

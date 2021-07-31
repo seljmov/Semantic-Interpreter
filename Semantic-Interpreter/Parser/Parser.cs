@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using Semantic_Interpreter.Core;
 using Semantic_Interpreter.Core.Items;
-using Semantic_Interpreter.Core.Operators;
 
 namespace Semantic_Interpreter.Parser
 {
@@ -36,7 +35,10 @@ namespace Semantic_Interpreter.Parser
 
         public SemanticTree Parse()
         {
-            SemanticOperator lastOperator = null;
+            var root = new Root();
+            _semanticTree.InsertOperator(null, root);
+            _operatorsStack.Push(root);
+            SemanticOperator lastOperator = root;
             
             while (!Match(TokenType.Eof))
             {
@@ -44,12 +46,14 @@ namespace Semantic_Interpreter.Parser
 
                 var prevOperator = lastOperator;
                 var newOperator = ParseOperator();
-                var asChild = false;
+                bool asChild;
                 // Операторы Module и Beginning имеют индивидуальные правила, по которым они вставляются
                 // в дерево, а остальные операторы вставляются по общим правилам (кейс default)
                 switch (newOperator)
                 {
                     case Module module:
+                        module.GetRoot().Module = module;
+                        asChild = _operatorsStack.Peek().Child == null;
                         _operatorsStack.Push(module);
                         break;
                     case Start start:
@@ -74,6 +78,7 @@ namespace Semantic_Interpreter.Parser
             _pos++;
             var @operator = token.Type switch
             {
+                TokenType.Import => ParseImportOperator(),
                 TokenType.Module => ParseModuleOperator(),
                 TokenType.Start => ParseStartOperator(),
                 TokenType.VisibilityType => ParseVisibilityOperator(),
@@ -89,6 +94,13 @@ namespace Semantic_Interpreter.Parser
             };
             @operator.Parent = _operatorsStack.Count > 0 ? _operatorsStack.Peek() : null;
             return @operator;
+        }
+
+        private SemanticOperator ParseImportOperator()
+        {
+            var name = Consume(TokenType.Word).Text;
+            Consume(TokenType.Semicolon);
+            return new Import(name);
         }
         
         private SemanticOperator ParseModuleOperator()
@@ -229,7 +241,7 @@ namespace Semantic_Interpreter.Parser
             method.VisibilityType = visibilityType;
             method.Name = name;
             method.Parameters = _parameters;
-            ((IMethod) method).ClassParameter = new ClassParameter(classParameterName);
+            ((IHaveClassParameter) method).ClassParameter = classParameterName;
             return method;
         }
         
@@ -301,7 +313,7 @@ namespace Semantic_Interpreter.Parser
             function.Name = name;
             function.Parameters = _parameters;
             function.SemanticType = returnType;
-            ((Module) _semanticTree.Root).FunctionStorage.Add(name, new DefineFunction(function));
+            ((Root) _semanticTree.Root).Module.FunctionStorage.Add(name, new DefineFunction(function));
             return function;
         }
 
@@ -326,17 +338,17 @@ namespace Semantic_Interpreter.Parser
             procedure.VisibilityType = visibilityType;
             procedure.Name = name;
             procedure.Parameters = _parameters;
-            ((Module) _semanticTree.Root).FunctionStorage.Add(name, new DefineFunction(procedure));
+            ((Root) _semanticTree.Root).Module.FunctionStorage.Add(name, new DefineFunction(procedure));
             return procedure;
         }
 
-        private void ParseBlock(MultilineOperator multiline, ParseBlockPredicate predicate)
+        private void ParseBlock(IHaveBlock haveBlock, ParseBlockPredicate predicate)
         {
-            multiline.Operators.Parent = multiline;
-            _operatorsStack.Push(multiline);
+            haveBlock.Block = new List<SemanticOperator>();
+            _operatorsStack.Push((MultilineOperator) haveBlock);
             while (predicate())
             {
-                multiline.Operators.Add(ParseOperator());
+                haveBlock.Block.Add(ParseOperator());
             }
             _operatorsStack.Pop();
         }
@@ -430,7 +442,7 @@ namespace Semantic_Interpreter.Parser
             // Если вызывается просто процедура
             if (!Next(TokenType.Dot))
             {
-                var function = ((Module) _semanticTree.Root).FunctionStorage.At(name);
+                var function = ((Root) _semanticTree.Root).Module.FunctionStorage.At(name);
                 ParseFunctionArguments(function.BaseFunction);
                 Consume(TokenType.Semicolon);
 
@@ -911,7 +923,7 @@ namespace Semantic_Interpreter.Parser
                     if (Next(TokenType.LParen))
                     {
                         var functionName = current.Text;
-                        var functionDefine = ((Module) _semanticTree.Root).FunctionStorage.At(functionName);
+                        var functionDefine = ((Root) _semanticTree.Root).Module.FunctionStorage.At(functionName);
                         ParseFunctionArguments(functionDefine.BaseFunction);
                         
                         return new CalculatedExpression(functionDefine);
@@ -944,7 +956,7 @@ namespace Semantic_Interpreter.Parser
                     {
                         var operatorName = current.Text;
                         // Если выбираем у модуля
-                        if (((Module) _semanticTree.Root).Name == operatorName)
+                        if (((Root) _semanticTree.Root).Module.Name == operatorName)
                         {
                             
                         }

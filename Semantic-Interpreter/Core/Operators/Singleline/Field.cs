@@ -1,9 +1,8 @@
 ﻿using Semantic_Interpreter.Core.Items;
-using Semantic_Interpreter.Core.Operators;
 
 namespace Semantic_Interpreter.Core
 {
-    public class Field : SemanticOperator, ICalculated, IHaveVisibility, IHaveType, IHaveName
+    public class Field : SemanticOperator, ICalculated
     {
         public Field(VisibilityType visibilityType, SemanticType semanticType, string name, IExpression expression)
         {

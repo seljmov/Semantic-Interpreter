@@ -1,24 +1,18 @@
-﻿using Semantic_Interpreter.Core.Items;
-
-namespace Semantic_Interpreter.Core
+﻿namespace Semantic_Interpreter.Core
 {
-    public class MethodProcedure : BaseFunction, IMethod
+    public class MethodProcedure : BaseFunction, IHaveClassParameter
     {
-        public MethodProcedure()
-        {
-            OperatorId = GenerateOperatorId();
-            Operators = new BlockSemanticOperator();
-        }
-        
-        public sealed override string OperatorId { get; set; }
-        public ClassParameter ClassParameter { get; set; }
+        public MethodProcedure() => OperatorId = GenerateOperatorId();
+
+        public sealed override string OperatorId { get; }
+        public string ClassParameter { get; set; }
         
         public override void Execute()
         {
-            Operators.Operators.ForEach(x => x.Execute());
+            Block.ForEach(x => x.Execute());
             
             VerifyParametersExpressions();
-            ClearVariableStorage();
+            IHaveBlock.ClearVariableStorage(Block);
         }
     }
 }

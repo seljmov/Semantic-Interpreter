@@ -2,15 +2,9 @@
 {
     public class Start : MultilineOperator
     {
-        public Start()
-        {
-            OperatorId = GenerateOperatorId();
-            Operators = new BlockSemanticOperator();
-        }
+        public Start() => OperatorId = GenerateOperatorId();
         
-        public sealed override string OperatorId { get; set; }
-        
-        public sealed override BlockSemanticOperator Operators { get; set; }
+        public sealed override string OperatorId { get; }
         
         public override void Execute() { }
     }

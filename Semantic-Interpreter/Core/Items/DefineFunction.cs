@@ -23,11 +23,7 @@ namespace Semantic_Interpreter.Core
             }
             catch (Exception)
             {
-                return BaseFunction switch
-                {
-                    Function function => function.Return.Result,
-                    MethodFunction function => function.Return.Result,
-                };
+                return ((IHaveReturn) BaseFunction).Return.Result;
             }
         }
 

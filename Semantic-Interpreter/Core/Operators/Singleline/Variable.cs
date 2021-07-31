@@ -1,10 +1,9 @@
 ﻿using System;
 using Semantic_Interpreter.Core.Items;
-using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
-    public class Variable : SemanticOperator, ICalculated, IHaveType
+    public class Variable : SemanticOperator, ICalculated, ICloneable
     {
         public Variable(SemanticType semanticType, string name, string id, IExpression expression)
         {
@@ -20,19 +19,20 @@ namespace Semantic_Interpreter.Core
         public IExpression Expression { get; set; }
 
         public IValue Calculate() =>
-            VariableStorage.IsExist(Id) 
-                ? VariableStorage.At(Id).Expression.Eval() 
+            GetRoot().Module.VariableStorage.IsExist(Id) 
+                ? GetRoot().Module.VariableStorage.At(Id).Expression.Eval() 
                 : Expression.Eval();
 
         public override void Execute()
         {
-            VariableStorage.Add(Id, new Variable(SemanticType, Name, Id, Expression));
+            var module = GetRoot().Module;
+            module.VariableStorage.Add(Id, (Variable) Clone());
             
             if (Expression != null && !(Expression is ArrayExpression) && !(Expression.Eval() is ClassValue))
             {
-                var value = VariableStorage.At(Id).Expression.Eval();
+                var value = module.VariableStorage.At(Id).Expression.Eval();
                 var expression = new ValueExpression(value);
-                VariableStorage.Replace(Id, expression);
+                module.VariableStorage.Replace(Id, expression);
             }
         }
 
@@ -57,6 +57,11 @@ namespace Semantic_Interpreter.Core
                 default:
                     return false;
             }
+        }
+
+        public object Clone()
+        {
+            return new Variable(SemanticType, Name, Id, Expression) {Parent = Parent};
         }
     }
 }

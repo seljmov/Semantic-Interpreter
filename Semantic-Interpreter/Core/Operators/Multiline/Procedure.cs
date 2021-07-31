@@ -2,20 +2,16 @@
 {
     public class Procedure : BaseFunction
     {
-        public Procedure() 
-        {
-            OperatorId = GenerateOperatorId();
-            Operators = new BlockSemanticOperator();
-        }
+        public Procedure() => OperatorId = GenerateOperatorId();
 
-        public sealed override string OperatorId { get; set; }
+        public sealed override string OperatorId { get; }
         
         public override void Execute()
         {
-            Operators.Operators.ForEach(x => x.Execute());
+            Block.ForEach(x => x.Execute());
             
             VerifyParametersExpressions();
-            ClearVariableStorage();
+            IHaveBlock.ClearVariableStorage(Block);
         }
     }
 }

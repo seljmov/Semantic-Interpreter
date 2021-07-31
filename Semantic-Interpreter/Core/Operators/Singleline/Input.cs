@@ -5,8 +5,7 @@ namespace Semantic_Interpreter.Core
 {
     public class Input : SemanticOperator
     {
-        public Input(string name)
-            => Name = name;
+        public Input(string name) => Name = name;
 
         public string Name { get; }
         
@@ -15,7 +14,7 @@ namespace Semantic_Interpreter.Core
             var value = Console.ReadLine();
             var type = Parent is BaseFunction function
                 ? function.GetParameterWithName(Name).SemanticType
-                : VariableStorage.At(Name).SemanticType;
+                : GetRoot().Module.VariableStorage.At(Name).SemanticType;
             
             var expression = type switch
             {
@@ -34,7 +33,7 @@ namespace Semantic_Interpreter.Core
             }
             else
             {
-                VariableStorage.Replace(Name, expression);   
+                GetRoot().Module.VariableStorage.Replace(Name, expression);   
             }
         }
     }

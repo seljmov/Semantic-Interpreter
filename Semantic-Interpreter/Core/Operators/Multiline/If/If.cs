@@ -2,27 +2,22 @@
 
 namespace Semantic_Interpreter.Core
 {
-    public class If : MultilineOperator
+    public class If : MultilineOperator, IHaveBlock
     {
-        public If()
-        {
-            OperatorId = GenerateOperatorId();
-            Operators = new BlockSemanticOperator();
-        }
+        public If() => OperatorId = GenerateOperatorId();
 
         public IExpression Expression { get; set; }
-        
-        public sealed override BlockSemanticOperator Operators { get; set; }
+        public List<SemanticOperator> Block { get; set; }
         public List<ElseIf> ElseIfs { get; set; }
         public Else Else { get; set; }
-        public sealed override string OperatorId { get; set; }
+        public sealed override string OperatorId { get; }
         
         public override void Execute()
         {
             var result = Expression.Eval().AsBoolean();
             if (result)
             {
-                Operators.Execute();
+                Block.ForEach(x => x.Execute());
             }
             else
             {
@@ -47,7 +42,7 @@ namespace Semantic_Interpreter.Core
                 }
             }
             
-            ClearVariableStorage();
+            IHaveBlock.ClearVariableStorage(Block);
         }
     }
 }

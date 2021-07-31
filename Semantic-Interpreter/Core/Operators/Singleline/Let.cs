@@ -76,9 +76,9 @@ namespace Semantic_Interpreter.Core
                 curr = curr.Parent;
             }
             
-            if (VariableStorage.IsExist(VariableName))
+            if (GetRoot().Module.VariableStorage.IsExist(VariableName))
             {
-                VariableStorage.Replace(VariableName, expression);
+                GetRoot().Module.VariableStorage.Replace(VariableName, expression);
                 return;
             }
 
@@ -87,17 +87,18 @@ namespace Semantic_Interpreter.Core
 
         private void AssignToArrayIndex()
         {
+            var module = GetRoot().Module;
             var value = Expression.Eval();
 
             if (Indexes != null)
             {
-                if (VariableStorage.IsExist(VariableName))
+                if (module.VariableStorage.IsExist(VariableName))
                 {
-                    var arrayExpression = (ArrayExpression) VariableStorage.At(VariableName).Expression;
+                    var arrayExpression = (ArrayExpression) module.VariableStorage.At(VariableName).Expression;
 
                     arrayExpression.Set(Indexes, value);
 
-                    VariableStorage.Replace(VariableName, arrayExpression);
+                    module.VariableStorage.Replace(VariableName, arrayExpression);
                 }
             }
         }
@@ -108,9 +109,9 @@ namespace Semantic_Interpreter.Core
             var value = Expression.Eval();
             var expression = new ValueExpression(value);
             
-            if (VariableStorage.IsExist(ClassName))
+            if (GetRoot().Module.VariableStorage.IsExist(ClassName))
             {
-                var classVariable = VariableStorage.At(ClassName);
+                var classVariable = GetRoot().Module.VariableStorage.At(ClassName);
                 var classValue = (ClassValue) classVariable.Calculate();
 
                 var field = classValue.Class.Fields.FirstOrDefault(x => x.Name == FieldName);

@@ -18,7 +18,7 @@ namespace Semantic_Interpreter.Core
         {
             if (VariableId != null)
             {
-                Expression = VariableStorage.At(VariableId).Expression;
+                Expression = GetRoot().Module.VariableStorage.At(VariableId).Expression;
             }
         }
     }

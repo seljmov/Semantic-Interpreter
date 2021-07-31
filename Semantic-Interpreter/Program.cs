@@ -11,7 +11,7 @@ namespace Semantic_Interpreter
         public static void Main()
         {
             Console.WriteLine();
-            using var reader = new StreamReader(Demo + "classes.slang");
+            using var reader = new StreamReader(Demo + "arith.slang");
             var program = reader.ReadToEnd();
             
             var lexer = new Lexer(program);
@@ -21,8 +21,6 @@ namespace Semantic_Interpreter
             
             var tree = new Parser.Parser(tokens).Parse();
             tree.TraversalTree();
-
-            // DocumentRW.Save(tree);
         }
         
         private static void PrintTokens(List<Token> tokens)
