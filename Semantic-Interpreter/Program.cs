@@ -7,7 +7,7 @@ namespace Semantic_Interpreter
 {
     public static class Program
     {
-        private const string Demo = @"E:\Education\Github\Own\Semantic-Interpreter\Semantic-Interpreter\Demo\";
+        private const string Demo = @"E:\Education\Own\Semantic-Language\Semantic-Interpreter\Demo\";
         public static void Main()
         {
             Console.WriteLine(Math.Acos(1));

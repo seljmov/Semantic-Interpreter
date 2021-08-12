@@ -15,12 +15,13 @@ namespace Semantic_Interpreter.Modules
         public Math(string name = "Math") : base(name) 
             => OperatorId = GenerateOperatorId();
 
+        public override string OperatorId { get; }
+        
         public override void Execute()
         {
-            VariableStorage.Add("E", new Variable(new ValueExpression(2.7182818284590451)));
-            VariableStorage.Add("PI", new Variable(new ValueExpression(3.1415926535897931)));
-            VariableStorage.Add("Tau", new Variable(new ValueExpression(6.2831853071795862)));
-            
+            FunctionStorage.Add("E", new E());
+            FunctionStorage.Add("PI", new Pi());
+            FunctionStorage.Add("Tau", new Tau());
             FunctionStorage.Add("Abs", new Abs());
             FunctionStorage.Add("Acos", new Acos());
             FunctionStorage.Add("Asin", new Asin());
@@ -46,8 +47,39 @@ namespace Semantic_Interpreter.Modules
             FunctionStorage.Add("Min", new Min());
         }
 
-        public override string OperatorId { get; }
-
+        /// <summary>
+        ///     Представляет основание натурального логарифма, определяемое константой e.
+        /// </summary>
+        private class E : IFunction
+        {
+            public IValue Execute(params IValue[] args)
+            {
+                return new RealValue(2.7182818284590451);
+            }
+        }
+        
+        /// <summary>
+        ///     Представляет отношение длины окружности к ее диаметру, определяемое константой π.
+        /// </summary>
+        private class Pi : IFunction
+        {
+            public IValue Execute(params IValue[] args)
+            {
+                return new RealValue(3.1415926535897931);
+            }
+        }
+        
+        /// <summary>
+        ///     Представляет число радианов в полном обороте, заданное константой τ.
+        /// </summary>
+        private class Tau : IFunction
+        {
+            public IValue Execute(params IValue[] args)
+            {
+                return new RealValue(6.2831853071795862);
+            }
+        }
+        
         /// <summary>
         ///     Возвращает абсолютное значение числа.
         /// </summary>

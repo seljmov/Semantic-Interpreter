@@ -16,6 +16,8 @@ namespace Semantic_Interpreter.Core
         
         public IValue Eval()
         {
+            if (Expressions == null) return Function.Execute();
+
             List<IValue> values = new();
             Expressions.ForEach(x => values.Add(x.Eval()));
             var array = values.ToArray();

@@ -13,8 +13,6 @@ namespace Semantic_Interpreter.Core
             Expression = expression;
         }
 
-        public Variable(IExpression expression) => Expression = expression;
-
         public SemanticType SemanticType { get; }
         public string Name { get; }
         public string Id { get; }

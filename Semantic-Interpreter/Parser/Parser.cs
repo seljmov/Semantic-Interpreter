@@ -121,7 +121,6 @@ namespace Semantic_Interpreter.Parser
             if (Match(TokenType.Function)) @operator = ParseFunctionOperator();
             if (Match(TokenType.Procedure)) @operator = ParseProcedureOperator();
             if (Match(TokenType.Class)) @operator = ParseClassOperator();
-            // if (Match(TokenType.Field)) @operator = ParseFieldOperator();
 
             return @operator;
         }
@@ -961,32 +960,30 @@ namespace Semantic_Interpreter.Parser
                         var operatorName = current.Text;
                         // Если выбираем у модуля
                         var root = (Root) _semanticTree.Root;
-                        if (root.Module.Name == operatorName || root.Imports.Any(x => x.Name == operatorName))
+                        if (root.Module.Name == operatorName)
                         {
-                            // Работа с модулем из стандартной библиотеки языка и пользовательким различается.
-                            // Определяем требуемый модуль
-                            var module = root.Module.Name == operatorName
-                                ? root.Module
-                                : root.Imports.Single(x => x.Name == operatorName);
+                            throw new Exception("Подобное обращение к модулю невозможно!");
+                        }
+                        
+                        if (root.Imports.Any(x => x.Name == operatorName))
+                        {
+                            var module = root.Imports.Single(x => x.Name == operatorName);
 
-                            var functionName = Consume(TokenType.Word).Text;
-                            var function = module.FunctionStorage.At(functionName);
-                            
-                            // Если модуль пользовательский
-                            if (module == root.Module)
+                            var childName = Consume(TokenType.Word).Text;
+                            List<IExpression> arguments = null;
+                            if (Next(TokenType.LParen))
                             {
-                                
+                                arguments = new List<IExpression>();
+                                Consume(TokenType.LParen);
+                                while (!Match(TokenType.RParen))
+                                {
+                                    var expression = ParseExpression();
+                                    arguments.Add(expression);
+                                    Match(TokenType.Comma);
+                                }
                             }
                             
-                            // Иначе модуль из стандартной библиотеки языка
-                            var arguments = new List<IExpression>();
-                            Consume(TokenType.LParen);
-                            while (!Match(TokenType.RParen))
-                            {
-                                var expression = ParseExpression();
-                                arguments.Add(expression);
-                                Match(TokenType.Comma);
-                            }
+                            var function = module.FunctionStorage.At(childName);
 
                             return new NativeFunctionExpression(arguments, function);
                         }
