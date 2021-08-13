@@ -8,6 +8,7 @@ namespace Semantic_Interpreter.Core
         
         public VisibilityType VisibilityType { get; set; }
         public string Name { get; set; }
+        public string BaseClass { get; set; }
         public List<Field> Fields { get; set; }
         public List<DefineFunction> Methods  { get; set; }
         public sealed override string OperatorId { get; }

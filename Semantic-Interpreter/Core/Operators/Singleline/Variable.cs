@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq.Expressions;
 using Semantic_Interpreter.Core.Items;
 
 namespace Semantic_Interpreter.Core
@@ -12,6 +13,8 @@ namespace Semantic_Interpreter.Core
             Id = id;
             Expression = expression;
         }
+
+        public Variable(IExpression expression) => Expression = expression;
 
         public SemanticType SemanticType { get; }
         public string Name { get; }

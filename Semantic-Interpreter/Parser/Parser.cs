@@ -23,6 +23,7 @@ namespace Semantic_Interpreter.Parser
         private List<Class> _classes = new();
         
         private Func<bool> IsFunctionParsed => () => _operatorsStack.Any(x => x is BaseFunction);
+        private Func<BaseFunction> GetParentBaseFunction => () => (BaseFunction) _operatorsStack.Single(x => x is BaseFunction);
 
         private delegate bool ParseBlockPredicate();
 
@@ -143,30 +144,35 @@ namespace Semantic_Interpreter.Parser
             {
                 throw new Exception($"Класс {baseClassName} не объявлен!");
             }
+            
+            classOperator.Parent = _operatorsStack.Peek();
+            classOperator.VisibilityType = visibilityType;
+            classOperator.Name = name;
+            classOperator.BaseClass = baseClassName;
 
             if (baseClass?.Fields != null)
             {
-                fields = new List<Field>(baseClass.Fields);
+                classOperator.Fields = new List<Field>(baseClass.Fields);
             }
 
             if (baseClass?.Methods != null)
             {
-                methods = new List<DefineFunction>(baseClass.Methods);
+                classOperator.Methods = new List<DefineFunction>(baseClass.Methods);
             }
 
             _operatorsStack.Push(classOperator);
             while (Get(1).Type == TokenType.Field)
             {
-                fields ??= new List<Field>();
+                classOperator.Fields ??= new List<Field>();
                 var field = ParseFieldOperator();
-                fields.Add(field);
+                classOperator.Fields.Add(field);
             }
             
             while (Get(1).Type == TokenType.Method)
             {
-                methods ??= new List<DefineFunction>();
+                classOperator.Methods ??= new List<DefineFunction>();
                 var method = ParseMethodOperator();
-                methods.Add(new DefineFunction(method));
+                classOperator.Methods.Add(new DefineFunction(method));
             }
             _operatorsStack.Pop();
 
@@ -174,12 +180,6 @@ namespace Semantic_Interpreter.Parser
             Consume(TokenType.Word);
             Consume(TokenType.Semicolon);
 
-            classOperator.Parent = _operatorsStack.Peek();
-            classOperator.VisibilityType = visibilityType;
-            classOperator.Name = name;
-            classOperator.Fields = fields;
-            classOperator.Methods = methods;
-            
             _classes.Add(classOperator);
             return classOperator;
         }
@@ -219,6 +219,12 @@ namespace Semantic_Interpreter.Parser
             
             Consume(TokenType.LParen);
             var classParameterType = Consume(TokenType.Word).Text;
+            var parent = (Class) _operatorsStack.Peek();
+            if (classParameterType != parent.Name)
+            {
+                throw new Exception($"В методе {name} указан неправильный тип параметра класса ({classParameterType})");
+            }
+            
             var classParameterName = Consume(TokenType.Word).Text;
             Consume(TokenType.RParen);
             
@@ -235,16 +241,15 @@ namespace Semantic_Interpreter.Parser
 
             method.Parent = _operatorsStack.Peek();
             method.Parameters = _parameters;
+            method.VisibilityType = visibilityType;
+            method.Name = name;
+            ((IHaveClassParameter) method).ClassParameter = classParameterName;
             
             ParseBlock(method, () => !Match(TokenType.End));
             
             Consume(TokenType.Word);   // Skip function name
             Consume(TokenType.Semicolon);   // Skip ;
-
-            method.VisibilityType = visibilityType;
-            method.Name = name;
-            method.Parameters = _parameters;
-            ((IHaveClassParameter) method).ClassParameter = classParameterName;
+            
             return method;
         }
         
@@ -991,7 +996,16 @@ namespace Semantic_Interpreter.Parser
                         var classVariable = _variables.FirstOrDefault(x => x.Name == operatorName);
                         if (classVariable == null)
                         {
-                            throw new Exception($"Переменная {operatorName} не объявлена!");
+                            var baseFunction = GetParentBaseFunction();
+                            if (((IHaveClassParameter) baseFunction).ClassParameter == operatorName)
+                            {
+                                var parentClass = (Class) baseFunction.Parent;
+                                classVariable = new Variable(new ValueExpression(parentClass));
+                            }
+                            else
+                            {
+                                throw new Exception($"Переменная {operatorName} не объявлена!");
+                            }
                         }
                         var value = (ClassValue) classVariable.Expression.Eval();
                         

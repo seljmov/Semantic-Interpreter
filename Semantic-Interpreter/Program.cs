@@ -10,8 +10,7 @@ namespace Semantic_Interpreter
         private const string Demo = @"E:\Education\Own\Semantic-Language\Semantic-Interpreter\Demo\";
         public static void Main()
         {
-            Console.WriteLine(Math.Acos(1));
-            using var reader = new StreamReader(Demo + "import.slang");
+            using var reader = new StreamReader(Demo + "classes.slang");
             var program = reader.ReadToEnd();
             
             var lexer = new Lexer(program);
