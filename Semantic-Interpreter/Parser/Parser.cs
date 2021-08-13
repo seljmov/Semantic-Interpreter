@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using Semantic_Interpreter.Core;
 using Semantic_Interpreter.Core.Items;
+using BinaryExpression = Semantic_Interpreter.Core.BinaryExpression;
+using ConditionalExpression = Semantic_Interpreter.Core.ConditionalExpression;
+using UnaryExpression = Semantic_Interpreter.Core.UnaryExpression;
 
 namespace Semantic_Interpreter.Parser
 {
@@ -139,27 +143,27 @@ namespace Semantic_Interpreter.Parser
 
             Consume(TokenType.Inherits);
             var baseClassName = Consume(TokenType.Word).Text;
-            var baseClass = _classes.FirstOrDefault(x => x.Name == baseClassName);
-            if (baseClass == null && baseClassName != "Object")
+            if (baseClassName != "Object" && baseClassName != "Объект")
             {
-                throw new Exception($"Класс {baseClassName} не объявлен!");
+                var any = _classes.Any(x => x.Name == baseClassName);
+                if (!any)
+                {
+                    throw new Exception($"Класс {baseClassName} не объявлен!");
+                }
+                
+                var baseClass = _classes.Single(x => x.Name == baseClassName);
+                classOperator.Fields = new List<Field>(baseClass.Fields);
+                classOperator.Methods = new List<DefineFunction>(baseClass.Methods);
+                
+                classOperator.Fields.ForEach(field => field.Parent = classOperator);
+                classOperator.Methods.ForEach(function => function.BaseFunction.Parent = classOperator);
             }
-            
+
             classOperator.Parent = _operatorsStack.Peek();
             classOperator.VisibilityType = visibilityType;
             classOperator.Name = name;
             classOperator.BaseClass = baseClassName;
-
-            if (baseClass?.Fields != null)
-            {
-                classOperator.Fields = new List<Field>(baseClass.Fields);
-            }
-
-            if (baseClass?.Methods != null)
-            {
-                classOperator.Methods = new List<DefineFunction>(baseClass.Methods);
-            }
-
+            
             _operatorsStack.Push(classOperator);
             while (Get(1).Type == TokenType.Field)
             {

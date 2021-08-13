@@ -1,4 +1,4 @@
-﻿module main
+﻿module main    
     public class Time inherits Object
         public field-string p0 := "field p0";
         public field-string p3 := "field p3";
