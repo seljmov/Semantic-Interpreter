@@ -14,7 +14,7 @@ namespace Semantic_Interpreter.Core
         }
         
         private string Name { get; }
-        private int Size { get; }
+        private long Size { get; }
         private SemanticType SemanticType { get; }
         private ArrayValue ArrayValue { get; }
         

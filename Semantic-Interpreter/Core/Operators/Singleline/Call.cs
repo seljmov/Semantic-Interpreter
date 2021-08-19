@@ -2,15 +2,13 @@
 {
     public class Call : SemanticOperator
     {
-        public Call(DefineFunction defineFunction)
-        {
-            DefineFunction = defineFunction;
-        }
+        public Call(IExpression expression) => Expression = expression;
         
-        public DefineFunction DefineFunction { get; set; }
+        public IExpression Expression { get; }
+        
         public override void Execute()
         {
-            DefineFunction.Execute();
+            Expression.Eval();
         }
     }
 }

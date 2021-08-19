@@ -10,7 +10,7 @@ namespace Semantic_Interpreter
         private const string Demo = @"E:\Education\Own\Semantic-Language\Semantic-Interpreter\Demo\";
         public static void Main()
         {
-            using var reader = new StreamReader(Demo + "classes.slang");
+            using var reader = new StreamReader(Demo + "files.slang");
             var program = reader.ReadToEnd();
             
             var lexer = new Lexer(program);
@@ -24,14 +24,10 @@ namespace Semantic_Interpreter
         
         private static void PrintTokens(List<Token> tokens)
         {
-            // tokens.ForEach(token => Console.WriteLine(token.Text == "" ? $"{token.Type} \n" : $"{token.Type} -> {token.Text} \n"));
-            
-            foreach (var token in tokens)
-            {
-                Console.Write(token.Type);
-                if (token.Text != "") Console.Write($" -> {token.Text}");
-                Console.WriteLine();
-            }
+            tokens.ForEach(token => 
+                Console.WriteLine(token.Text == "" 
+                    ? $"{token.Type}" 
+                    : $"{token.Type} -> {token.Text}"));
         }
     }
 }

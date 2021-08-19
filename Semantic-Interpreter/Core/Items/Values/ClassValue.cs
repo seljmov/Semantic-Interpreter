@@ -6,7 +6,7 @@
         
         public Class Class { get; set; }
 
-        public int AsInteger()
+        public long AsInteger()
         {
             throw new System.NotImplementedException();
         }

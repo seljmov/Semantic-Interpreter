@@ -4,7 +4,7 @@ namespace Semantic_Interpreter.Core
 {
     public class ArrayValue : IValue
     {
-        public ArrayValue(int size)
+        public ArrayValue(long size)
         {
             Size = size;
             Values = new IValue[size];
@@ -12,19 +12,19 @@ namespace Semantic_Interpreter.Core
 
         public ArrayValue(IValue[] values)
         {
-            Values ??= new IValue[values.Length];
+            Values = new IValue[values.Length];
             Array.Copy(values, Values, values.Length);
             Size = values.Length;
         }
 
-        public int Size { get; }
+        public long Size { get; }
         private IValue[] Values { get; }
 
-        public IValue Get(int index) => Values[index];
+        public IValue Get(long index) => Values[index];
 
-        public void Set(int index, IValue value) => Values[index] = value;
+        public void Set(long index, IValue value) => Values[index] = value;
 
-        public int AsInteger()
+        public long AsInteger()
             => throw new Exception("Невозможно преобразовать массив в целое числу");
 
         public double AsReal()

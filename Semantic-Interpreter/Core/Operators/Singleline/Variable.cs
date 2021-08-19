@@ -31,7 +31,7 @@ namespace Semantic_Interpreter.Core
             var module = GetRoot().Module;
             module.VariableStorage.Add(Id, (Variable) Clone());
             
-            if (Expression != null && !(Expression is ArrayExpression) && !(Expression.Eval() is ClassValue))
+            if (Expression != null && Expression is not ArrayExpression)
             {
                 var value = module.VariableStorage.At(Id).Expression.Eval();
                 var expression = new ValueExpression(value);

@@ -1,4 +1,4 @@
-﻿import Math;
+﻿import MathBase;
 module main
 start
     variable-integer i := -1;

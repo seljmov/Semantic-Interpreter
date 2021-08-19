@@ -9,7 +9,7 @@ namespace Semantic_Interpreter.Core
 
         private double Value { get; }
 
-        public int AsInteger() => Convert.ToInt32(Value);
+        public long AsInteger() => Convert.ToInt32(Value);
 
         public double AsReal() => Value;
 

@@ -4,7 +4,7 @@ namespace Semantic_Interpreter.Core
 {
     public interface IValue
     {
-        int AsInteger();
+        long AsInteger();
 
         double AsReal();
 

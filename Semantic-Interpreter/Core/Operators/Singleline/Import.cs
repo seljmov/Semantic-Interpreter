@@ -1,5 +1,5 @@
 ﻿using System;
-using Math = Semantic_Interpreter.Modules.Math;
+using Semantic_Interpreter.Modules;
 
 namespace Semantic_Interpreter.Core
 {
@@ -7,23 +7,18 @@ namespace Semantic_Interpreter.Core
     {
         public Import(string name) => Name = name; 
         
-        public string Name { get; set; }
+        public string Name { get; }
         
-        public override void Execute()
-        {
-            Console.WriteLine($"Import {Name} module");
-        }
+        public override void Execute() { }
 
         public Module GetImportedModule()
         {
-            var module = Name switch
+            return Name switch
             {
-                "Math" => new Math(),
+                "MathBase" => new MathBase(),
+                "FilesBase" => new FilesBase(),
                 _ => throw new ArgumentOutOfRangeException()
             };
-            
-            module.Execute();
-            return module;
         }
     }
 }

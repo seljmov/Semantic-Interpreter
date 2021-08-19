@@ -9,16 +9,13 @@ namespace Semantic_Interpreter.Modules
     ///     Предоставляет константы и методы для тригонометрических,
     ///     логарифмических и иных общих математических функций.
     /// </summary>
-    public class Math : Module
+    public class MathBase : Module
     {
         // TODO: Добавить проверку кол-ва аргументов
-        public Math(string name = "Math") : base(name) 
-            => OperatorId = GenerateOperatorId();
-
-        public override string OperatorId { get; }
-        
-        public override void Execute()
+        public MathBase(string name = "Math") : base(name)
         {
+            OperatorId = GenerateOperatorId();
+            
             FunctionStorage.Add("E", new E());
             FunctionStorage.Add("PI", new Pi());
             FunctionStorage.Add("Tau", new Tau());
@@ -47,6 +44,8 @@ namespace Semantic_Interpreter.Modules
             FunctionStorage.Add("Min", new Min());
         }
 
+        public override string OperatorId { get; }
+        
         /// <summary>
         ///     Представляет основание натурального логарифма, определяемое константой e.
         /// </summary>
@@ -369,7 +368,7 @@ namespace Semantic_Interpreter.Modules
                         }
                     : raw switch
                         {
-                            double d => new RealValue(System.Math.Round(d, args[1].AsInteger())),
+                            double d => new RealValue(System.Math.Round(d, (int) args[1].AsInteger())),
                             _ => throw new Exception("Math round exception")
                         };
             }

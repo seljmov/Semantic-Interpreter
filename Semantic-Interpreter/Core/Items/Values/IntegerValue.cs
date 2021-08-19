@@ -4,11 +4,11 @@ namespace Semantic_Interpreter.Core
 {
     public class IntegerValue : IValue
     {
-        public IntegerValue(int value) => Value = value;
+        public IntegerValue(long value) => Value = value;
 
-        private int Value { get; }
+        private long Value { get; }
 
-        public int AsInteger() => Value;
+        public long AsInteger() => Value;
 
         public double AsReal() => Convert.ToDouble(Value);
 

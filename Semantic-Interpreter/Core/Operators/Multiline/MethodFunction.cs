@@ -13,7 +13,7 @@ namespace Semantic_Interpreter.Core
 
         public override void Execute()
         {
-            Block.ForEach(x =>
+            foreach (var x in Block)
             {
                 try
                 {
@@ -23,7 +23,7 @@ namespace Semantic_Interpreter.Core
                 {
                     throw new  Exception();
                 }
-            });
+            }
             
             VerifyParametersExpressions();
             IHaveBlock.ClearVariableStorage(Block);

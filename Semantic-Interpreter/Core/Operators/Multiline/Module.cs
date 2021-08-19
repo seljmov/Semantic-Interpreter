@@ -12,6 +12,7 @@ namespace Semantic_Interpreter.Core
         
         public readonly VariableStorage VariableStorage = new();
         public readonly FunctionStorage FunctionStorage = new();
+        public readonly ClassStorage ClassStorage = new();
         
         public string Name { get; set; }
         public override string OperatorId { get; }
