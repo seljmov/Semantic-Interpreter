@@ -1,5 +1,4 @@
 ﻿using Semantic_Interpreter.Core.Items;
-using Semantic_Interpreter.Library;
 
 namespace Semantic_Interpreter.Core
 {
@@ -8,7 +7,7 @@ namespace Semantic_Interpreter.Core
         public ParameterType ParameterType { get; set; }
         public SemanticType SemanticType { get; set; }
         public string Name { get; set; }
-        public string VariableId { get; set; }
+        public SemanticOperator Operator { get; set; }
 
         public IExpression Expression { get; set; }
 
@@ -16,10 +15,19 @@ namespace Semantic_Interpreter.Core
 
         public override void Execute()
         {
-            if (VariableId != null)
+            if (Operator == null) return;
+
+            if (Operator is Variable variable)
             {
-                Expression = GetRoot().Module.VariableStorage.At(VariableId).Expression;
+                var module = GetRoot().Module;
+                if (module.VariableStorage.IsExist(variable.Id))
+                {
+                    Expression = variable.Expression;
+                    return;
+                }
             }
+
+            Expression = ((Parameter) Operator).Expression;
         }
     }
 }

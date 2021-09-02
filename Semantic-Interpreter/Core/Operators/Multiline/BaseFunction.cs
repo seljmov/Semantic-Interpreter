@@ -23,19 +23,28 @@ namespace Semantic_Interpreter.Core
 
         protected void VerifyParametersExpressions()
         {
-            /*
             if (Parameters != null)
             {
                 foreach (var t in Parameters.Where(x => x.ParameterType == ParameterType.Var))
                 {
-                    var variable = VariableStorage.At(t.VariableId);
-                    if (t.Expression != variable.Expression)
+                    if (t.Operator is Variable variable)
                     {
-                        VariableStorage.Replace(t.VariableId, t.Expression);
+                        if (t.Expression != variable.Expression)
+                        {
+                            var module = GetRoot().Module;
+                            module.VariableStorage.Replace(variable.Id, t.Expression);
+                        }
+                    }
+
+                    if (t.Operator is Parameter parameter)
+                    {
+                        if (t.Expression != parameter.Expression)
+                        {
+                            parameter.Expression = t.Expression;
+                        }
                     }
                 }
             }
-            */
         }
     }
 }

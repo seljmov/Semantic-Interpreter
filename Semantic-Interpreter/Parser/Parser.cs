@@ -556,14 +556,19 @@ namespace Semantic_Interpreter.Parser
 
                 for (var i = 0; i < arguments.Count; i++)
                 {
-                    if (arguments[i] is CalculatedExpression {Calculated: Variable variable})
+                    switch (arguments[i])
                     {
-                        function.Parameters[i].VariableId = variable.Id;
+                        case CalculatedExpression {Calculated: Variable variable}:
+                            function.Parameters[i].Operator = variable;
+                            break;
+                        case CalculatedExpression {Calculated: Parameter parameter}:
+                            function.Parameters[i].Operator = parameter;
+                            break;
+                        default:
+                            function.Parameters[i].Expression = arguments[i];
+                            break;
                     }
-                    else
-                    {
-                        function.Parameters[i].Expression = arguments[i];
-                    }
+
                     function.Parameters[i].Parent = function;
                 }
             }

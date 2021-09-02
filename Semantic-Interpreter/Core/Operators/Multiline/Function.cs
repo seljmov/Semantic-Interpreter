@@ -20,12 +20,14 @@ namespace Semantic_Interpreter.Core
                 }
                 catch (Exception)
                 {
+                    VerifyParametersExpressions();
+                    IHaveBlock.ClearVariableStorage(Block);
                     throw new  Exception();
                 }
             }
             
-            VerifyParametersExpressions();
-            IHaveBlock.ClearVariableStorage(Block);
+            // VerifyParametersExpressions();
+            // IHaveBlock.ClearVariableStorage(Block);
         }
     }
 }
