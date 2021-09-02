@@ -28,15 +28,22 @@ namespace Semantic_Interpreter.Core
 
         public override void Execute()
         {
-            var module = GetRoot().Module;
-            module.VariableStorage.Add(Id, (Variable) Clone());
-            
             if (Expression != null && Expression is not ArrayExpression)
             {
-                var value = module.VariableStorage.At(Id).Expression.Eval();
-                var expression = new ValueExpression(value);
-                module.VariableStorage.Replace(Id, expression);
+                var value = Expression.Eval();
+                Expression = new ValueExpression(value);
             }
+
+            var module = GetRoot().Module;
+            var clone = (Variable) Clone();
+            module.VariableStorage.Add(Id, clone);
+            
+            // if (Expression != null && Expression is not ArrayExpression)
+            // {
+            //     var value = clone.Expression.Eval();
+            //     var expression = new ValueExpression(value);
+            //     module.VariableStorage.Replace(Id, expression);
+            // }
         }
 
         /**

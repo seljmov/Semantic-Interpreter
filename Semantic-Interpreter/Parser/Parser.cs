@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using Semantic_Interpreter.Core;
 using Semantic_Interpreter.Core.Items;
+using Semantic_Interpreter.Library;
 using BinaryExpression = Semantic_Interpreter.Core.BinaryExpression;
 using ConditionalExpression = Semantic_Interpreter.Core.ConditionalExpression;
 using UnaryExpression = Semantic_Interpreter.Core.UnaryExpression;
@@ -26,7 +28,8 @@ namespace Semantic_Interpreter.Parser
         private List<Variable> _variables = new();
         private List<Parameter> _parameters = new();
         private List<Class> _classes = new();
-        
+        private List<string> _standartModules = new() {"MathBase", "FilesBase", "SystemBase"};
+
         private Func<bool> IsFunctionParsed => () => _operatorsStack.Any(x => x is BaseFunction);
         private Func<BaseFunction> GetParentBaseFunction => () => (BaseFunction) _operatorsStack.Single(x => x is BaseFunction);
 
@@ -107,9 +110,28 @@ namespace Semantic_Interpreter.Parser
             var name = Consume(TokenType.Word).Text;
             Consume(TokenType.Semicolon);
             var import = new Import(name);
-            var module = import.GetImportedModule();
-            var root = (Root) _semanticTree.Root;
-            root.Imports.Add(module);
+
+            if (_standartModules.Contains(name))
+            {
+                var module = import.GetImportedModule();
+                var root = (Root) _semanticTree.Root;
+                root.Imports.Add(module);
+            }
+            else
+            {
+                using var reader = new StreamReader($"{name}.slang");
+                var program = reader.ReadToEnd();
+            
+                var lexer = new Lexer(program);
+                var tokens = lexer.Tokenize();
+                var tree = new Parser(tokens).Parse();
+                tree.TraversalTree();
+
+                var module = ((Root) tree.Root).Module;
+                _treeRoot.Imports.Add(module);
+            }
+            
+            
             return import;
         }
         
@@ -609,12 +631,31 @@ namespace Semantic_Interpreter.Parser
 
         private Variable ParseObject(string className)
         {
-            var type = SemanticType.Object;
-            var classType = _classes.FirstOrDefault(x => x.Name == className);
-            if (classType == null)
+            const SemanticType type = SemanticType.Object;
+
+            Class classType;
+            if (!Match(TokenType.Dot))
             {
-                throw new Exception($"Класс {className} не объявлен!");
+                classType = _classes.FirstOrDefault(x => x.Name == className);
+                if (classType == null)
+                {
+                    throw new Exception($"Класс {className} не объявлен!");
+                }
             }
+            else
+            {
+                var moduleName = className;
+                className = Consume(TokenType.Word).Text;
+
+                var module = _treeRoot.Imports.FirstOrDefault(x => x.Name == moduleName);
+                if (module == null)
+                {
+                    throw new Exception($"Модуль {moduleName} не объявлен!");
+                }
+
+                classType = module.ClassStorage.At(className);
+            }
+            
             var name = Consume(TokenType.Word).Text;
 
             IExpression expression;
@@ -1005,6 +1046,15 @@ namespace Semantic_Interpreter.Parser
                             var module = root.Imports.Single(x => x.Name == operatorName);
 
                             var childName = Consume(TokenType.Word).Text;
+                            var function = module.FunctionStorage.At(childName);
+
+                            if (function is DefineFunction defineFunction)
+                            {
+                                ParseFunctionArguments(defineFunction.BaseFunction);
+                        
+                                return new CalculatedExpression(defineFunction);
+                            }
+                            
                             List<IExpression> arguments = null;
                             if (Next(TokenType.LParen))
                             {
@@ -1017,8 +1067,6 @@ namespace Semantic_Interpreter.Parser
                                     Match(TokenType.Comma);
                                 }
                             }
-                            
-                            var function = module.FunctionStorage.At(childName);
 
                             return new NativeFunctionExpression(arguments, function);
                         }

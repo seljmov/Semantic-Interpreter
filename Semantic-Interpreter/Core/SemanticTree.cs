@@ -30,7 +30,7 @@
             var parent = Root;
             while (index != _count)
             {
-                if (!(curr is BaseFunction) && !(curr is Class))
+                if (curr is not BaseFunction)
                 {
                     curr?.Execute();
                 }
@@ -48,7 +48,7 @@
                     }
                     else
                     {
-                        if (!(curr is Start))
+                        if (curr is not Start)
                         {
                             curr = parent.Next;
 

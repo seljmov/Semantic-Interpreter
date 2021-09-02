@@ -173,10 +173,5 @@ module Files
     end OpenOutputFile;
     
 start
-    variable-File myfile := OpenFile("file.txt");
-    output "1. pos -> ${myfile.Position()} \n";
-    call myfile.Seek(-1, SeekBeg());
-    output "2. pos -> ${myfile.Position()} \n";
-    output "int -> ${myfile.ReadInteger()} \n";
-    call myfile.Close();
+
 end 
