@@ -13,7 +13,7 @@ namespace Semantic_Interpreter.Core
         private IExpression Expression { get; }
         private Operations Operation { get; }
         
-        public IValue Eval()
+        public Value Eval()
         {
             var value1 = Expression.Eval();
             

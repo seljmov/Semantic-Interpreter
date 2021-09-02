@@ -64,7 +64,7 @@ namespace Semantic_Interpreter.Modules
         
         private class Exists : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 
                 var path = args[0].AsString();
@@ -76,7 +76,7 @@ namespace Semantic_Interpreter.Modules
         
         private class Open : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var number = _fileNumber;
                 var path = args[0].AsString();
@@ -98,7 +98,7 @@ namespace Semantic_Interpreter.Modules
         
         private class Close : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var number = args[0].AsInteger();
                 Files.Remove(number);
@@ -109,7 +109,7 @@ namespace Semantic_Interpreter.Modules
         
         private class Position : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var number = args[0].AsInteger();
                 var sf = Files[number];
@@ -120,7 +120,7 @@ namespace Semantic_Interpreter.Modules
         
         private class Seek : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var number = args[0].AsInteger();
                 var offset = args[1].AsInteger();
@@ -154,7 +154,7 @@ namespace Semantic_Interpreter.Modules
         
         private class SeekBeg : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 return new IntegerValue(0);
             }
@@ -162,7 +162,7 @@ namespace Semantic_Interpreter.Modules
         
         private class SeekCur : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 return new IntegerValue(1);
             }
@@ -170,7 +170,7 @@ namespace Semantic_Interpreter.Modules
         
         private class SeekEnd : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 return new IntegerValue(2);
             }
@@ -178,7 +178,7 @@ namespace Semantic_Interpreter.Modules
         
         private class ReadInteger : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var number = args[0].AsInteger();
                 var fs = Files[number];
@@ -201,7 +201,7 @@ namespace Semantic_Interpreter.Modules
         
         private class ReadReal : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var number = args[0].AsInteger();
                 var fs = Files[number];
@@ -225,7 +225,7 @@ namespace Semantic_Interpreter.Modules
         
         private class ReadString : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var number = args[0].AsInteger();
                 var fs = Files[number];
@@ -248,7 +248,7 @@ namespace Semantic_Interpreter.Modules
         
         private class ReadChar : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var number = args[0].AsInteger();
                 var fs = Files[number];
@@ -271,7 +271,7 @@ namespace Semantic_Interpreter.Modules
         
         private class ReadBoolean : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var number = args[0].AsInteger();
                 var fs = Files[number];
@@ -294,7 +294,7 @@ namespace Semantic_Interpreter.Modules
         
         private class Write : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var number = args[0].AsInteger();
                 var fs = Files[number];

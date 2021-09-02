@@ -13,6 +13,6 @@ namespace Semantic_Interpreter.Core
         private List<IExpression> Indexes { get; }
         private ArrayExpression ArrayExpression { get; }
         
-        public IValue Eval() => ArrayExpression.Get(Indexes);
+        public Value Eval() => ArrayExpression.Get(Indexes);
     }
 }

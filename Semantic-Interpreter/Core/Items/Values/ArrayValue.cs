@@ -2,44 +2,35 @@
 
 namespace Semantic_Interpreter.Core
 {
-    public class ArrayValue : IValue
+    public class ArrayValue : Value
     {
         public ArrayValue(long size)
         {
             Size = size;
-            Values = new IValue[size];
+            Values = new Value[size];
         }
 
-        public ArrayValue(IValue[] values)
+        public ArrayValue(Value[] values)
         {
-            Values = new IValue[values.Length];
+            Values = new Value[values.Length];
             Array.Copy(values, Values, values.Length);
             Size = values.Length;
         }
 
         public long Size { get; }
-        private IValue[] Values { get; }
+        private Value[] Values { get; }
 
-        public IValue Get(long index) => Values[index];
+        public Value Get(long index) => Values[index];
 
-        public void Set(long index, IValue value) => Values[index] = value;
+        public void Set(long index, Value value) => Values[index] = value;
 
-        public long AsInteger()
-            => throw new Exception("Невозможно преобразовать массив в целое числу");
+        public override bool AsBoolean() => Values.Length != 0;
 
-        public double AsReal()
-            => throw new Exception("Невозможно преобразовать массив в вещественное числу");
+        public override string AsString() => Values.ToString();
 
-        public bool AsBoolean() => Values.Length != 0;
+        public override Value[] AsArray() => Values;
 
-        public char AsChar()
-            => throw new Exception("Невозможно преобразовать массив в символ");
-
-        public string AsString() => Values.ToString();
-
-        public IValue[] AsArray() => Values;
-
-        public object AsObject() => Values;
+        public override object AsObject() => Values;
         
         public override string ToString() => AsString();
     }

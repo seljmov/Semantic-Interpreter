@@ -18,12 +18,12 @@ namespace Semantic_Interpreter.Core
         private SemanticType SemanticType { get; }
         private ArrayValue ArrayValue { get; }
         
-        public IValue Eval()
+        public Value Eval()
         {
             return ArrayValue;
         }
 
-        public void Set(List<IExpression> indexes, IValue value)
+        public void Set(List<IExpression> indexes, Value value)
         {
             var array = ArrayValue;
             for (var i = 0; i < indexes.Count-1; i++)
@@ -36,7 +36,7 @@ namespace Semantic_Interpreter.Core
             array?.Set(index, value);
         }
 
-        public IValue Get(List<IExpression> indexes)
+        public Value Get(List<IExpression> indexes)
         {
             var array = ArrayValue;
             for (var i = 0; i < indexes.Count-1; i++)

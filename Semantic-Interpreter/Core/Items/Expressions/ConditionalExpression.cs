@@ -16,7 +16,7 @@ namespace Semantic_Interpreter.Core
         private IExpression Expression2 { get; set; }
         private TokenType Operator { get; set; }
         
-        public IValue Eval()
+        public Value Eval()
         {
             var value1 = Expression1.Eval();
             var value2 = Expression2.Eval();

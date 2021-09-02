@@ -17,7 +17,7 @@ namespace Semantic_Interpreter.Core
         public string Name { get; set; }
         public IExpression Expression { get; set; }
         
-        public IValue Calculate() => Expression.Eval();
+        public Value Calculate() => Expression.Eval();
         
         public override void Execute()
         {

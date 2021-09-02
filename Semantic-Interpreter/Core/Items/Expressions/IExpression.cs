@@ -2,6 +2,6 @@
 {
     public interface IExpression
     {
-        IValue Eval();
+        Value Eval();
     }
 }

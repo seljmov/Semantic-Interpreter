@@ -51,7 +51,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class E : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 return new RealValue(2.7182818284590451);
             }
@@ -62,7 +62,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Pi : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 return new RealValue(3.1415926535897931);
             }
@@ -73,7 +73,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Tau : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 return new RealValue(6.2831853071795862);
             }
@@ -84,7 +84,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Abs : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -102,7 +102,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Acos : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -120,7 +120,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Acosh : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -138,7 +138,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Asin : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -156,7 +156,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Asinh : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -174,7 +174,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Atan : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -192,7 +192,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Atanh : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -210,7 +210,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Cos : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -228,7 +228,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Cosh : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -246,7 +246,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Sin : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -264,7 +264,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Sinh : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -282,7 +282,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Tan : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -300,7 +300,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Tanh : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -319,7 +319,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Ceil : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -337,7 +337,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Floor : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -356,7 +356,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Round : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -379,7 +379,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Truncate : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -397,7 +397,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Log : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -420,7 +420,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Log10 : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -437,7 +437,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Log2 : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -454,7 +454,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Pow : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -471,7 +471,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Cbrt : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -488,7 +488,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Sqrt : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -505,7 +505,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Exp : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -523,7 +523,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Mod : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -540,7 +540,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Max : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 
@@ -558,7 +558,7 @@ namespace Semantic_Interpreter.Modules
         /// </summary>
         private class Min : IFunction
         {
-            public IValue Execute(params IValue[] args)
+            public Value Execute(params Value[] args)
             {
                 var raw = args[0].AsObject();
 

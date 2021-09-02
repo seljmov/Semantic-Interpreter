@@ -2,26 +2,23 @@
 
 namespace Semantic_Interpreter.Core
 {
-    public class StringValue : IValue
+    public class StringValue : Value
     {
         public StringValue(string value) => Value = value;
         
         private string Value { get; }
 
-        public long AsInteger() => Convert.ToInt32(Value);
+        public override long AsInteger() => Convert.ToInt32(Value);
 
-        public double AsReal() => Convert.ToDouble(Value);
+        public override double AsReal() => Convert.ToDouble(Value);
 
-        public bool AsBoolean() => Convert.ToBoolean(Value);
+        public override bool AsBoolean() => Convert.ToBoolean(Value);
         
-        public char AsChar() => Convert.ToChar(Value);
+        public override char AsChar() => Convert.ToChar(Value);
 
-        public string AsString() => Value;
-        
-        public IValue[] AsArray()
-            => throw new Exception("Невозможно преобразовать строку к массиву");
+        public override string AsString() => Value;
 
-        public object AsObject() => Value;
+        public override object AsObject() => Value;
         
         public override string ToString() => AsString();
     }

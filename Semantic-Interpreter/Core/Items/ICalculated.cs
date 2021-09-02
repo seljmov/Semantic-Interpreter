@@ -2,6 +2,6 @@
 {
     public interface ICalculated
     {
-        public IValue Calculate();
+        public Value Calculate();
     }
 }

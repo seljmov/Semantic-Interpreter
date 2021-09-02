@@ -9,7 +9,7 @@ namespace Semantic_Interpreter.Core
         public CalculatedExpression(ICalculated calculated)
             => Calculated = calculated;
 
-        public IValue Eval()
+        public Value Eval()
             => Calculated.Calculate();
     }
 }

@@ -2,26 +2,23 @@
 
 namespace Semantic_Interpreter.Core
 {
-    public class IntegerValue : IValue
+    public class IntegerValue : Value
     {
         public IntegerValue(long value) => Value = value;
 
         private long Value { get; }
 
-        public long AsInteger() => Value;
+        public override long AsInteger() => Value;
 
-        public double AsReal() => Convert.ToDouble(Value);
+        public override double AsReal() => Convert.ToDouble(Value);
 
-        public bool AsBoolean() => Convert.ToBoolean(Value);
+        public override bool AsBoolean() => Convert.ToBoolean(Value);
         
-        public char AsChar() => Convert.ToChar(Value);
+        public override char AsChar() => Convert.ToChar(Value);
 
-        public string AsString() => Convert.ToString(Value);
-        
-        public IValue[] AsArray()
-            => throw new Exception("Невозможно преобразовать целое число к массиву");
+        public override string AsString() => Convert.ToString(Value);
 
-        public object AsObject() => Value;
+        public override object AsObject() => Value;
 
         public override string ToString() => AsString();
     }

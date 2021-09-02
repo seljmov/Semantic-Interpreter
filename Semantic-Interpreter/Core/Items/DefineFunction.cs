@@ -12,7 +12,7 @@ namespace Semantic_Interpreter.Core
         
         public BaseFunction BaseFunction { get; }
 
-        public IValue Execute(params IValue[] args)
+        public Value Execute(params Value[] args)
         {
             BaseFunction.Parameters?.ForEach(x => x.Execute());
 
@@ -27,6 +27,6 @@ namespace Semantic_Interpreter.Core
             }
         }
 
-        public IValue Calculate() => Execute();
+        public Value Calculate() => Execute();
     }
 }

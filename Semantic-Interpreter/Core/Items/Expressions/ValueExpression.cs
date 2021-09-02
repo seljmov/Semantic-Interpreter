@@ -13,11 +13,11 @@
         public ValueExpression(string value) => Value = new StringValue(value);
         public ValueExpression(Class value) => Value = new ClassValue(value);
 
-        public ValueExpression(IValue value) => Value = value;
+        public ValueExpression(Value value) => Value = value;
 
-        private IValue Value { get; }
+        private Value Value { get; }
 
-        public IValue Eval() => Value;
+        public Value Eval() => Value;
 
         public override string ToString() => Value.AsString();
     }

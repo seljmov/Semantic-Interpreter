@@ -2,6 +2,6 @@
 {
     public interface IFunction
     {
-        IValue Execute(params IValue[] args);
+        Value Execute(params Value[] args);
     }
 }

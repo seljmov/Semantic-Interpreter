@@ -1,41 +1,11 @@
 ﻿namespace Semantic_Interpreter.Core
 {
-    public class ClassValue : IValue
+    public class ClassValue : Value
     {
         public ClassValue(Class @class) => Class = @class;
         
         public Class Class { get; set; }
-
-        public long AsInteger()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public double AsReal()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public bool AsBoolean()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public char AsChar()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public string AsString()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public IValue[] AsArray()
-        {
-            throw new System.NotImplementedException();
-        }
         
-        public object AsObject() => Class;
+        public override object AsObject() => Class;
     }
 }

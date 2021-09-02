@@ -14,11 +14,11 @@ namespace Semantic_Interpreter.Core
         private List<IExpression> Expressions { get; }
         private IFunction Function { get; }
         
-        public IValue Eval()
+        public Value Eval()
         {
             if (Expressions == null) return Function.Execute();
 
-            List<IValue> values = new();
+            List<Value> values = new();
             Expressions.ForEach(x => values.Add(x.Eval()));
             var array = values.ToArray();
             return Function.Execute(array);

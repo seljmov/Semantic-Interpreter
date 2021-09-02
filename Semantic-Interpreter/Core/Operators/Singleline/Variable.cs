@@ -21,7 +21,7 @@ namespace Semantic_Interpreter.Core
         public string Id { get; }
         public IExpression Expression { get; set; }
 
-        public IValue Calculate() =>
+        public Value Calculate() =>
             GetRoot().Module.VariableStorage.IsExist(Id) 
                 ? GetRoot().Module.VariableStorage.At(Id).Expression.Eval() 
                 : Expression.Eval();
@@ -37,13 +37,6 @@ namespace Semantic_Interpreter.Core
             var module = GetRoot().Module;
             var clone = (Variable) Clone();
             module.VariableStorage.Add(Id, clone);
-            
-            // if (Expression != null && Expression is not ArrayExpression)
-            // {
-            //     var value = clone.Expression.Eval();
-            //     var expression = new ValueExpression(value);
-            //     module.VariableStorage.Replace(Id, expression);
-            // }
         }
 
         /**
@@ -54,7 +47,7 @@ namespace Semantic_Interpreter.Core
          * К типа Char можно присвоить только CharValue,
          * а вот к типа Real можно присвоить RealValue и IntegerValue.
          */
-        private static bool TypeIsCorrect(SemanticType semanticType, IValue value)
+        private static bool TypeIsCorrect(SemanticType semanticType, Value value)
         {
             switch (semanticType)
             {
@@ -62,7 +55,7 @@ namespace Semantic_Interpreter.Core
                 case SemanticType.Integer when value is IntegerValue:
                 case SemanticType.Boolean when value is BooleanValue:
                 case SemanticType.Char when value is CharValue:
-                case SemanticType.Real when value is RealValue || value is IntegerValue:
+                case SemanticType.Real when value is RealValue or IntegerValue:
                     return true;
                 default:
                     return false;

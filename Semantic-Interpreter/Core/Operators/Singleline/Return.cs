@@ -10,7 +10,7 @@ namespace Semantic_Interpreter.Core
         }
         
         public IExpression Expression { get; set; }
-        public IValue Result { get; set; }
+        public Value Result { get; set; }
         
         public override void Execute()
         {

@@ -13,7 +13,7 @@ namespace Semantic_Interpreter.Core
         
         private readonly List<IExpression> _expressions;
         
-        public IValue Eval()
+        public Value Eval()
         {
             var result = "";
             
