@@ -8,7 +8,10 @@
         
         public override void Execute()
         {
-            Block.ForEach(x => x.Execute());
+            foreach (var t in Block)
+            {
+                t.Execute();
+            }
             
             VerifyParametersExpressions();
             IHaveBlock.ClearVariableStorage(Block);

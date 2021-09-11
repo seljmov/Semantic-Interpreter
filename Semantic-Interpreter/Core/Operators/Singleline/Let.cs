@@ -67,7 +67,7 @@ namespace Semantic_Interpreter.Core
             var curr = Parent;
             while (curr.Parent != null)
             {
-                if (curr is BaseFunction function && function.ParameterIsExist(VariableName))
+                if (curr is BaseFunction {Parameters: { }} function && function.ParameterIsExist(VariableName))
                 {
                     function.Parameters.Single(t => t.Name == VariableName).Expression = expression;
                     return;
@@ -75,10 +75,11 @@ namespace Semantic_Interpreter.Core
                 
                 curr = curr.Parent;
             }
-            
-            if (GetRoot().Module.VariableStorage.IsExist(VariableName))
+
+            var module = GetRoot().Module;
+            if (module.VariableStorage.IsExist(VariableName))
             {
-                GetRoot().Module.VariableStorage.Replace(VariableName, expression);
+                module.VariableStorage.Replace(VariableName, expression);
                 return;
             }
 
@@ -100,6 +101,22 @@ namespace Semantic_Interpreter.Core
 
                     module.VariableStorage.Replace(VariableName, arrayExpression);
                 }
+                else
+                {
+                    var curr = Parent;
+                    while (curr.Parent != null)
+                    {
+                        if (curr is BaseFunction function && function.ParameterIsExist(VariableName))
+                        {
+                            var arrayExpression = (ArrayExpression) function.Parameters.Single(t => t.Name == VariableName).Expression;
+                            arrayExpression.Set(Indexes, value);
+                            function.Parameters.Single(t => t.Name == VariableName).Expression = arrayExpression;
+                            return;
+                        }
+                
+                        curr = curr.Parent;
+                    }
+                }
             }
         }
 
@@ -109,6 +126,7 @@ namespace Semantic_Interpreter.Core
             var value = Expression.Eval();
             var expression = new ValueExpression(value);
             
+            // TODO: Проверить класс-параметр 
             if (GetRoot().Module.VariableStorage.IsExist(ClassName))
             {
                 var classVariable = GetRoot().Module.VariableStorage.At(ClassName);

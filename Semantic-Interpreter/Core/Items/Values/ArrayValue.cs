@@ -18,6 +18,7 @@ namespace Semantic_Interpreter.Core
         }
 
         public long Size { get; }
+        
         private Value[] Values { get; }
 
         public Value Get(long index) => Values[index];

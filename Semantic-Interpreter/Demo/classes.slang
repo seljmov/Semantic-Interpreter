@@ -10,8 +10,12 @@
         public method p2(Time this)():string
             return this.p3;
         end p2;
-    end Time;        
+    end Time;   
+    
+    public class ABC inherits Time
+
+    end ABC;      
 start
-    variable-Time time;
-    output "p2 -> ${time.p2()} \n";
+    variable-ABC abc;
+    output "p2 -> ${abc.p2()} \n";
 end main.

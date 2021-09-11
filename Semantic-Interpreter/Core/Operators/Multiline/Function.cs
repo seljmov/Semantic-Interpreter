@@ -1,12 +1,13 @@
 ﻿using System;
+using Semantic_Interpreter.Core.Items.Types;
 
 namespace Semantic_Interpreter.Core
 {
-    public class Function : BaseFunction, IHaveReturn
+    public class Function : BaseFunction, IHaveReturn, IHaveType
     {
         public Function() => OperatorId = GenerateOperatorId();
         
-        public SemanticType SemanticType { get; set; }
+        public ISemanticType Type { get; set; }
         public Return Return { get; set; }
         public sealed override string OperatorId { get; }
         
@@ -25,9 +26,6 @@ namespace Semantic_Interpreter.Core
                     throw new  Exception();
                 }
             }
-            
-            // VerifyParametersExpressions();
-            // IHaveBlock.ClearVariableStorage(Block);
         }
     }
 }

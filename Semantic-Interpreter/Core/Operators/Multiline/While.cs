@@ -17,7 +17,11 @@ namespace Semantic_Interpreter.Core
             var result = Expression.Eval().AsBoolean();
             while (result)
             {
-                Block.ForEach(x => x.Execute());
+                foreach (var t in Block)
+                {
+                    t.Execute();
+                }
+                
                 IHaveBlock.ClearVariableStorage(Block);
 
                 result = Expression.Eval().AsBoolean();

@@ -1,18 +1,31 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Semantic_Interpreter.Core
 {
     public class ArrayAccessExpression : IExpression
     {
-        public ArrayAccessExpression(List<IExpression> indexes, ArrayExpression arrayExpression)
+        public ArrayAccessExpression(List<IExpression> indexes, IExpression expression)
         {
             Indexes = indexes;
-            ArrayExpression = arrayExpression;
+            Expression = expression;
         }
         
         private List<IExpression> Indexes { get; }
-        private ArrayExpression ArrayExpression { get; }
-        
-        public Value Eval() => ArrayExpression.Get(Indexes);
+        private IExpression Expression { get; set; }
+
+        public Value Eval()
+        {
+            if (Expression is not ArrayExpression)
+            {
+                if (Expression.Eval() is ArrayValue arrayValue)
+                {
+                    Expression = new ArrayExpression(arrayValue);
+                } 
+                else throw new Exception("Что-то пошло не так...");
+            }
+
+            return ((ArrayExpression) Expression).Get(Indexes);
+        }
     }
 }

@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Linq.Expressions;
 using Semantic_Interpreter.Core.Items;
+using Semantic_Interpreter.Core.Items.Types;
 
 namespace Semantic_Interpreter.Core
 {
-    public class Variable : SemanticOperator, ICalculated, ICloneable
+    public class Variable : SemanticOperator, ICalculated, IHaveType, ICloneable
     {
-        public Variable(SemanticType semanticType, string name, string id, IExpression expression)
+        public Variable(ISemanticType type, string name, string id, IExpression expression)
         {
-            SemanticType = semanticType;
+            Type = type;
             Name = name;
             Id = id;
             Expression = expression;
@@ -16,7 +17,7 @@ namespace Semantic_Interpreter.Core
 
         public Variable(IExpression expression) => Expression = expression;
 
-        public SemanticType SemanticType { get; }
+        public ISemanticType Type { get; set; }
         public string Name { get; }
         public string Id { get; }
         public IExpression Expression { get; set; }
@@ -47,15 +48,15 @@ namespace Semantic_Interpreter.Core
          * К типа Char можно присвоить только CharValue,
          * а вот к типа Real можно присвоить RealValue и IntegerValue.
          */
-        private static bool TypeIsCorrect(SemanticType semanticType, Value value)
+        private static bool TypeIsCorrect(ValueType valueType, Value value)
         {
-            switch (semanticType)
+            switch (valueType)
             {
-                case SemanticType.String when value is StringValue:
-                case SemanticType.Integer when value is IntegerValue:
-                case SemanticType.Boolean when value is BooleanValue:
-                case SemanticType.Char when value is CharValue:
-                case SemanticType.Real when value is RealValue or IntegerValue:
+                case ValueType.String when value is StringValue:
+                case ValueType.Integer when value is IntegerValue:
+                case ValueType.Boolean when value is BooleanValue:
+                case ValueType.Char when value is CharValue:
+                case ValueType.Real when value is RealValue or IntegerValue:
                     return true;
                 default:
                     return false;
@@ -64,7 +65,7 @@ namespace Semantic_Interpreter.Core
 
         public object Clone()
         {
-            return new Variable(SemanticType, Name, Id, Expression) {Parent = Parent};
+            return new Variable(Type, Name, Id, Expression) {Parent = Parent};
         }
     }
 }

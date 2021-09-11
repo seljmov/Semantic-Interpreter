@@ -6,10 +6,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using Semantic_Interpreter.Core;
 using Semantic_Interpreter.Core.Items;
+using Semantic_Interpreter.Core.Items.Types;
 using Semantic_Interpreter.Library;
 using BinaryExpression = Semantic_Interpreter.Core.BinaryExpression;
 using ConditionalExpression = Semantic_Interpreter.Core.ConditionalExpression;
 using UnaryExpression = Semantic_Interpreter.Core.UnaryExpression;
+using ValueType = Semantic_Interpreter.Core.ValueType;
 
 namespace Semantic_Interpreter.Parser
 {
@@ -259,7 +261,7 @@ namespace Semantic_Interpreter.Parser
             if (Next(TokenType.Colon))
             {
                 Consume(TokenType.Colon);
-                method = new MethodFunction {SemanticType = GetSemanticType(Consume(TokenType.Word).Text)};
+                method = new MethodFunction {Type = GetSemanticType(Consume(TokenType.Word).Text, false)};
 
             }
             else method = new MethodProcedure();
@@ -298,7 +300,7 @@ namespace Semantic_Interpreter.Parser
                 parameters.Add(new Parameter
                 {
                     ParameterType = Consume(TokenType.Word).Text == "in" ? ParameterType.In : ParameterType.Var,
-                    SemanticType = GetSemanticType(Consume(TokenType.Word).Text),
+                    Type = GetSemanticType(Consume(TokenType.Word).Text, false),
                     Name = Consume(TokenType.Word).Text
                 });
                 Match(TokenType.Comma);
@@ -307,18 +309,79 @@ namespace Semantic_Interpreter.Parser
             return parameters;
         }
 
-        private SemanticType GetSemanticType(string text)
+        private ValueType GetValueType(string text)
         {
             return text switch
             {
-                "integer" => SemanticType.Integer,
-                "real" => SemanticType.Real,
-                "boolean" => SemanticType.Boolean,
-                "char" => SemanticType.Char,
-                "string" => SemanticType.String,
-                "array" => SemanticType.Array,
-                _ => SemanticType.Object
+                "integer" => ValueType.Integer,
+                "real" => ValueType.Real,
+                "boolean" => ValueType.Boolean,
+                "char" => ValueType.Char,
+                "string" => ValueType.String,
+                "array" => ValueType.Array,
+                _ => ValueType.Object
             };
+        }
+
+        private ISemanticType GetSemanticType(string text, bool withSize = true)
+        {
+            if (text != "array")
+            {
+                var semanticType = text switch
+                {
+                    "integer" => ValueType.Integer,
+                    "real" => ValueType.Real,
+                    "boolean" => ValueType.Boolean,
+                    "char" => ValueType.Char,
+                    "string" => ValueType.String,
+                    _ => ValueType.Object
+                };
+
+                return new SimpleType(semanticType);
+            }
+
+            var stack = new Stack<ArrayType>();
+            while (text == "array")
+            {
+                Consume(TokenType.LBracket);
+                var arrayType = new ArrayType();
+                if (withSize)
+                {
+                    // TODO: Сделать проверку размера при выполнении
+                    var expression = ParseExpression();
+
+                    var size = expression.Eval() is IntegerValue value && value.AsInteger() >= 1
+                        ? value.AsInteger()
+                        : throw new Exception("Только натуральное число может быть размером массива.");
+
+                    arrayType.Size = size;
+                }
+                Consume(TokenType.RBracket);
+                stack.Push(arrayType);
+
+                text = Consume(TokenType.Word).Text;
+            }
+            
+            var last = text switch
+            {
+                "integer" => ValueType.Integer,
+                "real" => ValueType.Real,
+                "boolean" => ValueType.Boolean,
+                "char" => ValueType.Char,
+                "string" => ValueType.String,
+                _ => ValueType.Object
+            };
+
+            ISemanticType type = new SimpleType(last);
+
+            while (stack.Count > 0)
+            {
+                var array = stack.Pop();
+                array.Type = type;
+                type = array;
+            }
+
+            return type;
         }
         
         private SemanticOperator ParseFunctionOperator()
@@ -332,7 +395,7 @@ namespace Semantic_Interpreter.Parser
             _parameters = GetFunctionParameters();
             
             Consume(TokenType.Colon);
-            var returnType = GetSemanticType(Consume(TokenType.Word).Text);
+            var returnType = GetSemanticType(Consume(TokenType.Word).Text, false);
 
             function.Parent = _operatorsStack.Peek();
             function.Parameters = _parameters;
@@ -345,7 +408,7 @@ namespace Semantic_Interpreter.Parser
             function.VisibilityType = visibilityType;
             function.Name = name;
             function.Parameters = _parameters;
-            function.SemanticType = returnType;
+            function.Type = returnType;
             ((Root) _semanticTree.Root).Module.FunctionStorage.Add(name, new DefineFunction(function));
             return function;
         }
@@ -579,12 +642,12 @@ namespace Semantic_Interpreter.Parser
         private SemanticOperator ParseVariableOperator()
         {
             Consume(TokenType.Minus);  // Skip -
-            var type = GetSemanticType(Consume(TokenType.Word).Text);
+            var type = GetValueType(Consume(TokenType.Word).Text);
 
             var variable = type switch
             {
-                SemanticType.Array => ParseArray(),
-                SemanticType.Object => ParseObject(Get(-1).Text),
+                ValueType.Array => ParseArray(),
+                ValueType.Object => ParseObject(Get(-1).Text),
                 _ => ParseSimpleVariable(type)
             };
 
@@ -596,23 +659,16 @@ namespace Semantic_Interpreter.Parser
 
         private Variable ParseArray()
         {
-            var type = SemanticType.Array;
+            _pos--; // Возвращаемся на токен array
+            var semanticType = GetSemanticType(Consume(TokenType.Word).Text);
+
             var list = new List<ArrayValue>();
-
-            while (type == SemanticType.Array)
+            var type = semanticType;
+            while (type is ArrayType arrayType)
             {
-                Consume(TokenType.LBracket);
-                var expression = ParseExpression();
-                
-                var size = expression.Eval() is IntegerValue value && value.AsInteger() >= 1 
-                    ? value.AsInteger() 
-                    : throw new Exception("Только натуральное число может быть размером массива.");
-                Consume(TokenType.RBracket);
-
-                var array = new ArrayValue(size);
+                var array = new ArrayValue(arrayType.Size);
                 list.Add(array);
-                
-                type = GetSemanticType(Consume(TokenType.Word).Text);
+                type = arrayType.Type;
             }
 
             for (var i = 0; i < list.Count-1; i++)
@@ -625,18 +681,22 @@ namespace Semantic_Interpreter.Parser
             }
 
             var name = Consume(TokenType.Word).Text;
+
+            var expression = Match(TokenType.Assign) 
+                ? ParseExpression() 
+                : new ArrayExpression(list.First());
+
             Consume(TokenType.Semicolon);
                 
             var parentId = _operatorsStack.Peek().OperatorId;
             var variableId = $"{parentId}^{name}";
-
-            var arrayExpression = new ArrayExpression(name, type, list.First());
-            return new Variable(type, name, variableId, arrayExpression);
+            
+            return new Variable(semanticType, name, variableId, expression);
         }
 
         private Variable ParseObject(string className)
         {
-            const SemanticType type = SemanticType.Object;
+            const ValueType type = ValueType.Object;
 
             Class classType;
             if (!Match(TokenType.Dot))
@@ -680,10 +740,10 @@ namespace Semantic_Interpreter.Parser
             var parentId = _operatorsStack.Peek().OperatorId;
             var variableId = $"{parentId}^{name}";
 
-            return new Variable(type, name, variableId, expression);
+            return new Variable(new SimpleType(type), name, variableId, expression);
         }
         
-        private Variable ParseSimpleVariable(SemanticType type)
+        private Variable ParseSimpleVariable(ValueType type)
         {
             var name = Get().Text;
             IExpression expression = null;
@@ -697,7 +757,7 @@ namespace Semantic_Interpreter.Parser
             var parentId = _operatorsStack.Peek().OperatorId;
             var variableId = $"{parentId}^{name}";
             
-            return new Variable(type, name, variableId, expression);
+            return new Variable(new SimpleType(type), name, variableId, expression);
         }
         #endregion ParseVariableFunctions
         
@@ -763,7 +823,7 @@ namespace Semantic_Interpreter.Parser
         {
             if (IsFunctionParsed())
             {
-                var parameter = _parameters.FirstOrDefault(x => x.Name == name);
+                var parameter = _parameters?.FirstOrDefault(x => x.Name == name);
                 if (parameter != null)
                 {
                     return name;
@@ -791,7 +851,7 @@ namespace Semantic_Interpreter.Parser
         {
             if (IsFunctionParsed())
             {
-                var parameter = _parameters.FirstOrDefault(x => x.Name == name);
+                var parameter = _parameters?.FirstOrDefault(x => x.Name == name);
                 if (parameter != null)
                 {
                     return parameter;
@@ -1017,10 +1077,10 @@ namespace Semantic_Interpreter.Parser
                         var arrayName = current.Text;
                         var array = GetVariableOrParameterByName(arrayName);
 
-                        var arrayExpression = array switch
+                        var expression = array switch
                         {
-                            Variable variable => (ArrayExpression) variable.Expression,
-                            Parameter parameter => (ArrayExpression) parameter.Expression,
+                            Variable variable => variable.Expression,
+                            Parameter parameter => parameter.Expression,
                             _ => throw new Exception("Что-то пошло не так при парсинге индексации")
                         };
                         
@@ -1034,7 +1094,7 @@ namespace Semantic_Interpreter.Parser
                             Consume(TokenType.RBracket);
                         }
                         
-                        return new ArrayAccessExpression(indexes, arrayExpression);
+                        return new ArrayAccessExpression(indexes, expression);
                     }
                     else if (Match(TokenType.Dot))
                     {

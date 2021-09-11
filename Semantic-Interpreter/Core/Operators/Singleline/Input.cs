@@ -13,9 +13,10 @@ namespace Semantic_Interpreter.Core
         {
             var value = Console.ReadLine();
             var type = Parent is BaseFunction function
-                ? function.GetParameterWithName(Name).SemanticType
-                : GetRoot().Module.VariableStorage.At(Name).SemanticType;
+                ? function.GetParameterWithName(Name).Type
+                : GetRoot().Module.VariableStorage.At(Name).Type;
             
+            /*
             var expression = type switch
             {
                 SemanticType.Integer => new ValueExpression(Convert.ToInt32(value)),
@@ -35,6 +36,7 @@ namespace Semantic_Interpreter.Core
             {
                 GetRoot().Module.VariableStorage.Replace(Name, expression);   
             }
+            */
         }
     }
 }

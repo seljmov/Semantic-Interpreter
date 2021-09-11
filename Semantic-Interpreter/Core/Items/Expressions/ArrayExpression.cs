@@ -5,17 +5,10 @@ namespace Semantic_Interpreter.Core
 {
     public class ArrayExpression : IExpression
     {
-        public ArrayExpression(string name, SemanticType semanticType, ArrayValue arrayValue)
+        public ArrayExpression(ArrayValue arrayValue)
         {
-            Name = name;
-            SemanticType = semanticType;
-            Size = arrayValue.Size;
             ArrayValue = arrayValue;
         }
-        
-        private string Name { get; }
-        private long Size { get; }
-        private SemanticType SemanticType { get; }
         private ArrayValue ArrayValue { get; }
         
         public Value Eval()

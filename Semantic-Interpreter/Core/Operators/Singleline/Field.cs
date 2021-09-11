@@ -1,19 +1,20 @@
 ﻿using Semantic_Interpreter.Core.Items;
+using Semantic_Interpreter.Core.Items.Types;
 
 namespace Semantic_Interpreter.Core
 {
-    public class Field : SemanticOperator, ICalculated
+    public class Field : SemanticOperator, ICalculated, IHaveType
     {
-        public Field(VisibilityType visibilityType, SemanticType semanticType, string name, IExpression expression)
+        public Field(VisibilityType visibilityType, ISemanticType type, string name, IExpression expression)
         {
             VisibilityType = visibilityType;
-            SemanticType = semanticType;
+            Type = type;
             Name = name;
             Expression = expression;
         }
         
         public VisibilityType VisibilityType { get; set; }
-        public SemanticType SemanticType { get; }
+        public ISemanticType Type { get; set; }
         public string Name { get; set; }
         public IExpression Expression { get; set; }
         

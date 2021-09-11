@@ -1,11 +1,12 @@
 ﻿using Semantic_Interpreter.Core.Items;
+using Semantic_Interpreter.Core.Items.Types;
 
 namespace Semantic_Interpreter.Core
 {
-    public class Parameter : SemanticOperator, ICalculated
+    public class Parameter : SemanticOperator, ICalculated, IHaveType
     {
         public ParameterType ParameterType { get; set; }
-        public SemanticType SemanticType { get; set; }
+        public ISemanticType Type { get; set; }
         public string Name { get; set; }
         public SemanticOperator Operator { get; set; }
 
