@@ -1,6 +1,5 @@
 ﻿module main
-    public function getArray():array[] integer
-        variable-integer n := 5;
+    public function getArray(in integer n):array[] integer
         variable-array[n] integer arr;
         variable-integer i := 0;
         while i < n do
@@ -11,7 +10,7 @@
     end getArray;
 start
     variable-integer N := 5;
-    variable-array[N] integer arr := getArray();
+    variable-array[N] integer arr := getArray(N);
     
     variable-integer i := 0;
     while i < N do

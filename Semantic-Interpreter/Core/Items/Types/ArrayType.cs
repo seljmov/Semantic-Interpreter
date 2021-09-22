@@ -3,12 +3,15 @@
     public class ArrayType : ISemanticType
     {
         public ISemanticType Type { get; set; }
-        public long Size { get; set; }
+        public IExpression Size { get; set; }
         public string FullType => ToString();
+        public string Signature => $"array[] {Type.Signature}";
 
         public override string ToString()
         {
-            return $"array[{Size}] {Type.FullType}";
+            var size = Size.Eval().AsInteger();
+            var dim = size == 0 ? "" : $"{size}";
+            return $"array[{dim}] {Type.FullType}";
         }
     }
 }

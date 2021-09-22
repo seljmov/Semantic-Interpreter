@@ -5,27 +5,27 @@ namespace Semantic_Interpreter.Core
 {
     public class ArrayAccessExpression : IExpression
     {
-        public ArrayAccessExpression(List<IExpression> indexes, IExpression expression)
+        public ArrayAccessExpression(List<IExpression> indexes, IHaveExpression haveExpression)
         {
             Indexes = indexes;
-            Expression = expression;
+            HaveExpression = haveExpression;
         }
         
         private List<IExpression> Indexes { get; }
-        private IExpression Expression { get; set; }
+        private IHaveExpression HaveExpression { get; set; }
 
         public Value Eval()
         {
-            if (Expression is not ArrayExpression)
+            if (HaveExpression.Expression is not ArrayExpression)
             {
-                if (Expression.Eval() is ArrayValue arrayValue)
+                if (HaveExpression.Expression.Eval() is ArrayValue arrayValue)
                 {
-                    Expression = new ArrayExpression(arrayValue);
+                    HaveExpression.Expression = new ArrayExpression(arrayValue);
                 } 
                 else throw new Exception("Что-то пошло не так...");
             }
 
-            return ((ArrayExpression) Expression).Get(Indexes);
+            return ((ArrayExpression) HaveExpression.Expression).Get(Indexes);
         }
     }
 }

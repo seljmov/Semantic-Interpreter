@@ -1,13 +1,13 @@
 ﻿module main
 start
-    variable-integer N := 3;
-    variable-array[N] array[N] integer arr;
+    variable-integer N := 2;
+    variable-array[N] array[N+1] integer arr;
     
     variable-integer c := 0;
     variable-integer i := 0;
     while i < N do
         variable-integer j := 0;
-        while j < N do
+        while j < N+1 do
             let arr[i][j] := c;
             let c := c + 1;
             let j := j + 1;
@@ -18,7 +18,7 @@ start
     let i := 0;
     while i < N do
         variable-integer j := 0;
-        while j < N do
+        while j < N+1 do
             output arr[i][j];
             output " ";
             let j := j + 1;

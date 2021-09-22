@@ -1,25 +1,15 @@
 ﻿using System;
+using Semantic_Interpreter.Core.Items.Types;
 
 namespace Semantic_Interpreter.Core
 {
     public class ArrayValue : Value
     {
-        public ArrayValue(long size)
-        {
-            Size = size;
-            Values = new Value[size];
-        }
-
-        public ArrayValue(Value[] values)
-        {
-            Values = new Value[values.Length];
-            Array.Copy(values, Values, values.Length);
-            Size = values.Length;
-        }
-
-        public long Size { get; }
+        public long Size { get; set; }
         
-        private Value[] Values { get; }
+        public ISemanticType Type { get; set; }
+        
+        public Value[] Values { get; set; }
 
         public Value Get(long index) => Values[index];
 

@@ -11,6 +11,7 @@ namespace Semantic_Interpreter.Core.Items.Types
 
         public ValueType Type { get; }
         public string FullType => ToString();
+        public string Signature => ToString();
 
         public override string ToString()
         {

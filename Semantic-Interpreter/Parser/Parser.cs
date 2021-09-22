@@ -348,11 +348,13 @@ namespace Semantic_Interpreter.Parser
                 if (withSize)
                 {
                     // TODO: Сделать проверку размера при выполнении
-                    var expression = ParseExpression();
+                    var size = ParseExpression();
 
+                    /*
                     var size = expression.Eval() is IntegerValue value && value.AsInteger() >= 1
                         ? value.AsInteger()
                         : throw new Exception("Только натуральное число может быть размером массива.");
+                    */
 
                     arrayType.Size = size;
                 }
@@ -662,29 +664,13 @@ namespace Semantic_Interpreter.Parser
             _pos--; // Возвращаемся на токен array
             var semanticType = GetSemanticType(Consume(TokenType.Word).Text);
 
-            var list = new List<ArrayValue>();
-            var type = semanticType;
-            while (type is ArrayType arrayType)
-            {
-                var array = new ArrayValue(arrayType.Size);
-                list.Add(array);
-                type = arrayType.Type;
-            }
-
-            for (var i = 0; i < list.Count-1; i++)
-            {
-                for (var j = 0; j < list[i].Size; j++)
-                {
-                    var copyArr = new ArrayValue(list[i + 1].AsArray());
-                    list[i].Set(j, copyArr);
-                }
-            }
-
+            var value = new ArrayValue {Type = semanticType};
+            
             var name = Consume(TokenType.Word).Text;
 
             var expression = Match(TokenType.Assign) 
                 ? ParseExpression() 
-                : new ArrayExpression(list.First());
+                : new ArrayExpression(value);
 
             Consume(TokenType.Semicolon);
                 
@@ -1075,7 +1061,7 @@ namespace Semantic_Interpreter.Parser
                     else if (Next(TokenType.LBracket))
                     {
                         var arrayName = current.Text;
-                        var array = GetVariableOrParameterByName(arrayName);
+                        var array = (IHaveExpression) GetVariableOrParameterByName(arrayName);
 
                         var expression = array switch
                         {
@@ -1094,7 +1080,7 @@ namespace Semantic_Interpreter.Parser
                             Consume(TokenType.RBracket);
                         }
                         
-                        return new ArrayAccessExpression(indexes, expression);
+                        return new ArrayAccessExpression(indexes, array);
                     }
                     else if (Match(TokenType.Dot))
                     {

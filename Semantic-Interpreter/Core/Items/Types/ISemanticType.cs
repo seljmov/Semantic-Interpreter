@@ -3,5 +3,6 @@
     public interface ISemanticType
     {
         public string FullType { get; }
+        public string Signature { get; }
     }
 }

@@ -3,7 +3,7 @@ using Semantic_Interpreter.Core.Items.Types;
 
 namespace Semantic_Interpreter.Core
 {
-    public class Parameter : SemanticOperator, ICalculated, IHaveType
+    public class Parameter : SemanticOperator, IHaveExpression, ICalculated, IHaveType
     {
         public ParameterType ParameterType { get; set; }
         public ISemanticType Type { get; set; }

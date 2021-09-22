@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using Semantic_Interpreter.Core.Items;
 using Semantic_Interpreter.Core.Items.Types;
 
 namespace Semantic_Interpreter.Core
 {
-    public class Variable : SemanticOperator, ICalculated, IHaveType, ICloneable
+    public class Variable : SemanticOperator, IHaveExpression, ICalculated, IHaveType, ICloneable
     {
         public Variable(ISemanticType type, string name, string id, IExpression expression)
         {
@@ -29,10 +31,44 @@ namespace Semantic_Interpreter.Core
 
         public override void Execute()
         {
-            if (Expression != null && Expression is not ArrayExpression)
+            if (Expression != null)
             {
-                var value = Expression.Eval();
-                Expression = new ValueExpression(value);
+                if (Expression is not ArrayExpression)
+                {
+                    var value = Expression.Eval();
+                    Expression = new ValueExpression(value);
+                }
+                else
+                {
+                    var val = (ArrayValue) Expression.Eval();
+                    var type = val.Type;
+                    var list = new List<ArrayValue>();
+                    while (type is ArrayType arrayType)
+                    {
+                        var size = arrayType.Size.Eval().AsInteger();
+                        var array = new ArrayValue {Size = size, Type = type, Values = new Value[size]};
+                        list.Add(array);
+                        type = arrayType.Type;
+                    }
+
+                    for (var i = 0; i < list.Count - 1; ++i)
+                    {
+                        for (var j = 0; j < list[i].Size; ++j)
+                        {
+                            // Создаю копию, чтобы не было ссылок на один и тот же объект
+                            var arr = new ArrayValue
+                            {
+                                Size = list[i+1].Size,
+                                Type = list[i+1].Type,
+                                Values = new Value[list[i+1].Size]
+                            };
+                            
+                            list[i].Set(j, arr);
+                        }
+                    }
+
+                    Expression = new ArrayExpression(list.First());
+                }
             }
 
             var module = GetRoot().Module;
