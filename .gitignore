@@ -4,5 +4,7 @@
 cloc.exe
 .editorconfig
 
+**/.DS_Store/
+
 */obj/
 */bin/

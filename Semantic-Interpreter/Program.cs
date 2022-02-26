@@ -7,7 +7,9 @@ namespace Semantic_Interpreter
 {
     public static class Program
     {
-        private const string Demo = @"E:\Education\Own\Semantic-Language\Semantic-Interpreter\Demo\";
+        private const string _windowsDemoFolder = @"E:\Education\Own\Semantic-Language\Semantic-Interpreter\Demo\";
+        private const string _macDemoFolder = @"/Users/seljmov/ArtWorks/Personal/Semantic-Language/Semantic-Interpreter/Demo/";
+        private const string Demo = _macDemoFolder;
         public static void Main()
         {
             using var reader = new StreamReader(Demo + "array4.slang");
